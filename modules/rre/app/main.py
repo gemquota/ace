@@ -65,6 +65,50 @@ class SessionConfig(BaseModel):
     depth: str = "STANDARD"
     discussion_depth: int = 1
 
+def get_deterministic_intro(config: SessionConfig) -> str:
+    use_cases = {
+        1: "ALIGNMENT // Base_Refinement",
+        2: "IDEATION // Expansion_Mode",
+        3: "CONVERGENCE // Commitment_Phase",
+        4: "STRESS // Vulnerability_Check",
+        5: "DATA // Information_Entropy",
+        6: "DETERMINISM // Search_Space_Lock"
+    }
+    modes = {
+        1: "HYBRID // Fluid_Discussion",
+        2: "BATCH // Group_Synthesis",
+        3: "PULSE // Asynchronous_Bursts"
+    }
+    
+    uc_name = use_cases.get(config.u, "UNDEFINED_INTENT")
+    m_name = modes.get(config.m, "UNDEFINED_FLOW")
+    
+    intro = f"""### 🌌 SOVEREIGN_INITIALIZATION_PROTOCOL
+**STATUS**: DESIGN_SUBSTRATE_ACTIVE
+**IDENTITY**: RRP_CORE_V1.2.4
+
+---
+
+**CORE_PARAMETERS**:
+- **USE_CASE**: [U{config.u}] {uc_name}
+- **EXECUTION_MODE**: [M{config.m}] {m_name}
+- **RECURSION_LIMIT**: {config.z} ROUNDS
+- **QUESTION_BREADTH**: {config.x} (OPEN) | {config.y} (MCQ)
+
+---
+
+**OPERATIONAL_DIRECTIVE**:
+This session is now locked into the **{uc_name.split(' // ')[1]}** trajectory. The system will systematically reduce ambiguity across four key vectors: Requirements, Data Model, Edge Cases, and Determinism.
+
+**INSTRUCTIONS**:
+1. Engage with the Lead Architect and any invited specialist units.
+2. Monitor the **SYSTEM_METRICS** tab for real-time integrity checks.
+3. Every round will lock behavioral constraints into the **BLUEPRINT**.
+
+**INITIALIZING_ORCHESTRATION...**
+"""
+    return intro
+
 class Session(BaseModel):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
     name: str
@@ -226,7 +270,8 @@ def create_session(req: dict):
     # 4. Trigger Initial Turn (Optional: Auto-Greeting)
     # We'll let the frontend decide to send a 'START' signal or just wait for user.
     # To avoid empty screen, let's add an initial system message.
-    new_session["history"].append(ChatMessage(role="system", content=f"Session '{new_session['name']}' initialized with Use Case U{config.u}.", source="system").dict())
+    intro = get_deterministic_intro(config)
+    new_session["history"].append(ChatMessage(role="system", content=intro, source="system").dict())
     
     save_sessions(sessions)
     return new_session

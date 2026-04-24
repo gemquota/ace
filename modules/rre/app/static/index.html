@@ -169,6 +169,35 @@
 
         .tab-content { display: none; flex-direction: column; flex: 1; overflow: hidden; }
         .tab-content.active { display: flex; }
+
+        /* Compact Sidebar & Auto-hide */
+        #participants-sidebar {
+            width: 150px; transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: absolute; right: 0; top: 0; bottom: 0; z-index: 100; transform: translateX(100%);
+            background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(20px);
+        }
+        #participants-sidebar.active { transform: translateX(0); box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+        
+        #sidebar-tab {
+            position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+            width: 32px; height: 80px; display: flex; align-items: center; justify-content: center;
+            background: var(--metal-shine); border: 1px solid #111; border-right: none;
+            cursor: pointer; z-index: 90; transition: all 0.3s;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+            border-radius: 4px 0 0 4px;
+        }
+        #sidebar-tab:hover { width: 40px; color: var(--accent-bright); }
+        #sidebar-tab.hidden { display: none; }
+
+        .agent-card-mini { margin: 2px; padding: 6px !important; border-left-width: 2px !important; }
+
+        /* Glassmorphic Message Styles */
+        .chat-msg { 
+            background: rgba(15, 15, 15, 0.4); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.03); border-left: 3px solid var(--accent-muted);
+            padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden">
@@ -461,73 +490,116 @@
 
     <!-- WORKSPACE VIEW -->
     <div id="workspace-view" class="hidden flex-1 flex flex-col overflow-hidden relative z-10">
-        <header class="bg-black/80 border-b border-white/5 h-12 flex items-center px-4 justify-between shrink-0">
-            <div class="flex items-center gap-2 h-full">
-                <div class="nav-tab active" onclick="setTab('init')"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-width="2"/></svg></div>
-                <div class="nav-tab" onclick="setTab('ctrl')"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17h18M3 12h18M3 7h18M7 5v4M12 10v4M17 15v4" stroke-width="2"/></svg></div>
-                <div class="nav-tab" onclick="setTab('exec')"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 17l6-6-6-6M12 19h8" stroke-width="2"/></svg></div>
-                <div class="nav-tab" onclick="setTab('res')"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5a5 5 0 110-10 5 5 0 010 10z" stroke-width="2"/></svg></div>
-                <div class="w-[1px] h-4 bg-white/10 mx-2"></div>
-                <div id="active-session-title" class="font-black text-white uppercase text-[8px] tracking-widest">SESSION</div>
-                <div id="state-anchor" class="text-accent-mid font-mono text-[7px]">[U1|M1|RND1]</div>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-1 bg-black/40 p-1 rounded border border-white/5">
-                    <button class="icon-btn p-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm1 5h-2v7h5v-2h-3V7z" stroke-width="2"/></svg></button>
-                    <button onclick="toggleDrawer('world')" class="icon-btn p-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke-width="2"/></svg></button>
+        <header class="glass-panel border-b border-white/10 h-14 flex items-center px-6 justify-between shrink-0">
+            <div class="flex items-center gap-4 h-full">
+                <div class="flex items-center gap-1 h-full">
+                    <div class="nav-tab active" onclick="setTab('init')"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-width="2"/></svg></div>
+                    <div class="nav-tab" onclick="setTab('ctrl')"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17h18M3 12h18M3 7h18M7 5v4M12 10v4M17 15v4" stroke-width="2"/></svg></div>
+                    <div class="nav-tab" onclick="setTab('exec')"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 17l6-6-6-6M12 19h8" stroke-width="2"/></svg></div>
+                    <div class="nav-tab" onclick="setTab('res')"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5a5 5 0 110-10 5 5 0 010 10z" stroke-width="2"/></svg></div>
                 </div>
-                <button onclick="showLanding()" class="icon-btn"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+                <div class="w-[1px] h-6 bg-white/10 mx-2"></div>
+                <div class="flex flex-col">
+                    <div id="active-session-title" class="font-black text-white uppercase text-[10px] tracking-widest">SESSION_ACTIVE</div>
+                    <div id="state-anchor" class="text-accent-mid font-mono text-[8px]">[U1|M1|RND1]</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2 bg-black/40 p-1.5 rounded border border-white/5">
+                    <button class="icon-btn p-1" title="Visual Summary"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm1 5h-2v7h5v-2h-3V7z" stroke-width="2"/></svg></button>
+                    <button onclick="toggleDrawer('world')" class="icon-btn p-1" title="Global Controls"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke-width="2"/></svg></button>
+                </div>
+                <button onclick="showLanding()" class="icon-btn text-accent-bright" title="Exit to Landing"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
             </div>
         </header>
-        <main class="flex-1 flex flex-col overflow-hidden">
-            <section id="tab-init" class="tab-content active p-4 space-y-4 overflow-y-auto">
-                <div class="menu-chunk">
-                    <div class="chunk-inner py-4 px-6">
-                        <div class="text-accent-bright font-black text-xs tracking-widest mb-2">SESSION_INITIALIZATION</div>
-                        <div class="text-zinc-500 text-[10px] leading-relaxed">
-                            Welcome to the active design environment. This session is currently in the refinement phase. 
-                            Use the **EXECUTION** tab to communicate with the architect agents.
+
+        <div class="flex-1 flex overflow-hidden">
+            <main class="flex-1 flex flex-col overflow-hidden relative">
+                <div class="bg-lines"></div>
+                
+                <section id="tab-init" class="tab-content active p-8 space-y-8 overflow-y-auto relative z-10">
+                    <div class="glass-panel p-8 space-y-6 max-w-2xl mx-auto">
+                        <div class="space-y-2">
+                            <div class="text-accent-bright font-black text-[10px] tracking-[0.5em] uppercase border-b border-accent-muted pb-2">Session_Brief // Orientation</div>
+                            <h2 class="text-2xl font-black text-white uppercase italic">Active Design Substrate</h2>
+                        </div>
+                        <div class="text-zinc-400 text-xs leading-relaxed space-y-4">
+                            <p>You have entered a deterministic configuration space. This substrate is designed to transform high-level intent into technical blueprints through the **Recursive Refinement Protocol (RRP)**.</p>
+                            <div class="grid grid-cols-2 gap-4 pt-4">
+                                <div class="p-4 bg-black/40 border border-white/5 space-y-2">
+                                    <div class="text-[8px] font-black text-accent-mid uppercase">Primary_Goal</div>
+                                    <div id="init-goal" class="text-[10px] text-zinc-300">Refining system architecture and locking behavioral constraints.</div>
+                                </div>
+                                <div class="p-4 bg-black/40 border border-white/5 space-y-2">
+                                    <div class="text-[8px] font-black text-accent-mid uppercase">Engine_Status</div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                                        <div class="text-[10px] text-zinc-300">Synchronized</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-6 border-t border-white/5">
+                            <button onclick="setTab('exec')" class="menu-chunk w-full group">
+                                <div class="chunk-inner py-4 text-center text-[10px] font-black uppercase text-accent-bright group-hover:scale-105 transition-transform tracking-[0.3em]">Enter_Execution_Phase</div>
+                            </button>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <section id="tab-ctrl" class="tab-content p-4 space-y-4 overflow-y-auto">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="menu-chunk">
-                        <div class="chunk-inner">
-                            <div class="text-zinc-500 text-[8px] font-black uppercase mb-3">System_Metrics</div>
-                            <div id="ambiguity-display" class="space-y-2">
-                                <!-- Dynamic ambiguity meters -->
+                <section id="tab-ctrl" class="tab-content p-8 space-y-8 overflow-y-auto relative z-10">
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-2 flex justify-between">
+                                <span>Ambiguity_Vectors</span>
+                                <span class="text-accent-mid">System_Integrity_Check</span>
+                            </div>
+                            <div id="ambiguity-display" class="space-y-4 glass-panel p-6">
+                                <!-- Progress bars -->
+                            </div>
+                        </div>
+                        <div class="space-y-4 flex flex-col h-full">
+                            <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-2">Locked_Constraints</div>
+                            <div id="constraints-display" class="grid grid-cols-1 gap-2 flex-1 glass-panel p-6 overflow-y-auto">
+                                <!-- Constraints list -->
                             </div>
                         </div>
                     </div>
-                    <div class="menu-chunk">
-                        <div class="chunk-inner h-full">
-                            <div class="text-zinc-500 text-[8px] font-black uppercase mb-3">Locked_Constraints</div>
-                            <div id="constraints-display" class="text-[9px] text-zinc-400 font-mono space-y-1">
-                                <!-- Dynamic constraints list -->
-                            </div>
+                </section>
+
+                <section id="tab-exec" class="tab-content overflow-hidden relative z-10">
+                    <div id="chat-feed" class="flex-1 overflow-y-auto space-y-4 p-6 scroll-smooth"></div>
+                </section>
+
+                <section id="tab-res" class="tab-content p-8 overflow-y-auto relative z-10">
+                    <div class="glass-panel p-8 min-h-full space-y-6">
+                        <div class="flex justify-between items-center border-b border-white/10 pb-4">
+                            <div class="text-accent-bright font-black text-[10px] tracking-[0.5em] uppercase">Artifact_Generation</div>
+                            <div class="stat-badge uppercase">Status: Synthesized</div>
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="tab-exec" class="tab-content overflow-hidden">
-                <div id="chat-feed" class="flex-1 overflow-y-auto space-y-2 p-3 mx-2 my-2"></div>
-            </section>
-
-            <section id="tab-res" class="tab-content p-4 space-y-4 overflow-y-auto">
-                <div class="menu-chunk h-full">
-                    <div class="chunk-inner h-full flex flex-col">
-                        <div class="text-zinc-500 text-[8px] font-black uppercase mb-3">System_Blueprint</div>
-                        <div id="blueprint-display" class="flex-1 text-zinc-400 text-[10px] prose prose-invert prose-xs max-w-none overflow-y-auto">
+                        <div id="blueprint-display" class="text-zinc-400 text-[11px] prose prose-invert prose-sm max-w-none leading-relaxed">
                             No blueprint synthesized yet. Complete the refinement rounds to generate artifacts.
                         </div>
                     </div>
+                </section>
+            </main>
+
+            <div id="sidebar-tab" onclick="toggleSidebar(true)" title="Orchestration Units">
+                <svg class="w-4 h-4 text-accent-mid" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m16-10V7a4 4 0 00-4-4H5a4 4 0 00-4 4v4m16 4h2a2 2 0 002-2V7a2 2 0 00-2-2h-2m-9 5a4 4 0 11-8 0 4 4 0 018 0z" stroke-width="2"/></svg>
+            </div>
+
+            <aside id="participants-sidebar" class="glass-panel border-l border-white/10 p-2 flex flex-col gap-4">
+                <div class="text-[7px] font-black text-accent-mid uppercase tracking-[0.2em] border-b border-white/5 pb-1 px-1">Units</div>
+                <div id="participants-list" class="space-y-1.5 overflow-y-auto flex-1">
+                    <!-- Agents list -->
                 </div>
-            </section>
-        </main>
+                <button onclick="showInviteModal()" class="menu-chunk group shrink-0">
+                    <div class="bolt t-l"></div><div class="bolt t-r"></div>
+                    <div class="chunk-inner py-1.5 text-center text-[7px] font-black uppercase text-zinc-400 group-hover:text-accent-bright tracking-wider">+ Invite</div>
+                </button>
+            </aside>
+        </div>
+
         <footer class="h-16 menu-chunk mx-2 mb-2 shrink-0">
             <div class="chunk-inner h-full flex gap-2 p-1">
                 <textarea id="user-input" class="flex-1 bg-black/40 outline-none p-2 text-white text-[11px] resize-none" placeholder="Type here..."></textarea>
@@ -536,12 +608,89 @@
         </footer>
     </div>
 
+    <div id="modal-invite" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4">
+        <div class="menu-chunk w-full max-w-sm">
+            <div class="bolt t-l"></div><div class="bolt t-r"></div>
+            <div class="chunk-inner space-y-4">
+                <span class="text-[10px] font-black text-accent-bright uppercase tracking-widest block border-b border-white/5 pb-2">Invite_New_Unit</span>
+                <div class="space-y-3">
+                    <div class="space-y-1"><span class="text-[8px] font-black text-zinc-500 uppercase">Unit_Name</span><input id="invite-name" class="w-full bg-black/40 border border-white/10 p-2 text-white text-[10px]" placeholder="Architect_Prime"></div>
+                    <div class="space-y-1"><span class="text-[8px] font-black text-zinc-500 uppercase">Unit_Type</span><input id="invite-type" class="w-full bg-black/40 border border-white/10 p-2 text-white text-[10px]" placeholder="specialist_auditor"></div>
+                    <div class="space-y-1"><span class="text-[8px] font-black text-zinc-500 uppercase">Directives</span><textarea id="invite-instructions" class="w-full bg-black/40 border border-white/10 p-2 text-white text-[10px] h-20" placeholder="Focus on edge cases and failure modes..."></textarea></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2">
+                    <button onclick="inviteAgent()" class="menu-chunk"><div class="chunk-inner py-2 text-center text-[8px] font-black text-accent-bright uppercase">Deploy_Unit</div></button>
+                    <button onclick="hideInviteModal()" class="menu-chunk"><div class="chunk-inner py-2 text-center text-[8px] font-black text-zinc-600 uppercase">Abort</div></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONSTRAINT DETAIL MODAL -->
+    <div id="modal-constraint" class="fixed inset-0 bg-black/90 z-[200] hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="menu-chunk w-full max-w-md">
+            <div class="bolt t-l"></div><div class="bolt t-r"></div>
+            <div class="chunk-inner space-y-6 p-8">
+                <div class="space-y-1">
+                    <div class="text-accent-bright font-black text-[10px] tracking-widest uppercase border-b border-accent-muted pb-2">Behavioral_Lock // Detail</div>
+                    <h3 id="constraint-title" class="text-xl font-black text-white uppercase italic pt-2">Constraint_Name</h3>
+                </div>
+                <div id="constraint-desc" class="text-zinc-400 text-xs leading-relaxed border-l-2 border-white/10 pl-4 py-2">
+                    Constraint description goes here.
+                </div>
+                <div class="pt-4 flex justify-end">
+                    <button onclick="hideConstraintModal()" class="menu-chunk group">
+                        <div class="chunk-inner px-8 py-2 text-center text-[8px] font-black uppercase text-zinc-500 group-hover:text-accent-bright">Acknowledge</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AGENT DETAIL MODAL -->
+    <div id="modal-agent" class="fixed inset-0 bg-black/90 z-[200] hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="menu-chunk w-full max-w-md">
+            <div class="bolt t-l"></div><div class="bolt t-r"></div>
+            <div class="chunk-inner space-y-6 p-8">
+                <div class="space-y-1">
+                    <div class="text-accent-mid font-black text-[10px] tracking-widest uppercase border-b border-white/5 pb-2">Unit_Manifest // Details</div>
+                    <h3 id="agent-detail-name" class="text-xl font-black text-white uppercase italic pt-2">Unit_Name</h3>
+                    <div id="agent-detail-type" class="text-[8px] font-black text-accent-bright uppercase tracking-widest">specialist_type</div>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-[7px] font-black text-zinc-600 uppercase tracking-tighter">Active_Directives</div>
+                    <div id="agent-detail-instructions" class="text-zinc-400 text-xs leading-relaxed bg-black/20 p-4 border border-white/5 font-mono">
+                        Directives loading...
+                    </div>
+                </div>
+                <div class="pt-4 flex justify-end">
+                    <button onclick="hideAgentModal()" class="menu-chunk group">
+                        <div class="chunk-inner px-8 py-2 text-center text-[8px] font-black uppercase text-zinc-500 group-hover:text-accent-bright">Dismiss</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let config = { u: 1, m: 1, depth: "STANDARD", x: 2, y: 3, discussion_depth: 1, selected_u: [1] };
         let activeDrawer = null;
         let currentSessionId = null;
         let sessionData = null;
         let currentTab = 'init';
+
+        // Custom Marked Renderer for RRE Figures
+        const renderer = new marked.Renderer();
+        renderer.code = (code, lang) => {
+            if (lang === 'rre-figure') {
+                return `<div class="p-4 my-4 bg-accent-muted/10 border border-accent-muted rounded glass-panel">
+                    <div class="text-[8px] font-black text-accent-bright uppercase mb-2">System_Projection</div>
+                    <pre class="text-[10px] text-zinc-300 font-mono">${code}</pre>
+                </div>`;
+            }
+            return `<pre class="bg-black/60 p-3 rounded border border-white/5 my-3 overflow-x-auto"><code class="language-${lang}">${code}</code></pre>`;
+        };
+        marked.setOptions({ renderer });
 
         function setTheme(t) { 
             document.body.setAttribute('data-theme', t); localStorage.setItem('mrre_theme', t);
@@ -554,6 +703,40 @@
             if (id && activeDrawer !== id) { document.getElementById(`drawer-${id}`).classList.add('active'); activeDrawer = id; } 
             else { activeDrawer = null; }
         }
+
+        function toggleSidebar(force) {
+            const sidebar = document.getElementById('participants-sidebar');
+            const tab = document.getElementById('sidebar-tab');
+            const isActive = force !== undefined ? force : !sidebar.classList.contains('active');
+            sidebar.classList.toggle('active', isActive);
+            tab.classList.toggle('hidden', isActive);
+            if (isActive) {
+                const hide = (e) => {
+                    if (!sidebar.contains(e.target) && !tab.contains(e.target)) {
+                        toggleSidebar(false);
+                        document.removeEventListener('click', hide);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', hide), 10);
+            }
+        }
+
+        function showConstraint(name, desc) {
+            document.getElementById('constraint-title').innerText = name;
+            document.getElementById('constraint-desc').innerText = desc;
+            document.getElementById('modal-constraint').classList.remove('hidden');
+        }
+        function hideConstraintModal() { document.getElementById('modal-constraint').classList.add('hidden'); }
+
+        function showAgentInfo(idx) {
+            const agent = sessionData.agents[idx];
+            if (!agent) return;
+            document.getElementById('agent-detail-name').innerText = agent.name;
+            document.getElementById('agent-detail-type').innerText = agent.type;
+            document.getElementById('agent-detail-instructions').innerText = agent.instructions;
+            document.getElementById('modal-agent').classList.remove('hidden');
+        }
+        function hideAgentModal() { document.getElementById('modal-agent').classList.add('hidden'); }
 
         function showTooltip(event, type) {
             const tooltip = document.getElementById('icon-tooltip');
@@ -586,8 +769,8 @@
                 const tabs = ['init', 'ctrl', 'exec', 'res'];
                 el.classList.toggle('active', tabs[i] === tab);
             });
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.toggle('active', el.id === `tab-${tab}`));
             console.log(`Tab switched to: ${tab}`);
-            // Logic for tab content switching can be added here
         }
 
         function toggleSelection(event, val) {
@@ -631,8 +814,11 @@
                     const div = document.createElement('div');
                     div.className = "menu-chunk cursor-pointer mb-2 hover:border-accent-bright transition-colors";
                     div.innerHTML = `<div class="chunk-inner py-2 px-4 flex justify-between items-center">
-                        <span class="text-[9px] font-black text-white uppercase">${s.name}</span>
-                        <span class="text-[7px] text-zinc-500 uppercase">U${s.config.u} | ID: ${s.id.slice(0,6)}</span>
+                        <span class="text-[9px] font-black text-white uppercase tracking-wider">${s.name}</span>
+                        <div class="flex gap-2">
+                            <span class="text-[7px] text-zinc-500 uppercase px-2 py-0.5 bg-black/40 rounded border border-white/5">U${s.config.u}</span>
+                            <span class="text-[7px] text-zinc-600 uppercase">ID: ${s.id.slice(0,6)}</span>
+                        </div>
                     </div>`;
                     div.onclick = () => loadSession(s.id);
                     list.appendChild(div);
@@ -641,7 +827,7 @@
         }
 
         async function createNewSession() {
-            const name = document.getElementById('new-session-name').value || "ANON_UNIT";
+            const name = document.getElementById('new-session-name')?.value || "ANON_UNIT";
             const res = await fetch('/api/sessions', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, config}) });
             const data = await res.json(); loadSession(data.id);
         }
@@ -660,6 +846,20 @@
             loadSessions();
         }
 
+        function showInviteModal() { document.getElementById('modal-invite').classList.remove('hidden'); }
+        function hideInviteModal() { document.getElementById('modal-invite').classList.add('hidden'); }
+
+        async function inviteAgent() {
+            const name = document.getElementById('invite-name').value || "Unit_X";
+            const type = document.getElementById('invite-type').value || "specialist";
+            const instructions = document.getElementById('invite-instructions').value || "Collaborate and refine.";
+            try {
+                await fetch(`/api/sessions/${currentSessionId}/invite`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, type, instructions}) });
+                hideInviteModal();
+                await refreshSessionData();
+            } catch (e) { console.error("Failed to invite agent", e); }
+        }
+
         async function refreshSessionData() {
             if(!currentSessionId) return;
             try {
@@ -668,26 +868,108 @@
                 document.getElementById('active-session-title').innerText = sessionData.name;
                 const c = sessionData.config; 
                 document.getElementById('state-anchor').innerText = `[U${c.u}|M${c.m}|RND${sessionData.round}]`;
+                
+                // Populate Orientation Tab
+                const initGoal = document.getElementById('init-goal');
+                if (initGoal && sessionData.history.length > 1) {
+                    const firstMsg = sessionData.history.find(m => m.role === 'ai')?.content || "";
+                    const goalMatch = firstMsg.match(/Goal: (.*)\]/);
+                    if (goalMatch) initGoal.innerText = goalMatch[1];
+                }
+
+                // Populate Metrics Tab
+                const ambFeed = document.getElementById('ambiguity-display');
+                if (ambFeed) {
+                    ambFeed.innerHTML = '';
+                    for (const [key, val] of Object.entries(sessionData.ambiguity)) {
+                        // FIX: Progress is 100 - (ambiguity * 100)
+                        const score = Math.max(0, 100 - (val * 100));
+                        ambFeed.innerHTML += `
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[8px] font-black uppercase text-zinc-500 tracking-wider"><span>${key}</span><span class="${score > 80 ? 'text-green-500' : 'text-accent-mid'}">${score.toFixed(0)}%</span></div>
+                                <div class="h-2 bg-black/60 rounded-full overflow-hidden border border-white/10 p-[1px]">
+                                    <div class="h-full bg-gradient-to-r from-accent-muted to-accent-bright rounded-full transition-all duration-1000 shadow-[0_0_10px_var(--accent-mid)]" style="width: ${score}%"></div>
+                                </div>
+                            </div>`;
+                    }
+                }
+
+                const conFeed = document.getElementById('constraints-display');
+                if (conFeed) {
+                    conFeed.innerHTML = '';
+                    for (const [name, desc] of Object.entries(sessionData.constraints)) {
+                        const div = document.createElement('div');
+                        div.className = "p-3 glass-panel cursor-pointer hover:border-accent-bright transition-all group border-l-4 border-l-accent-bright";
+                        div.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-black text-white uppercase truncate">${name}</span>
+                                <svg class="w-3 h-3 text-accent-mid group-hover:text-accent-bright" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5a5 5 0 110-10 5 5 0 010 10z"/></svg>
+                            </div>`;
+                        div.onclick = () => showConstraint(name, desc);
+                        conFeed.appendChild(div);
+                    }
+                    if (Object.keys(sessionData.constraints).length === 0) conFeed.innerHTML = '<div class="flex items-center justify-center h-full italic text-zinc-700 text-[10px]">No behavioral locks established.</div>';
+                }
+
+                // Populate Blueprint Tab
+                const blueFeed = document.getElementById('blueprint-display');
+                if (blueFeed && sessionData.summary) blueFeed.innerHTML = marked.parse(sessionData.summary);
+
+                // Populate Participants Sidebar
+                const pList = document.getElementById('participants-list');
+                if (pList) {
+                    pList.innerHTML = '';
+                    sessionData.agents.forEach((agent, idx) => {
+                        pList.innerHTML += `
+                            <div class="menu-chunk agent-card-mini cursor-pointer hover:border-accent-bright transition-all" onclick="showAgentInfo(${idx})">
+                                <div class="chunk-inner p-1.5 border-l border-accent-mid flex flex-col gap-0.5">
+                                    <div class="flex justify-between items-start gap-1">
+                                        <div class="text-[8px] font-black text-white uppercase truncate flex-1">${agent.name}</div>
+                                        <div class="w-1 h-1 bg-accent-bright rounded-full mt-1"></div>
+                                    </div>
+                                    <div class="text-[6px] text-zinc-600 font-black uppercase tracking-tighter truncate">${agent.type}</div>
+                                </div>
+                            </div>`;
+                    });
+                }
                 renderChatFeed();
             } catch (e) { console.error("Failed to refresh session", e); }
         }
 
         function renderChatFeed() {
             const feed = document.getElementById('chat-feed'); 
-            if (!feed) return;
+            if (!feed || !sessionData || !sessionData.history) return;
             feed.innerHTML = '';
-            if (!sessionData || !sessionData.history) return;
             
             sessionData.history.forEach(msg => {
-                const div = document.createElement('div'); div.className = "chat-msg";
-                const content = typeof marked !== 'undefined' ? marked.parse(msg.content) : msg.content;
-                if(msg.role === 'ai') div.innerHTML = `<div class="font-black text-accent-bright uppercase text-[7px] mb-1 tracking-widest">${msg.agent_name || 'AGENT'}</div><div class="text-zinc-400 text-[10px] prose-invert prose-xs max-w-none">${content}</div>`;
-                else if(msg.role === 'user') div.innerHTML = `<div class="font-black text-zinc-600 uppercase text-[7px] mb-1 tracking-widest">USER</div><div class="text-zinc-200 text-[10px] whitespace-pre-wrap">${msg.content}</div>`;
-                else if(msg.role === 'system') div.innerHTML = `<div class="font-black text-zinc-500 uppercase text-[7px] mb-1 tracking-widest">SYSTEM</div><div class="text-zinc-500 text-[10px] italic">${msg.content}</div>`;
+                if (msg.content === 'INITIALIZE_SESSION') return;
+                const div = document.createElement('div'); 
+                div.className = "chat-msg glass-panel";
+                
+                const content = marked.parse(msg.content);
+                if(msg.role === 'ai') {
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-1">
+                            <div class="font-black text-accent-bright uppercase text-[8px] tracking-[0.2em]">${msg.agent_name || 'AGENT'}</div>
+                            <div class="flex gap-2">
+                                <button class="icon-btn p-0.5 hover:bg-white/5 rounded" title="Pin Instruction"><svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M16 5h.99L12 1.01 7.01 5H8v7l-2 2v2h5v5l1 1 1-1v-5h5v-2l-2-2z"/></svg></button>
+                                <button class="icon-btn p-0.5 hover:bg-white/5 rounded" title="Copy Content"><svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+                            </div>
+                        </div>
+                        <div class="text-zinc-300 text-[11px] leading-relaxed prose-invert prose-sm max-w-none">${content}</div>`;
+                } else if(msg.role === 'user') {
+                    div.classList.add('border-l-zinc-600', 'ml-8');
+                    div.innerHTML = `<div class="font-black text-zinc-500 uppercase text-[8px] mb-1 tracking-widest">User_Intent</div><div class="text-zinc-100 text-[11px] whitespace-pre-wrap">${msg.content}</div>`;
+                } else if(msg.role === 'system') {
+                    div.classList.add('border-l-accent-muted', 'opacity-80', 'mx-12');
+                    div.innerHTML = `<div class="font-black text-accent-muted uppercase text-[7px] mb-1 tracking-widest">Protocol_Log</div><div class="text-zinc-500 text-[10px] italic">${msg.content}</div>`;
+                }
                 feed.appendChild(div);
             });
             feed.scrollTop = feed.scrollHeight;
         }
+
+        document.addEventListener('keydown', (e) => { if (e.target.id === 'user-input' && (e.ctrlKey || e.metaKey) && e.key === 'Enter') sendMessage(); });
 
         async function sendMessage(textOverride = null, isHidden = false) {
             const input = document.getElementById('user-input');
@@ -695,15 +977,15 @@
             if(!msg) return;
             if(!isHidden) input.value = '';
             const btn = document.getElementById('send-btn'); 
-            if (btn) btn.disabled = true;
+            const originalContent = btn.innerHTML;
+            if (btn) { btn.disabled = true; btn.innerHTML = '<span class="text-[8px] animate-pulse">DEPLOYING...</span>'; }
             try {
-                await fetch(`/api/sessions/${currentSessionId}/chat`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({message: msg}) });
+                const response = await fetch(`/api/sessions/${currentSessionId}/chat`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({message: msg}) });
+                if (!response.ok) { const err = await response.text(); console.error("Server error:", err); alert(`Send failed: ${err}`); }
                 await refreshSessionData();
-            } catch (e) { console.error("Failed to send message", e); }
-            finally { if (btn) btn.disabled = false; }
+            } catch (e) { console.error("Network error:", e); alert(`Network error: ${e.message}`); }
+            finally { if (btn) { btn.disabled = false; btn.innerHTML = originalContent; } }
         }
-
-        // Initialize
         loadSessions();
     </script>
 </body>
