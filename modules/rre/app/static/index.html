@@ -166,6 +166,9 @@
         }
         .nav-tab:hover { color: #999; background: rgba(255,255,255,0.02); }
         .nav-tab.active { color: var(--accent-bright); border-bottom-color: var(--accent-bright); }
+
+        .tab-content { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+        .tab-content.active { display: flex; }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden">
@@ -476,7 +479,55 @@
                 <button onclick="showLanding()" class="icon-btn"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
             </div>
         </header>
-        <main id="chat-feed" class="flex-1 overflow-y-auto space-y-2 p-3 mx-2 my-2"></main>
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <section id="tab-init" class="tab-content active p-4 space-y-4 overflow-y-auto">
+                <div class="menu-chunk">
+                    <div class="chunk-inner py-4 px-6">
+                        <div class="text-accent-bright font-black text-xs tracking-widest mb-2">SESSION_INITIALIZATION</div>
+                        <div class="text-zinc-500 text-[10px] leading-relaxed">
+                            Welcome to the active design environment. This session is currently in the refinement phase. 
+                            Use the **EXECUTION** tab to communicate with the architect agents.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-ctrl" class="tab-content p-4 space-y-4 overflow-y-auto">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="menu-chunk">
+                        <div class="chunk-inner">
+                            <div class="text-zinc-500 text-[8px] font-black uppercase mb-3">System_Metrics</div>
+                            <div id="ambiguity-display" class="space-y-2">
+                                <!-- Dynamic ambiguity meters -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-chunk">
+                        <div class="chunk-inner h-full">
+                            <div class="text-zinc-500 text-[8px] font-black uppercase mb-3">Locked_Constraints</div>
+                            <div id="constraints-display" class="text-[9px] text-zinc-400 font-mono space-y-1">
+                                <!-- Dynamic constraints list -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-exec" class="tab-content overflow-hidden">
+                <div id="chat-feed" class="flex-1 overflow-y-auto space-y-2 p-3 mx-2 my-2"></div>
+            </section>
+
+            <section id="tab-res" class="tab-content p-4 space-y-4 overflow-y-auto">
+                <div class="menu-chunk h-full">
+                    <div class="chunk-inner h-full flex flex-col">
+                        <div class="text-zinc-500 text-[8px] font-black uppercase mb-3">System_Blueprint</div>
+                        <div id="blueprint-display" class="flex-1 text-zinc-400 text-[10px] prose prose-invert prose-xs max-w-none overflow-y-auto">
+                            No blueprint synthesized yet. Complete the refinement rounds to generate artifacts.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
         <footer class="h-16 menu-chunk mx-2 mb-2 shrink-0">
             <div class="chunk-inner h-full flex gap-2 p-1">
                 <textarea id="user-input" class="flex-1 bg-black/40 outline-none p-2 text-white text-[11px] resize-none" placeholder="Type here..."></textarea>

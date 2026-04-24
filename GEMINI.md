@@ -16,16 +16,15 @@ The **ACE (Agentic Context Engineering) Suite** is a unified autonomous agent fr
 .
 ├── main.py (Legacy/Auxiliary Bot Loop)
 ├── context.html (GCE V5 Context Engineer UI)
-└── ace/
-    ├── cap/ (Cognitive Architecture Platform)
-    │   ├── core/ (CLIDE, APC, PIE logic)
-    │   ├── scripts/ (Startup and utility scripts)
-    │   └── data/ (Persistent ledgers and models)
-    ├── glyph/ (Integrated Glyph Substrate - Logic layer)
-    ├── gce/ (Context Engine specs and assets)
-    ├── modules/ (Specialized agent modules like RRE)
-    ├── plans/ (Architectural roadmap and Master Spec)
-    └── GEMINI.md (Internal ACE component documentation)
+├── cap/ (Cognitive Architecture Platform)
+│   ├── core/ (CLIDE, APC, PIE logic)
+│   ├── scripts/ (Startup and utility scripts)
+│   └── data/ (Persistent ledgers and models)
+├── glyph/ (Integrated Glyph Substrate - Logic layer)
+├── gce/ (Context Engine specs and assets)
+├── modules/ (Specialized agent modules like RRE)
+├── plans/ (Architectural roadmap and Master Spec)
+└── GEMINI.md (Internal ACE component documentation)
 ```
 
 ## Building and Running
@@ -44,13 +43,13 @@ The **ACE (Agentic Context Engineering) Suite** is a unified autonomous agent fr
 
 | Component | Command | Port | Description |
 | :--- | :--- | :--- | :--- |
-| **Singularity Pulse Dashboard** | `python ace/cap/scripts/startup_dashboard.py` | 8080 | Visual monitor for the Swarm Grid. |
-| **CAP CLI (CLIDE)** | `python ace/cap/core/clide/cli.py [goal]` | N/A | The main interface for dispatching intents. |
-| **Glyph (GFS) Server** | `python ace/glyph/main.py` | 8080/8082 | Neural graph state and logic server. |
-| **ARM Worker** | `python ace/cap/scripts/arm_worker.py` | N/A | Executes tasks from the Redis queue. |
-| **Introspection** | `python ace/cap/scripts/autonomous_introspection.py` | N/A | Triggers PIE causal loop analysis. |
+| **Singularity Pulse Dashboard** | `python cap/scripts/startup_dashboard.py` | 8080 | Visual monitor for the Swarm Grid. |
+| **CAP CLI (CLIDE)** | `python cap/core/clide/cli.py [goal]` | N/A | The main interface for dispatching intents. |
+| **Glyph (GFS) Server** | `python glyph/main.py` | 8080/8082 | Neural graph state and logic server. |
+| **ARM Worker** | `python cap/scripts/arm_worker.py` | N/A | Executes tasks from the Redis queue. |
+| **Introspection** | `python cap/scripts/autonomous_introspection.py` | N/A | Triggers PIE causal loop analysis. |
 
-*Note: Always set `PYTHONPATH=./ace` when running from the root to ensure proper module resolution for `cap`, `glyph`, etc.*
+*Note: Always set `PYTHONPATH=.` when running from the root to ensure proper module resolution.*
 
 ## Development Conventions
 

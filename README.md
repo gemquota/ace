@@ -72,14 +72,14 @@ export PYTHONPATH=./ace
 ### 2. Start Core Services (Separate Terminals)
 | Component | Command | Port |
 | :--- | :--- | :--- |
-| **Singularity Pulse** | `python ace/cap/scripts/startup_dashboard.py` | 8080 |
-| **Glyph Logic Server** | `python ace/glyph/main.py` | 8082 |
-| **ARM Worker** | `python ace/cap/scripts/arm_worker.py` | N/A |
+| **Singularity Pulse** | `python cap/scripts/startup_dashboard.py` | 8080 |
+| **Glyph Logic Server** | `python glyph/main.py` | 8082 |
+| **ARM Worker** | `python cap/scripts/arm_worker.py` | N/A |
 
 ### 3. Dispatch Intents
 Use the CLIDE CLI to send high-level goals to the system:
 ```bash
-python ace/cap/core/clide/cli.py "Optimize the swarm economy for low-latency nodes"
+python cap/core/clide/cli.py "Optimize the swarm economy for low-latency nodes"
 ```
 
 ---
