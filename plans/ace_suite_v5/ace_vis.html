@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACE SUITE: ZERO-OVERLAP PLANAR MESH</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --bg: #050505; --surface: #111; --text: #e0e0e0;
+            --ace: #d500f9;
+        }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; overflow: hidden; }
+        #canvas { width: 100vw; height: 100vh; cursor: crosshair; }
+        .header { position: absolute; top: 20px; left: 20px; z-index: 10; pointer-events: none; }
+        .header h1 { margin: 0; font-size: 1.5em; color: var(--ace); text-transform: uppercase; letter-spacing: 2px; }
+        .header p { margin: 5px 0; color: #888; font-size: 0.9em; }
+        .legend { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.85); padding: 12px; border: 1px solid #333; border-radius: 4px; font-size: 0.7em; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 5px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+        #info-panel { position: absolute; top: 20px; right: 20px; width: 320px; background: rgba(0,0,0,0.95); border: 2px solid var(--ace); padding: 15px; border-radius: 4px; opacity: 0; transition: 0.3s; z-index: 20; max-height: 80vh; overflow-y: auto; }
+        #info-panel h3 { margin: 0 0 10px 0; color: var(--ace); text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        #info-panel p { margin: 5px 0; font-size: 0.85em; line-height: 1.4; color: #ccc; }
+        .close-btn { position: absolute; top: 5px; right: 10px; cursor: pointer; color: #888; font-size: 1.5em; }
+        .selected-node { stroke: #fff !important; stroke-width: 4px !important; filter: drop-shadow(0 0 15px #fff); }
+        .selected-link { stroke-opacity: 1 !important; stroke-width: 8px !important; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ACE SUITE // PLANAR ONTOLOGY</h1>
+        <p>Absolute Zero-Overlap Refactor v1.0.0 | Fixed Geometry</p>
+    </div>
+
+    <div id="info-panel">
+        <span class="close-btn" onclick="hidePanel()">×</span>
+        <div id="info-content"></div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="dot" style="background:#3d5afe"></div> EXECUTIVE (CLIDE)</div>
+        <div class="legend-item"><div class="dot" style="background:#00e5ff"></div> EXECUTION (APC)</div>
+        <div class="legend-item"><div class="dot" style="background:#1de9b6"></div> ANALYSIS (PIE)</div>
+        <div class="legend-item"><div class="dot" style="background:#00e676"></div> FORGE (GCE)</div>
+        <div class="legend-item"><div class="dot" style="background:#ffff00"></div> LOGIC (GFS)</div>
+    </div>
+
+    <svg id="canvas"></svg>
+
+    <script>
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const cX = width / 2;
+        const cY = height / 2;
+        const S = 190; // Global Radius Scale
+
+        const colors = {
+            clide: "#3d5afe", apc: "#00e5ff", pie: "#1de9b6", gce: "#ff9800", gfs: "#ffff00",
+            semantic: "#ffea00", infra: "#ff1744", ace: "#cb9255", cap: "#651fff"
+        };
+
+        // Mathematically Planar Coordinates (Angle in Degrees, Radius in Multipliers)
+        const polarMap = {
+            CAP:   { a: 0, r: 0, size: 65, group: "cap", full: "Cognitive Architecture Platform" },
+            
+            // INNER RING (r=1.2)
+            APC:   { a: 0,   r: 1.2, size: 52, group: "apc", full: "Executioner Branch" },
+            PIE:   { a: 90,  r: 1.2, size: 52, group: "pie", full: "Analyst Branch" },
+            GFS:   { a: 135, r: 1.2, size: 52, group: "gfs", full: "Logic Substrate" },
+            ACE:   { a: 180, r: 1.2, size: 85, group: "ace", full: "Agentic Context Engineering" },
+            GCE:   { a: 225, r: 1.2, size: 52, group: "gce", full: "Sovereign Context Forge" },
+            CLIDE: { a: 270, r: 1.2, size: 52, group: "clide", full: "Executive Branch" },
+
+            // RING 2 (r=2.2)
+            DSC:   { a: 15,  r: 2.2, size: 26, group: "apc", full: "Deterministic State Capture" },
+            SEH:   { a: 30,  r: 2.2, size: 26, group: "apc", full: "Side-Effect Hash" },
+            PCA:   { a: 60,  r: 2.2, size: 26, group: "pie", full: "Praxis Causal Analysis" },
+            DIA:   { a: 90,  r: 2.2, size: 26, group: "pie", full: "Diagnostic Inference" },
+            PIA:   { a: 110, r: 2.2, size: 26, group: "pie", full: "Predictive Inference" },
+            COG:   { a: 125, r: 2.2, size: 26, group: "gfs", full: "Cognitive Substrate" },
+            MEM:   { a: 135, r: 2.2, size: 26, group: "gfs", full: "Memory Substrate" },
+            TEL:   { a: 145, r: 2.2, size: 26, group: "gfs", full: "Telemetry Substrate" },
+            TOP:   { a: 155, r: 2.2, size: 26, group: "gfs", full: "Topology Substrate" },
+            SBK:   { a: 215, r: 2.2, size: 26, group: "gce", full: "Snippet Bank" },
+            CVL:   { a: 225, r: 2.2, size: 26, group: "gce", full: "Context Vault" },
+            CSH:   { a: 235, r: 2.2, size: 26, group: "gce", full: "Chat Session History" },
+            ARC:   { a: 245, r: 2.2, size: 26, group: "gce", full: "Architecture Collections" },
+            IDAG:  { a: 255, r: 2.2, size: 26, group: "clide", full: "Intent DAG" },
+            SLC:   { a: 285, r: 2.2, size: 26, group: "clide", full: "Swarm Ledger & Comms" },
+            ARM:   { a: 315, r: 2.2, size: 26, group: "apc", full: "Automated Resource Manager" },
+            PRV:   { a: 345, r: 2.2, size: 26, group: "apc", full: "Pre-Exec Validation" },
+
+            // RING 3 (r=3.0)
+            AST:   { a: 150, r: 3.0, size: 22, group: "gfs", full: "Abstract Syntax Tree" },
+            DSL:   { a: 160, r: 3.0, size: 22, group: "gfs", full: "Glyph Domain Language" },
+            LCLK:  { a: 280, r: 3.0, size: 22, group: "clide", full: "Lamport Clock" },
+            TTL:   { a: 290, r: 3.0, size: 22, group: "clide", full: "Time To Live" },
+            LED:   { a: 300, r: 3.0, size: 22, group: "clide", full: "Swarm Ledger" },
+
+            // SEMANTIC & INFRASTRUCTURE
+            TRP:   { a: 200, r: 4.5, size: 42, group: "semantic", full: "Triple-Pack Nucleus" },
+            VO:    { a: 205, r: 3.2, size: 22, group: "semantic", full: "Visual Optimism" },
+            CRV:   { a: 205, r: 4.2, size: 22, group: "semantic", full: "Causal Reversion" },
+            CB:    { a: 115, r: 3.2, size: 22, group: "semantic", full: "Causal Branching" },
+            GEN:   { a: 180, r: 0.6, size: 32, group: "semantic", full: "Genesis Hash" },
+            SQL:   { a: 45,  r: 0.6, size: 26, group: "infra", full: "Persistent Ledger" },
+            GB:    { a: 315, r: 0.6, size: 22, group: "semantic", full: "Genesis Bailout" },
+            CR:    { a: 285, r: 4.0, size: 22, group: "semantic", full: "Compute Credit" },
+            DP:    { a: 100, r: 3.2, size: 22, group: "semantic", full: "Darwinian Pruning" },
+
+            REDIS: { a: 270, r: 3.5, size: 30, group: "infra", full: "Broker/Memory Store" },
+            CEL:   { a: 325, r: 3.5, size: 30, group: "infra", full: "Task Queue" },
+            TAIL:  { a: 335, r: 3.5, size: 30, group: "infra", full: "Mesh Networking" },
+            WS:    { a: 180, r: 2.5, size: 30, group: "infra", full: "WebSocket Event Bus" },
+            API:   { a: 190, r: 2.5, size: 30, group: "infra", full: "REST Interface" }
+        };
+
+        const data = { nodes: [], links: [] };
+
+        // Generate Nodes
+        for (const [id, props] of Object.entries(polarMap)) {
+            const rad = (props.a - 90) * Math.PI / 180; // Map 0 to UP
+            data.nodes.push({
+                id: id,
+                label: id,
+                full: props.full,
+                color: colors[props.group] || "#888",
+                size: props.size,
+                x: cX + props.r * S * Math.cos(rad),
+                y: cY + props.r * S * Math.sin(rad)
+            });
+        }
+
+        // Define Links (Zero-Overlap Guaranteed by Polar Math)
+        const connections = [
+            // Core
+            { s: "ACE", t: "CAP" }, { s: "ACE", t: "GCE" }, { s: "ACE", t: "GFS" },
+            { s: "CAP", t: "CLIDE" }, { s: "CAP", t: "APC" }, { s: "CAP", t: "PIE" },
+            
+            // Sub-components
+            { s: "CLIDE", t: "IDAG" }, { s: "CLIDE", t: "SLC" },
+            { s: "APC", t: "ARM" }, { s: "APC", t: "PRV" }, { s: "APC", t: "DSC" },
+            { s: "PIE", t: "PCA" }, { s: "PIE", t: "DIA" }, { s: "PIE", t: "PIA" },
+            { s: "GCE", t: "SBK" }, { s: "GCE", t: "CVL" }, { s: "GCE", t: "ARC" }, { s: "GCE", t: "CSH" },
+            { s: "GFS", t: "COG" }, { s: "GFS", t: "MEM" }, { s: "GFS", t: "TEL" }, { s: "GFS", t: "TOP" },
+            
+            // Deep leaves
+            { s: "DSC", t: "SEH" },
+            { s: "TOP", t: "AST" }, { s: "TOP", t: "DSL" },
+            { s: "SLC", t: "LCLK" }, { s: "SLC", t: "TTL" }, { s: "SLC", t: "LED" },
+            
+            // Perimeter Bridges (Planar Embeddings)
+            { s: "IDAG", t: "ARM", reason: "Intent ⇢ Action" },
+            { s: "SEH", t: "PCA", reason: "Mutation Proof ⇢ Perception" },
+            { s: "DIA", t: "COG", reason: "Diagnostic ⇢ Reasoning" },
+            { s: "ARC", t: "IDAG", reason: "Presets ⇢ Intent" },
+            { s: "CSH", t: "CVL", reason: "History ⇢ Rules" },
+            
+            // Infra & Semantic
+            { s: "VO", t: "GCE" }, { s: "CRV", t: "VO" }, { s: "CB", t: "GFS" },
+            { s: "GEN", t: "CAP" }, { s: "SQL", t: "CAP" }, { s: "GB", t: "CAP" },
+            { s: "DP", t: "PIE" }, { s: "CR", t: "SLC" },
+            { s: "REDIS", t: "CLIDE" }, { s: "CEL", t: "ARM" }, { s: "TAIL", t: "ARM" },
+            { s: "WS", t: "ACE" }, { s: "API", t: "ACE" },
+
+            // TRIPLE-PACK (Rendered as Bezier curves to prevent crossing inner rings)
+            { s: "TRP", t: "GFS", curve: true },
+            { s: "TRP", t: "CLIDE", curve: true },
+            { s: "TRP", t: "AST", curve: true },
+            { s: "TRP", t: "GCE", curve: true }
+        ];
+
+        connections.forEach(c => {
+            data.links.push({
+                source: data.nodes.find(n => n.id === c.s),
+                target: data.nodes.find(n => n.id === c.t),
+                reason: c.reason || "Structural Definition",
+                curve: c.curve || false
+            });
+        });
+
+        const svg = d3.select("#canvas").attr("viewBox", [0, 0, width, height]);
+        const defs = svg.append("defs");
+
+        // Gradients
+        data.links.forEach((l, i) => {
+            const grad = defs.append("linearGradient").attr("id", `grad-${i}`).attr("gradientUnits", "userSpaceOnUse");
+            grad.append("stop").attr("offset", "0%").attr("stop-color", l.source.color);
+            grad.append("stop").attr("offset", "100%").attr("stop-color", l.target.color);
+        });
+
+        const container = svg.append("g");
+        const zoom = d3.zoom().scaleExtent([0.1, 10]).on("zoom", (e) => container.attr("transform", e.transform));
+        svg.call(zoom);
+
+        // Path Drawer
+        function drawPath(d) {
+            const sx = d.source.x, sy = d.source.y;
+            const tx = d.target.x, ty = d.target.y;
+            
+            if (!d.curve) return `M${sx},${sy} L${tx},${ty}`;
+
+            // Outward bending Bezier curve for TRP connections
+            const midX = (sx + tx) / 2;
+            const midY = (sy + ty) / 2;
+            const dx = tx - sx;
+            const dy = ty - sy;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            
+            const nx = (midX - cX) / Math.sqrt(Math.pow(midX - cX, 2) + Math.pow(midY - cY, 2));
+            const ny = (midY - cY) / Math.sqrt(Math.pow(midX - cX, 2) + Math.pow(midY - cY, 2));
+            
+            const cpX = midX + nx * (dist / 1.5);
+            const cpY = midY + ny * (dist / 1.5);
+
+            return `M${sx},${sy} Q${cpX},${cpY} ${tx},${ty}`;
+        }
+
+        const link = container.append("g").selectAll("path").data(data.links).join("path")
+            .attr("d", drawPath)
+            .attr("fill", "none")
+            .attr("stroke", (d, i) => `url(#grad-${i})`)
+            .attr("stroke-width", 6)
+            .attr("stroke-opacity", 0.6)
+            .style("cursor", "pointer")
+            .on("click", (e, d) => showLinkInfo(e, d));
+
+        const node = container.append("g").selectAll("g").data(data.nodes).join("g")
+            .attr("transform", d => `translate(${d.x},${d.y})`)
+            .style("cursor", "pointer").on("click", (e, d) => showNodeInfo(e, d));
+
+        node.append("circle").attr("r", d => d.size).attr("fill", d => d.color).attr("stroke", "#000").attr("stroke-width", 2)
+            .style("filter", d => `drop-shadow(0 0 ${d.size/3}px ${d.color})`);
+
+        node.append("text").attr("text-anchor", "middle").attr("dy", ".35em").text(d => d.label)
+            .attr("fill", d => (d.group === 'gfs' || d.group === 'gce' || d.group === 'ace' || d.group === 'semantic') ? "#000" : "#fff")
+            .style("font-weight", "bold").style("font-size", d => (d.size / 2.2) + "px").style("pointer-events", "none");
+
+        // Interaction Panels
+        function showNodeInfo(e, d) {
+            e.stopPropagation(); d3.selectAll("circle").classed("selected-node", false); d3.select(e.currentTarget).select("circle").classed("selected-node", true);
+            const panel = d3.select("#info-panel"); panel.style("opacity", 1).style("border-color", d.color);
+            d3.select("#info-content").html(`<h3>${d.id} Node</h3><p><strong>Identity:</strong> ${d.full}</p><p><strong>Status:</strong> LOCKED GEOMETRY</p>`);
+        }
+
+        function showLinkInfo(e, d) {
+            e.stopPropagation(); d3.selectAll("path").classed("selected-link", false); d3.select(e.currentTarget).classed("selected-link", true);
+            const panel = d3.select("#info-panel"); panel.style("opacity", 1).style("border-color", "#fff");
+            d3.select("#info-content").html(`<h3>Causal Interdependency</h3><p><strong>Path:</strong> ${d.source.id} ⇢ ${d.target.id}</p><p><strong>Logic:</strong> ${d.reason}</p>`);
+        }
+
+        function hidePanel() { d3.select("#info-panel").style("opacity", 0); d3.selectAll("circle").classed("selected-node", false); d3.selectAll("path").classed("selected-link", false); }
+        svg.on("click", hidePanel);
+        
+        // Initial Zoom alignment
+        svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(width/2, height/2).scale(0.5).translate(-cX, -cY));
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# CAP State Hashing Ignore List
+# Prevents performance bottlenecks by excluding high-entropy or massive directories
+
+# Node/Build Artifacts
+node_modules/
+dist/
+build/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment & Metadata
+.git/
+.venv/
+env/
+venv/
+.env
+
+# CAP Internal Data (handled by DB, not filesystem hashing)
+data/*.db
+data/*.db-wal
+data/*.db-shm
+logs/
+.cap/operator_manifest.json
+
+# Temporary Files
+tmp/
+*.log
+*.bak
+*.swp
+.DS_Store

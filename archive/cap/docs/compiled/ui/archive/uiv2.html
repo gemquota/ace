@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATEGORY 1 // SUBCATEGORY_1</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --red-muted: #661414;
+            --red-mid: #8a1a1a;
+            --red-bright: #cc2424;
+            --cyan-dim: #1a5c66;
+            --border-muted: rgba(102, 20, 20, 0.4);
+            --metal-shine: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 45%, #333 50%, #1a1a1a 55%, #111 100%);
+            --glass-bg: rgba(15, 15, 15, 0.7);
+            --trans-timing: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.15); /* Bouncy, mechanical snap */
+            --trans-slow: 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            background-color: var(--bg-deep); color: #999;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            overflow: hidden; 
+        }
+
+        .bg-lines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--border-muted) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--border-muted) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.04; z-index: 0;
+        }
+
+        #app-container {
+            position: relative; width: 100vw; height: 100vh;
+            z-index: 10;
+        }
+
+        /* 1. STRETCH MAIN CONTENT TO FULL WIDTH */
+        #content-wrapper {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            overflow-y: auto; background: #000; z-index: 1;
+            transition: padding-top 0.6s ease;
+        }
+
+        #content {
+            padding: 60px 4vw; width: 100%; box-sizing: border-box;
+            background: radial-gradient(circle at top right, #0d0d0d, #050505);
+            min-height: 100%;
+        }
+
+        #sidebar-overlay {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 100; pointer-events: none;
+            perspective: 2500px;
+        }
+        #sidebar-overlay.active { pointer-events: auto; }
+
+        #sidebar-scroll-area {
+            width: 420px; height: 100%; padding: 20px; box-sizing: border-box;
+            overflow-y: auto; overflow-x: visible; pointer-events: auto;
+            scrollbar-width: none;
+            transition: all 0.6s ease;
+        }
+        #sidebar-scroll-area::-webkit-scrollbar { display: none; }
+
+        /* 2. STYLIZED MENU ICON BUTTON */
+        #menu-trigger {
+            position: fixed; top: 30px; left: 30px; z-index: 1000;
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            border: 1px solid var(--red-muted);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 15px rgba(204, 36, 36, 0.2);
+            width: 50px; height: 50px; cursor: pointer;
+            transition: all 0.4s; opacity: 0; pointer-events: none;
+            transform: translateX(-200px) rotate(-90deg);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+        }
+        #menu-trigger.visible { opacity: 1; pointer-events: auto; transform: translateX(0) rotate(0deg); }
+        #menu-trigger:hover { background: rgba(30, 30, 30, 0.9); border-color: var(--red-bright); }
+        
+        .trigger-bar {
+            width: 25px; height: 2px; background: var(--red-bright);
+            box-shadow: 0 0 5px var(--red-mid); transition: 0.3s;
+        }
+        .trigger-bar:nth-child(2) { width: 15px; }
+
+        /* 3. MULTISTAGE TANGRAM MACHINERY MODULES */
+        .menu-chunk {
+            background: transparent;
+            margin-bottom: 25px; position: relative;
+            transform-origin: center center; transform-style: preserve-3d;
+            transition: transform var(--trans-slow), opacity 0.4s ease, filter 0.5s ease, width 0.6s, height 0.6s;
+        }
+
+        /* Tangram Segmentation Wrapper */
+        .chunk-tangram-wrapper {
+            display: grid;
+            grid-template-columns: 30px 1fr 40px;
+            grid-template-rows: auto auto;
+            gap: 4px;
+            transform-style: preserve-3d;
+        }
+
+        .tangram-piece {
+            background: var(--metal-shine); border: 1px solid #111;
+            box-shadow: inset 1px 1px 0 rgba(255,255,255,0.05), inset -1px -1px 0 rgba(0,0,0,0.8), 5px 5px 15px rgba(0,0,0,0.9);
+            position: relative;
+        }
+
+        .piece-sq-1 { grid-column: 1; grid-row: 1; height: 30px; border-bottom: 2px solid var(--red-muted); }
+        .piece-rect-long { grid-column: 2; grid-row: 1; display: flex; align-items: center; justify-content: center; }
+        .piece-sq-2 { grid-column: 3; grid-row: 1; height: 30px; background: rgba(204, 36, 36, 0.1); }
+        .piece-main-body { grid-column: 1 / span 3; grid-row: 2; }
+
+        .chunk-inner {
+            background: rgba(10, 10, 10, 0.6); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 15px; position: relative; z-index: 2;
+        }
+
+        /* Complex Folding Animations for Hidden State */
+        #sidebar-overlay:not(.active):not(.minimized) .menu-chunk {
+            opacity: 0; filter: blur(10px); pointer-events: none;
+        }
+        #sidebar-overlay:not(.active):not(.minimized) .chunk-type-1 { transform: rotateY(180deg) rotateX(90deg) rotateZ(-45deg) translate3d(-300px, -500px, -800px); }
+        #sidebar-overlay:not(.active):not(.minimized) .chunk-type-2 { transform: rotateY(-180deg) rotateX(-90deg) rotateZ(45deg) translate3d(500px, 300px, -1000px) scale(0.5); }
+        #sidebar-overlay:not(.active):not(.minimized) .chunk-type-3 { transform: rotateX(180deg) rotateZ(90deg) translate3d(-400px, 800px, -600px) skew(20deg); }
+        #sidebar-overlay:not(.active):not(.minimized) .chunk-type-4 { transform: rotateY(90deg) rotateX(-180deg) translate3d(600px, -400px, -900px) scale(1.5); }
+
+        /* 4. GRID MINIMIZATION ALONG TOP ROW */
+        #sidebar-overlay.minimized {
+            pointer-events: auto; background: transparent; 
+            height: 80px; width: 100vw;
+        }
+        
+        #sidebar-overlay.minimized #sidebar-scroll-area {
+            display: flex; flex-direction: row; justify-content: center; align-items: center;
+            width: 100vw; height: 80px; padding: 0 20px;
+            background: linear-gradient(to bottom, rgba(5,5,5,0.9), transparent);
+            border-bottom: 1px solid rgba(102, 20, 20, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        #sidebar-overlay.minimized .menu-chunk {
+            width: 45px; height: 45px; margin: 0 15px;
+            transform: rotate(0) translate(0) scale(1) !important;
+            opacity: 1 !important; filter: none !important;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #sidebar-overlay.minimized .menu-chunk:hover {
+            transform: scale(1.2) translateY(-5px) !important;
+            box-shadow: 0 10px 20px rgba(204, 36, 36, 0.3);
+        }
+
+        #sidebar-overlay.minimized .chunk-tangram-wrapper {
+            grid-template-columns: 1fr; grid-template-rows: 1fr;
+            height: 100%;
+        }
+
+        /* Hide all internal content when minimized, show icon */
+        #sidebar-overlay.minimized .piece-sq-1, 
+        #sidebar-overlay.minimized .piece-sq-2, 
+        #sidebar-overlay.minimized .piece-main-body,
+        #sidebar-overlay.minimized .tier-1-header span {
+            display: none;
+        }
+
+        #sidebar-overlay.minimized .piece-rect-long {
+            grid-column: 1; grid-row: 1; height: 100%;
+            background: var(--metal-shine); border-radius: 4px;
+        }
+        
+        /* Icon pseudo-element for minimized squares */
+        #sidebar-overlay.minimized .piece-rect-long::after {
+            content: '◰'; font-size: 20px; color: var(--red-bright);
+        }
+        #sidebar-overlay.minimized .chunk-type-2 .piece-rect-long::after { content: '◳'; color: #ccc; }
+        #sidebar-overlay.minimized .chunk-type-3 .piece-rect-long::after { content: '◱'; color: var(--cyan-dim); }
+        #sidebar-overlay.minimized .chunk-type-4 .piece-rect-long::after { content: '◲'; }
+
+        /* Push content down when top bar is active */
+        body.has-top-bar #content-wrapper { padding-top: 80px; }
+
+        /* Internal UI Elements */
+        .tier-1-header {
+            color: var(--red-bright); font-size: 0.7em; text-transform: uppercase;
+            letter-spacing: 3px; font-weight: bold; width: 100%; text-align: center;
+        }
+
+        .tier-2-wrapper { margin-bottom: 6px; }
+        .tier-2-header {
+            color: #ccc; font-size: 0.65em; text-transform: uppercase; letter-spacing: 1.5px;
+            padding: 10px 12px; background: rgba(0, 0, 0, 0.4); border-left: 2px solid var(--red-muted);
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+        }
+        .tier-2-header::after { content: '⚙'; font-size: 1em; color: #555; transition: transform 0.4s; }
+        .tier-2-wrapper.active .tier-2-header::after { transform: rotate(180deg); color: var(--red-bright); }
+
+        .tier-3-container { max-height: 0; overflow: hidden; transition: max-height 0.4s; background: rgba(0,0,0,0.6); opacity: 0; }
+        .tier-2-wrapper.active .tier-3-container { max-height: 1000px; opacity: 1; }
+
+        .doc-link {
+            display: block; padding: 8px 15px; color: #666; text-decoration: none; cursor: pointer;
+            font-size: 0.75em; border-bottom: 1px solid rgba(255,255,255,0.01);
+        }
+        .doc-link:hover { color: #aaa; background: rgba(255, 255, 255, 0.03); padding-left: 20px; }
+        .doc-link.active { color: #fff; background: rgba(138, 26, 26, 0.3); border-right: 3px solid var(--red-bright); }
+
+        /* Controls */
+        .controls-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-muted);
+        }
+        .ctrl-btn {
+            background: transparent; border: 1px solid #555; color: #888;
+            padding: 5px 10px; cursor: pointer; font-family: monospace; transition: 0.3s;
+        }
+        .ctrl-btn:hover { background: var(--red-muted); color: #fff; border-color: var(--red-bright); }
+
+        #content h1 { color: #eee; border-bottom: 2px solid var(--red-muted); padding-bottom: 15px; }
+        #content h2 { color: #8a1a1a; font-size: 1.5em; margin-top: 50px; }
+        #content p, #content li { line-height: 1.8; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="bg-lines"></div>
+    
+    <div id="menu-trigger" onclick="event.stopPropagation(); setMenuState('expanded')" class="visible">
+        <div class="trigger-bar"></div>
+        <div class="trigger-bar"></div>
+        <div class="trigger-bar"></div>
+    </div>
+
+    <div id="app-container">
+        <div id="content-wrapper">
+            <div id="content">
+                <h1 style="text-align:center; margin-top: 25vh; border:none; color: #222; font-size: 4em; letter-spacing: 20px;">00</h1>
+            </div>
+        </div>
+
+        <div id="sidebar-overlay">
+            <div id="sidebar-scroll-area" onclick="event.stopPropagation()">
+                
+                <div class="controls-header">
+                    <div style="font-size:0.7em; letter-spacing: 2px; color: #666;">SYS_NAV</div>
+                    <div>
+                        <button class="ctrl-btn" onclick="setMenuState('minimized')" title="Minimize to Top Grid">[ _ ]</button>
+                        <button class="ctrl-btn" onclick="setMenuState('hidden')" title="Close Menu">[ X ]</button>
+                    </div>
+                </div>
+
+                <div id="menu-chunks"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const docsData = {
+            "CATEGORY 1": {
+                "SUBCATEGORY 1": {
+                    "FILE 1": "# HEADER 1\n\n## HEADER 2\nBODY 1\n\n* LIST 1\n* LIST 2",
+                    "FILE 2": "# HEADER 3\n\n## HEADER 4\nBODY 2"
+                },
+                "SUBCATEGORY 2": {
+                    "FILE 3": "# HEADER 5\n\nBODY 3"
+                }
+            },
+            "CATEGORY 2": {
+                "SUBCATEGORY 3": {
+                    "FILE 4": "# HEADER 6\n\nBODY 4"
+                }
+            }
+        };
+
+        // States: 'hidden', 'expanded', 'minimized'
+        let currentState = 'hidden';
+
+        function setMenuState(newState) {
+            const overlay = document.getElementById('sidebar-overlay');
+            const btn = document.getElementById('menu-trigger');
+            
+            currentState = newState;
+
+            // Reset classes
+            overlay.classList.remove('active', 'minimized');
+            btn.classList.remove('visible');
+            document.body.classList.remove('has-top-bar');
+
+            if (currentState === 'expanded') {
+                overlay.classList.add('active');
+            } else if (currentState === 'minimized') {
+                overlay.classList.add('minimized');
+                document.body.classList.add('has-top-bar');
+            } else {
+                // hidden
+                btn.classList.add('visible');
+            }
+        }
+
+        function renderMenu() {
+            const menuContainer = document.getElementById('menu-chunks');
+            let chunkIndex = 1;
+            
+            for (const [catName, subcats] of Object.entries(docsData)) {
+                const typeClass = 'chunk-type-' + ((chunkIndex % 4) + 1);
+                const chunk = document.createElement('div');
+                chunk.className = `menu-chunk ${typeClass}`;
+                chunk.style.transitionDelay = (chunkIndex * 0.08) + "s";
+                
+                // Tangram Wrapper
+                const tangramWrapper = document.createElement('div');
+                tangramWrapper.className = 'chunk-tangram-wrapper';
+
+                // Tangram Pieces (Rects and Squares)
+                const sq1 = document.createElement('div'); sq1.className = 'tangram-piece piece-sq-1';
+                const rectLong = document.createElement('div'); rectLong.className = 'tangram-piece piece-rect-long';
+                const sq2 = document.createElement('div'); sq2.className = 'tangram-piece piece-sq-2';
+                const mainBody = document.createElement('div'); mainBody.className = 'tangram-piece piece-main-body';
+
+                // Add text/headers into the appropriate pieces
+                const catHeader = document.createElement('div'); 
+                catHeader.className = 'tier-1-header'; 
+                const catSpan = document.createElement('span');
+                catSpan.textContent = catName;
+                catHeader.appendChild(catSpan);
+                rectLong.appendChild(catHeader);
+
+                // Clicking a minimized chunk restores it to expanded view
+                chunk.onclick = (e) => {
+                    if(currentState === 'minimized') {
+                        e.stopPropagation();
+                        setMenuState('expanded');
+                    }
+                };
+
+                const inner = document.createElement('div'); inner.className = 'chunk-inner';
+
+                // Subcategories build-out
+                for (const [subcatName, files] of Object.entries(subcats)) {
+                    const subcatWrapper = document.createElement('div'); subcatWrapper.className = 'tier-2-wrapper active';
+                    const subcatHeader = document.createElement('div'); subcatHeader.className = 'tier-2-header'; subcatHeader.textContent = subcatName;
+                    
+                    subcatHeader.onclick = (e) => {
+                        e.stopPropagation();
+                        subcatWrapper.classList.toggle('active');
+                    };
+                    
+                    subcatWrapper.appendChild(subcatHeader);
+                    const linksContainer = document.createElement('div'); linksContainer.className = 'tier-3-container';
+                    
+                    for (const [title, content] of Object.entries(files)) {
+                        const link = document.createElement('a'); link.className = 'doc-link'; link.textContent = title;
+                        link.onclick = (e) => {
+                            e.preventDefault(); e.stopPropagation();
+                            document.querySelectorAll('.doc-link').forEach(el => el.classList.remove('active'));
+                            link.classList.add('active');
+                            renderContent(content);
+                            // Auto-minimize on mobile-sized screens upon selection, else stay expanded
+                            if(window.innerWidth < 800) setMenuState('minimized');
+                        };
+                        linksContainer.appendChild(link);
+                    }
+                    subcatWrapper.appendChild(linksContainer); 
+                    inner.appendChild(subcatWrapper);
+                }
+
+                mainBody.appendChild(inner);
+
+                // Assemble tangram piece structure
+                tangramWrapper.appendChild(sq1);
+                tangramWrapper.appendChild(rectLong);
+                tangramWrapper.appendChild(sq2);
+                tangramWrapper.appendChild(mainBody);
+
+                chunk.appendChild(tangramWrapper); 
+                menuContainer.appendChild(chunk);
+                chunkIndex++;
+            }
+        }
+
+        function renderContent(markdownString) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.style.opacity = 0;
+            setTimeout(() => {
+                contentDiv.innerHTML = marked.parse(markdownString);
+                contentDiv.style.opacity = 1;
+                document.getElementById('content-wrapper').scrollTop = 0;
+            }, 200);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMenu();
+            setMenuState('hidden'); // Initialize state
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACE SUITE: SOVEREIGN PENTAD MESH</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --bg: #050505; --surface: #111; --text: #e0e0e0;
+            --will: #bb86fc; --logic: #03dac6; --action: #ffb74d; --memory: #2196F3; --economy: #4CAF50;
+        }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; overflow: hidden; }
+        #canvas { width: 100vw; height: 100vh; cursor: crosshair; }
+        .header { position: absolute; top: 20px; left: 20px; z-index: 10; pointer-events: none; }
+        .header h1 { margin: 0; font-size: 1.5em; color: var(--will); text-transform: uppercase; letter-spacing: 2px; }
+        .header p { margin: 5px 0; color: #888; font-size: 0.9em; }
+        .legend { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.85); padding: 12px; border: 1px solid #333; border-radius: 4px; font-size: 0.8em; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 5px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+        #info-panel { position: absolute; top: 20px; right: 20px; width: 300px; background: rgba(0,0,0,0.9); border: 1px solid var(--will); padding: 15px; border-radius: 4px; opacity: 0; transition: 0.3s; z-index: 20; }
+        #info-panel h3 { margin: 0 0 10px 0; color: var(--will); text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        #info-panel p { margin: 5px 0; font-size: 0.9em; line-height: 1.4; color: #ccc; }
+        .close-btn { position: absolute; top: 5px; right: 10px; cursor: pointer; color: #888; }
+        .selected-node { stroke: #fff !important; stroke-width: 4px !important; }
+        .selected-link { stroke-opacity: 1 !important; stroke-width: 3px !important; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ACE SUITE // SOVEREIGN PENTAD</h1>
+        <p>Interactive Mesh v0.2.0 | Select Nodes/Links for Detail</p>
+    </div>
+
+    <div id="info-panel">
+        <span class="close-btn" onclick="hidePanel()">×</span>
+        <div id="info-content"></div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="dot" style="background:var(--will)"></div> EXECUTIVE (CLIDE)</div>
+        <div class="legend-item"><div class="dot" style="background:var(--action)"></div> EXECUTION (APC)</div>
+        <div class="legend-item"><div class="dot" style="background:var(--memory)"></div> ANALYSIS (PIE/GCE)</div>
+        <div class="legend-item"><div class="dot" style="background:var(--logic)"></div> LOGIC (GFS)</div>
+        <div class="legend-item"><div class="dot" style="background:var(--economy)"></div> ECONOMY (SWARM)</div>
+    </div>
+
+    <svg id="canvas"></svg>
+
+    <script>
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        const data = {
+            nodes: [
+                // ROOT
+                { id: "ACE", group: "will", label: "ACE", full: "Agentic Context Engineering (The Sovereign Host)", size: 65, level: 1 },
+                { id: "CAP", group: "will", label: "CAP", full: "Cognitive Architecture Platform (The Core Platform)", size: 55, level: 1 },
+
+                // SOVEREIGN PENTAD
+                { id: "CLIDE", group: "will", label: "CLIDE", full: "The Executive: Goal Resolution & Intent Scheduling", size: 42, level: 2 },
+                { id: "APC", group: "action", label: "APC", full: "The Executioner: Sandboxed Command Validation", size: 42, level: 2 },
+                { id: "PIE", group: "memory", label: "PIE (CAP)", full: "The Analyst: Causal Graph Reconstruction", size: 42, level: 2 },
+                { id: "GCE", group: "memory", label: "GCE", full: "The Forge: Context Engineering & Asset Management", size: 42, level: 2 },
+                { id: "GFS", group: "logic", label: "GFS", full: "The Logic: Glyph-Native Cognitive Substrate", size: 42, level: 2 },
+
+                // SUB-COMPONENTS
+                { id: "IDAG", group: "will", label: "IDAG", full: "Intent Directed Acyclic Graph", size: 18, level: 3 },
+                { id: "SLC", group: "will", label: "SLC", full: "Swarm Ledger & Comms", size: 18, level: 3 },
+                { id: "ARM", group: "action", label: "ARM", full: "Automated Resource Manager Daemon", size: 18, level: 3 },
+                { id: "PRV", group: "action", label: "PRV", full: "Pre-Execution Validation Filter", size: 18, level: 3 },
+                { id: "DSC", group: "action", label: "DSC", full: "Deterministic State Capture (Hashing)", size: 18, level: 3 },
+                { id: "PCA", group: "memory", label: "PCA", full: "Praxis Causal Analysis Engine", size: 18, level: 3 },
+                { id: "DIA", group: "memory", label: "DIA", full: "Diagnostic Inference Agent", size: 18, level: 3 },
+                { id: "SBK", group: "memory", label: "SBK", full: "Snippet Bank Library", size: 18, level: 3 },
+                { id: "CVL", group: "memory", label: "CVL", full: "Context Vault Library", size: 18, level: 3 },
+                { id: "ARC", group: "memory", label: "ARC", full: "Architecture Collections (Presets)", size: 18, level: 3 },
+                { id: "CSH", group: "memory", label: "CSH", full: "Chat Sessions History", size: 18, level: 3 },
+                { id: "COG", group: "logic", label: "COG", full: "Cognitive Substrate (LLM Reasoning)", size: 18, level: 3 },
+                { id: "MEM", group: "logic", label: "MEM", full: "Memory Substrate (Graph Persistence)", size: 18, level: 3 },
+                { id: "TOP", group: "logic", label: "TOP", full: "Topology Substrate (Mutation)", size: 18, level: 3 }
+            ],
+            links: [
+                { source: "ACE", target: "CAP", reason: "Sovereign Host wraps the Core Platform", type: "hierarchy" },
+                { source: "ACE", target: "GCE", reason: "Interface for Context Engineering", type: "hierarchy" },
+                { source: "ACE", target: "GFS", reason: "Logic Core for Neural Operations", type: "hierarchy" },
+                { source: "CAP", target: "CLIDE", reason: "Executive branch of CAP", type: "hierarchy" },
+                { source: "CAP", target: "APC", reason: "Execution branch of CAP", type: "hierarchy" },
+                { source: "CAP", target: "PIE", reason: "Analysis branch of CAP", type: "hierarchy" },
+                { source: "CLIDE", target: "IDAG", reason: "Compiles goals into Task Graphs", type: "hierarchy" },
+                { source: "CLIDE", target: "SLC", reason: "Manages economic and temporal state", type: "hierarchy" },
+                { source: "APC", target: "ARM", reason: "Dispatches tasks to worker daemons", type: "hierarchy" },
+                { source: "APC", target: "PRV", reason: "Filters commands before execution", type: "hierarchy" },
+                { source: "APC", target: "DSC", reason: "Hashes filesystem for verification", type: "hierarchy" },
+                { source: "PIE", target: "PCA", reason: "Reconstructs events from ledger", type: "hierarchy" },
+                { source: "PIE", target: "DIA", reason: "Identifies failure roots in traces", type: "hierarchy" },
+                { source: "GCE", target: "SBK", reason: "Maintains atomic logic fragments", type: "hierarchy" },
+                { source: "GCE", target: "CVL", reason: "Maintains behavioral constitutions", type: "hierarchy" },
+                { source: "GCE", target: "ARC", reason: "Maintains structural preset schemas", type: "hierarchy" },
+                { source: "GCE", target: "CSH", reason: "Maintains causal interaction logs", type: "hierarchy" },
+                { source: "GFS", target: "COG", reason: "Reasoning substrate for graph steps", type: "hierarchy" },
+                { source: "GFS", target: "MEM", reason: "Persistence substrate for neural state", type: "hierarchy" },
+                { source: "GFS", target: "TOP", reason: "Mutation substrate for graph changes", type: "hierarchy" },
+
+                // QUANTUM BRIDGES
+                { source: "IDAG", target: "ARM", reason: "Executive intent triggers mechanical action", type: "bridge" },
+                { source: "DSC", target: "PCA", reason: "Verification hashes drive causal analysis", type: "bridge" },
+                { source: "DIA", target: "COG", reason: "Diagnostic results refine agent reasoning", type: "bridge" },
+                { source: "ARC", target: "IDAG", reason: "Structural presets dictate intent scaffolding", type: "bridge" },
+                { source: "CSH", target: "CVL", reason: "Interaction logs crystallize into system rules", type: "bridge" }
+            ]
+        };
+
+        const colors = {
+            will: "#bb86fc",
+            logic: "#03dac6",
+            action: "#ffb74d",
+            memory: "#2196F3",
+            economy: "#4CAF50"
+        };
+
+        const svg = d3.select("#canvas")
+            .attr("viewBox", [0, 0, width, height]);
+
+        // Define Linear Gradients for all links
+        const defs = svg.append("defs");
+        data.links.forEach((l, i) => {
+            const sourceNode = data.nodes.find(n => n.id === l.source);
+            const targetNode = data.nodes.find(n => n.id === l.target);
+            const grad = defs.append("linearGradient")
+                .attr("id", `grad-${i}`)
+                .attr("gradientUnits", "userSpaceOnUse");
+            
+            grad.append("stop").attr("offset", "0%").attr("stop-color", colors[sourceNode.group]);
+            grad.append("stop").attr("offset", "100%").attr("stop-color", colors[targetNode.group]);
+        });
+
+        const container = svg.append("g");
+
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 10])
+            .on("zoom", (event) => container.attr("transform", event.transform));
+
+        svg.call(zoom);
+
+        const simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.links).id(d => d.id).distance(d => d.type === 'bridge' ? 120 : 60))
+            .force("charge", d3.forceManyBody().strength(-800))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collision", d3.forceCollide().radius(d => d.size + 10));
+
+        const link = container.append("g")
+            .selectAll("line")
+            .data(data.links)
+            .join("line")
+            .attr("stroke", (d, i) => `url(#grad-${i})`)
+            .attr("stroke-width", d => d.type === 'bridge' ? 2 : 1.5)
+            .attr("stroke-dasharray", d => d.type === 'bridge' ? "4,4" : "none")
+            .attr("stroke-opacity", 0.4)
+            .style("cursor", "pointer")
+            .on("click", (event, d) => showLinkInfo(event, d));
+
+        const node = container.append("g")
+            .selectAll("g")
+            .data(data.nodes)
+            .join("g")
+            .style("cursor", "pointer")
+            .on("click", (event, d) => showNodeInfo(event, d))
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        node.append("circle")
+            .attr("r", d => d.size)
+            .attr("fill", d => colors[d.group])
+            .attr("stroke", "#000")
+            .attr("stroke-width", 2)
+            .style("filter", "drop-shadow(0 0 5px rgba(255,255,255,0.1))");
+
+        node.append("text")
+            .attr("text-anchor", "middle")
+            .attr("dy", ".35em")
+            .text(d => d.label)
+            .attr("fill", "#000")
+            .style("font-weight", "bold")
+            .style("font-size", d => (d.size / 2.5) + "px")
+            .style("pointer-events", "none");
+
+        simulation.on("tick", () => {
+            link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+            
+            // Update gradient coords on every tick
+            data.links.forEach((l, i) => {
+                d3.select(`#grad-${i}`)
+                    .attr("x1", l.source.x).attr("y1", l.source.y)
+                    .attr("x2", l.target.x).attr("y2", l.target.y);
+            });
+
+            node.attr("transform", d => `translate(${d.x},${d.y})`);
+        });
+
+        function showNodeInfo(event, d) {
+            event.stopPropagation();
+            d3.selectAll("circle").classed("selected-node", false);
+            d3.select(event.currentTarget).select("circle").classed("selected-node", true);
+            
+            const panel = d3.select("#info-panel");
+            panel.style("opacity", 1).style("border-color", colors[d.group]);
+            d3.select("#info-content").html(`
+                <h3>${d.id} Node</h3>
+                <p><strong>Identity:</strong> ${d.full}</p>
+                <p><strong>Dimension:</strong> ${d.group.toUpperCase()}</p>
+                <p><strong>Level:</strong> ${d.level}</p>
+            `);
+        }
+
+        function showLinkInfo(event, d) {
+            event.stopPropagation();
+            d3.selectAll("line").classed("selected-link", false);
+            d3.select(event.currentTarget).classed("selected-link", true);
+            
+            const panel = d3.select("#info-panel");
+            panel.style("opacity", 1).style("border-color", "#888");
+            d3.select("#info-content").html(`
+                <h3>Causal Link</h3>
+                <p><strong>Source:</strong> ${d.source.id}</p>
+                <p><strong>Target:</strong> ${d.target.id}</p>
+                <p><strong>Reason:</strong> ${d.reason}</p>
+                <p><strong>Type:</strong> ${d.type.toUpperCase()}</p>
+            `);
+        }
+
+        function hidePanel() { d3.select("#info-panel").style("opacity", 0); }
+        svg.on("click", hidePanel);
+
+        function dragstarted(event) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            event.subject.fx = event.subject.x;
+            event.subject.fy = event.subject.y;
+        }
+        function dragged(event) { event.subject.fx = event.x; event.subject.fy = event.y; }
+        function dragended(event) {
+            if (!event.active) simulation.alphaTarget(0);
+            event.subject.fx = null;
+            event.subject.fy = null;
+        }
+    </script>
+</body>
+</html>

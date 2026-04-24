@@ -1,0 +1,2649 @@
+# Hierarchical Table of Contents
+
+```
+.
+├── library/
+│   └── programs.json
+├── src/
+│   └── backend/
+│       ├── engine.py
+│       └── models.py
+├── web/
+│   ├── js/
+│   │   ├── api.js
+│   │   ├── canvas.js
+│   │   ├── editor.js
+│   │   └── main.js
+│   ├── index.html
+│   └── style.css
+├── ~/
+│   └── .termux/
+│       ├── font.ttf
+│       ├── LICENSE
+│       ├── LICENSE.txt
+│       ├── MesloLGLDZNerdFont-Bold.ttf
+│       ├── MesloLGLDZNerdFont-BoldItalic.ttf
+│       ├── MesloLGLDZNerdFont-Italic.ttf
+│       ├── MesloLGLDZNerdFont-Regular.ttf
+│       ├── MesloLGLDZNerdFontMono-Bold.ttf
+│       ├── MesloLGLDZNerdFontMono-BoldItalic.ttf
+│       ├── MesloLGLDZNerdFontMono-Italic.ttf
+│       ├── MesloLGLDZNerdFontMono-Regular.ttf
+│       ├── MesloLGLDZNerdFontPropo-Bold.ttf
+│       ├── MesloLGLDZNerdFontPropo-BoldItalic.ttf
+│       ├── MesloLGLDZNerdFontPropo-Italic.ttf
+│       ├── MesloLGLDZNerdFontPropo-Regular.ttf
+│       ├── MesloLGLNerdFont-Bold.ttf
+│       ├── MesloLGLNerdFont-BoldItalic.ttf
+│       ├── MesloLGLNerdFont-Italic.ttf
+│       ├── MesloLGLNerdFont-Regular.ttf
+│       ├── MesloLGLNerdFontMono-Bold.ttf
+│       ├── MesloLGLNerdFontMono-BoldItalic.ttf
+│       ├── MesloLGLNerdFontMono-Italic.ttf
+│       ├── MesloLGLNerdFontMono-Regular.ttf
+│       ├── MesloLGLNerdFontPropo-Bold.ttf
+│       ├── MesloLGLNerdFontPropo-BoldItalic.ttf
+│       ├── MesloLGLNerdFontPropo-Italic.ttf
+│       ├── MesloLGLNerdFontPropo-Regular.ttf
+│       ├── MesloLGMDZNerdFont-Bold.ttf
+│       ├── MesloLGMDZNerdFont-BoldItalic.ttf
+│       ├── MesloLGMDZNerdFont-Italic.ttf
+│       ├── MesloLGMDZNerdFont-Regular.ttf
+│       ├── MesloLGMDZNerdFontMono-Bold.ttf
+│       ├── MesloLGMDZNerdFontMono-BoldItalic.ttf
+│       ├── MesloLGMDZNerdFontMono-Italic.ttf
+│       ├── MesloLGMDZNerdFontMono-Regular.ttf
+│       ├── MesloLGMDZNerdFontPropo-Bold.ttf
+│       ├── MesloLGMDZNerdFontPropo-BoldItalic.ttf
+│       ├── MesloLGMDZNerdFontPropo-Italic.ttf
+│       ├── MesloLGMDZNerdFontPropo-Regular.ttf
+│       ├── MesloLGMNerdFont-Bold.ttf
+│       ├── MesloLGMNerdFont-BoldItalic.ttf
+│       ├── MesloLGMNerdFont-Italic.ttf
+│       ├── MesloLGMNerdFont-Regular.ttf
+│       ├── MesloLGMNerdFontMono-Bold.ttf
+│       ├── MesloLGMNerdFontMono-BoldItalic.ttf
+│       ├── MesloLGMNerdFontMono-Italic.ttf
+│       ├── MesloLGMNerdFontMono-Regular.ttf
+│       ├── MesloLGMNerdFontPropo-Bold.ttf
+│       ├── MesloLGMNerdFontPropo-BoldItalic.ttf
+│       ├── MesloLGMNerdFontPropo-Italic.ttf
+│       ├── MesloLGMNerdFontPropo-Regular.ttf
+│       ├── MesloLGSDZNerdFont-Bold.ttf
+│       ├── MesloLGSDZNerdFont-BoldItalic.ttf
+│       ├── MesloLGSDZNerdFont-Italic.ttf
+│       ├── MesloLGSDZNerdFont-Regular.ttf
+│       ├── MesloLGSDZNerdFontMono-Bold.ttf
+│       ├── MesloLGSDZNerdFontMono-BoldItalic.ttf
+│       ├── MesloLGSDZNerdFontMono-Italic.ttf
+│       ├── MesloLGSDZNerdFontMono-Regular.ttf
+│       ├── MesloLGSDZNerdFontPropo-Bold.ttf
+│       ├── MesloLGSDZNerdFontPropo-BoldItalic.ttf
+│       ├── MesloLGSDZNerdFontPropo-Italic.ttf
+│       ├── MesloLGSDZNerdFontPropo-Regular.ttf
+│       ├── MesloLGSNerdFont-Bold.ttf
+│       ├── MesloLGSNerdFont-BoldItalic.ttf
+│       ├── MesloLGSNerdFont-Italic.ttf
+│       ├── MesloLGSNerdFont-Regular.ttf
+│       ├── MesloLGSNerdFontMono-Bold.ttf
+│       ├── MesloLGSNerdFontMono-BoldItalic.ttf
+│       ├── MesloLGSNerdFontMono-Italic.ttf
+│       ├── MesloLGSNerdFontMono-Regular.ttf
+│       ├── MesloLGSNerdFontPropo-Bold.ttf
+│       ├── MesloLGSNerdFontPropo-BoldItalic.ttf
+│       ├── MesloLGSNerdFontPropo-Italic.ttf
+│       ├── MesloLGSNerdFontPropo-Regular.ttf
+│       ├── README.md
+│       └── unifont.ttf
+├── main.py
+├── README.md
+├── README_NEW.md
+└── server.py
+```
+
+
+================================================================================
+File: library/programs.json
+Directory: library
+Name: programs.json
+File Type: .json
+================================================================================
+
+{"Target Loop (Stable)": "\u27d0(\u22a2\u25ca(\u2248\u27e1\u22a3\u2301)(\u2260\u2733\u232c\u21c4)\u2295)\u27f3", "Darwinian Core (Aggressive)": "\u27d0(\u22a2\u25ca(\u2733\u232c)(\u21c4\u2702)\u2295)\u27f3", "Neural Pulse (Compressive)": "\u27d0(\u22a2\u25ca(\u27e1\u27e1)(\u2248\u27e1)\u2295(\u2260\u2702)\u2935)\u27f3", "Chaos Engine (Unbounded)": "\u27d0(\u22a2\u2733\u232c\u21c4\u2934\u2702)\u27f3"}
+
+
+================================================================================
+File: src/backend/engine.py
+Directory: src/backend
+Name: engine.py
+File Type: .py
+================================================================================
+
+import os
+import random
+import uuid
+import copy
+import numpy as np
+import chromadb
+import tiktoken
+from sentence_transformers import SentenceTransformer
+import litellm
+from .models import GLYPHS, Node
+
+# Prevent LiteLLM from attempting to log to external telemetry platforms
+litellm.success_callback = []
+
+class Engine:
+    def __init__(self, graph, seed=42):
+        self.graph = graph
+        self.seed = seed
+        self.random = random.Random(seed)
+        
+        # Temporal and State Arrays
+        self.events = []
+        self.state = {'tick': 0, 'global_memory': {}}
+        self.history = []
+        self.holding_cells = {} 
+        
+        print("Initializing ML Substrate (ChromaDB, Sentence-Transformers, TikToken)...")
+        # Initialize persistent local vector database
+        self.chroma = chromadb.Client()
+        self.collection = self.chroma.get_or_create_collection(name=f"swarm_{seed}")
+        
+        # Initialize local dense embedding model for semantic search
+        self.encoder = SentenceTransformer('all-MiniLM-L6-v2')
+        self.tokenizer = tiktoken.get_encoding("cl100k_base")
+        
+        self.active_nodes = [(graph.root, self.create_genesis_payload())] if graph.root else []
+
+    def create_genesis_payload(self):
+        """Initializes a pristine agent payload at the root anchor."""
+        return {
+            "agent_id": f"agt_{str(uuid.uuid4())[:4]}",
+            "context_window": ["Agent spawned."],
+            "hardware_route": "cloud", # Defaults to Gemini API
+            "entropy": 1.0
+        }
+
+    def save_snapshot(self):
+        """Generates a fully decoupled deep-copy of the dimensional graph state."""
+        return {
+            "graph_data": self.graph.serialize(),
+            "active_nodes": copy.deepcopy(self.active_nodes),
+            "events": copy.deepcopy(self.events),
+            "state": copy.deepcopy(self.state),
+            "holding_cells": copy.deepcopy(self.holding_cells)
+        }
+
+    def load_snapshot(self, snap):
+        """Restores the execution matrix from a historical snapshot."""
+        self.graph.load_serialized(snap["graph_data"])
+        self.active_nodes = copy.deepcopy(snap["active_nodes"])
+        self.events = copy.deepcopy(snap["events"])
+        self.state = copy.deepcopy(snap["state"])
+        self.holding_cells = copy.deepcopy(snap.get("holding_cells", {}))
+
+    def step(self):
+        """Advances the entire topological swarm by one discrete microsecond."""
+        # Anchor the timeline before mutating
+        self.history.append(self.save_snapshot())
+        self.state['tick'] += 1
+        next_active = []
+        
+        for node_id, payload in self.active_nodes:
+            if node_id not in self.graph.nx_graph: continue
+            
+            g = self.graph.node_data[node_id]['glyph']
+            
+            # --- SWARM SYNC BARRIER LOGIC ---
+            if g == '⛖': 
+                if node_id not in self.holding_cells: self.holding_cells[node_id] = []
+                self.holding_cells[node_id].append(payload)
+                # Trap the agent if a peer has not arrived at the node
+                if len(self.holding_cells[node_id]) < 2:
+                    self.events.append({"type": "sync_wait", "node": node_id, "agent": payload["agent_id"]})
+                    next_active.append((node_id, payload)) 
+                    continue
+                else:
+                    # Release swarm lock
+                    self.events.append({"type": "sync_release", "node": node_id})
+                    self.holding_cells[node_id] = []
+
+            # Execute standard physics & neural logic
+            processed_payloads = self.execute_node(node_id, payload)
+            
+            successors = list(self.graph.nx_graph.successors(node_id))
+            for target_id in successors:
+                for p in processed_payloads:
+                    next_active.append((target_id, dict(p)))
+
+        self.active_nodes = next_active
+        if not self.active_nodes and self.graph.root:
+            self.events.append({"type": "fallback", "desc": "Graph starved. Re-anchoring."})
+            self.active_nodes = [(self.graph.root, self.create_genesis_payload())]
+
+    def step_back(self):
+        """Pops the execution stack to move backwards in time."""
+        if self.history:
+            previous_state = self.history.pop()
+            self.load_snapshot(previous_state)
+            return True
+        return False
+
+    def _call_llm(self, messages, route, temperature=0.7):
+        """Directs the cognitive load to the defined hardware API."""
+        if route == "local":
+            # Points to the local llama.cpp server running inside the Termux / Proot layer
+            return litellm.completion(
+                model="openai/local-model", 
+                api_base="http://127.0.0.1:8081/v1",
+                api_key="sk-local",
+                messages=messages,
+                temperature=temperature
+            ).choices[0].message.content.strip()
+        else:
+            # Reaches out to the official Google Gemini API endpoint
+            return litellm.completion(
+                model="gemini/gemini-1.5-flash",
+                messages=messages,
+                temperature=temperature
+            ).choices[0].message.content.strip()
+
+    def execute_node(self, node_id, payload):
+        """Executes the specific behavior bound to the active glyph."""
+        g = self.graph.node_data[node_id]['glyph']
+        out = [payload]
+        self.events.append({"type": GLYPHS.get(g, 'exec'), "node": node_id, "glyph": g})
+        route = payload.get("hardware_route", "cloud")
+        
+        # --- HARDWARE ROUTING ---
+        if g == '☁': payload['hardware_route'] = "cloud"
+        elif g == '🖧': payload['hardware_route'] = "local"
+        
+        # --- COGNITIVE PIPELINE ---
+        elif g == '⟡': 
+            text = " ".join(payload['context_window'][-3:])
+            try:
+                res = self._call_llm([{"role": "user", "content": f"Advance this thought process one step: {text}"}], route)
+                payload['context_window'].append(res)
+            except Exception as e: payload['context_window'].append("[LLM FAULT]")
+
+        elif g == '꩜': 
+            text = " ".join(payload['context_window'][-2:])
+            try:
+                res = self._call_llm([{"role": "user", "content": f"Generate a wildly creative divergence from this: {text}"}], route, temperature=1.2)
+                payload['context_window'].append(f"[DIVERGENCE]: {res}")
+            except Exception: pass
+
+        elif g == '∇': 
+            text = " ".join(payload['context_window'])
+            try:
+                res = self._call_llm([{"role": "user", "content": f"Summarize to a dense core directive: {text}"}], route)
+                payload['context_window'] = [f"[SYNTHESIS]: {res}"]
+            except Exception: pass
+
+        elif g == '⎋': 
+            text = " ".join(payload['context_window'][-2:])
+            try:
+                res = self._call_llm([{"role": "user", "content": f"Identify a logical flaw or blindspot in this thought: {text}"}], route)
+                payload['context_window'].append(f"[CRITIQUE]: {res}")
+            except Exception: pass
+
+        # --- MULTI-AGENT SWARM DYNAMICS ---
+        elif g == '⊢': 
+            payload['agent_id'] = f"agt_{str(uuid.uuid4())[:4]}"
+            payload['context_window'].append(f"Branched context at tick {self.state['tick']}")
+
+        elif g == '⧉': 
+            clone = copy.deepcopy(payload)
+            clone['agent_id'] = f"{payload['agent_id']}_clone"
+            out.append(clone) # Outputs two payload instances 
+            
+        elif g == '∿': 
+            msg = payload['context_window'][-1]
+            self.events.append({"type": "broadcast", "msg": msg})
+            for nid, other_payload in self.active_nodes:
+                if other_payload['agent_id'] != payload['agent_id']:
+                    other_payload['context_window'].append(f"[BROADCAST from {payload['agent_id']}]: {msg}")
+
+        elif g == '☍': 
+            peers = [p for nid, p in self.active_nodes if nid == node_id and p['agent_id'] != payload['agent_id']]
+            if peers:
+                peer = peers[0]
+                text1 = " ".join(payload['context_window'][-2:])
+                text2 = " ".join(peer['context_window'][-2:])
+                try:
+                    res = self._call_llm([{"role": "user", "content": f"Synthesize a resolution between these contexts. A: {text1}. B: {text2}"}], route)
+                    payload['context_window'].append(f"[RESOLUTION]: {res}")
+                    peer['context_window'].append(f"[RESOLUTION]: {res}")
+                except Exception: pass
+
+        # --- CHROMADB VECTOR MEMORY ---
+        elif g == '≈': 
+            try:
+                emb = self.encoder.encode([payload['context_window'][-1]])[0].tolist()
+                results = self.collection.query(query_embeddings=[emb], n_results=1)
+                if results['documents'] and results['documents'][0]:
+                    payload['context_window'].append(f"[RECALLED]: {results['documents'][0][0]}")
+            except Exception: pass
+            
+        elif g == '⊕': 
+            text = " ".join(payload['context_window'])
+            try:
+                emb = self.encoder.encode([text])[0].tolist()
+                doc_id = f"mem_{payload['agent_id']}_{self.state['tick']}"
+                self.collection.add(ids=[doc_id], embeddings=[emb], documents=[text])
+                payload['context_window'] = [f"Archived to Hivemind: {doc_id}"]
+            except Exception: pass
+
+        elif g == '⇥': 
+            if len(payload['context_window']) > 2:
+                payload['context_window'].pop(0) 
+                payload['context_window'].append("[PRUNED OLDEST MEMORY]")
+
+        # --- TOPOLOGICAL MUTATIONS ---
+        elif g == '✳':
+            new_id = str(uuid.uuid4())[:8]
+            self.graph.add_node(new_id, self.random.choice([k for k in GLYPHS.keys() if k not in ['(',')']]))
+            self.graph.add_edge(node_id, new_id)
+            
+        elif g == '⌬':
+            self.graph.node_data[node_id]['glyph'] = self.random.choice([k for k in GLYPHS.keys() if k not in ['(',')']])
+            self.graph.node_data[node_id]['type'] = GLYPHS.get(self.graph.node_data[node_id]['glyph'], 'unknown')
+
+        elif g == '✂':
+            nodes = list(self.graph.nx_graph.nodes)
+            if len(nodes) > 1:
+                target = self.random.choice(nodes)
+                if target != self.graph.root and target != node_id:
+                    self.graph.nx_graph.remove_node(target)
+                    del self.graph.node_data[target]
+
+        elif g == '⇄':
+            nodes = list(self.graph.nx_graph.nodes)
+            if len(nodes) > 1:
+                target = self.random.choice(nodes)
+                self.graph.add_edge(node_id, target)
+
+        elif g == '⤴':
+            successors = list(self.graph.nx_graph.successors(node_id))
+            if successors:
+                target_id = self.random.choice(successors)
+                orig_glyph = self.graph.node_data[target_id]['glyph']
+                new_id = str(uuid.uuid4())[:8]
+                self.graph.add_node(new_id, orig_glyph)
+                self.graph.add_edge(node_id, new_id)
+
+        elif g == '≠':
+            successors = list(self.graph.nx_graph.successors(node_id))
+            if successors:
+                target_id = self.random.choice(successors)
+                self.graph.nx_graph.remove_edge(node_id, target_id)
+
+        return out
+
+    def get_state(self):
+        return {
+            "graph": self.graph.serialize(),
+            "active": [nid for nid, p in self.active_nodes],
+            "payloads": {nid: p for nid, p in self.active_nodes},
+            "events": self.events[-30:],
+            "state": self.state,
+            "text": self.graph.to_text(),
+            "seed": self.seed
+        }
+
+
+
+================================================================================
+File: src/backend/models.py
+Directory: src/backend
+Name: models.py
+File Type: .py
+================================================================================
+
+import uuid
+import networkx as nx
+
+# The missing piece the engine was looking for
+class Node:
+    def __init__(self, node_id, glyph, type_name):
+        self.id = node_id
+        self.glyph = glyph
+        self.type = type_name
+        self.links = []
+
+GLYPHS = {
+    # Core & Topological
+    '⟐': 'anchor', '⊢': 'emerge', '⊣': 'resolve', '⟳': 'loop', '⌁': 'trace',
+    '◊': 'branch', '≠': 'divergence', '✳': 'spawn', '✂': 'delete', '⇄': 'rewire', '⌬': 'mutate',
+    '(': 'scope_open', ')': 'scope_close',
+    # Cognitive
+    '⟡': 'transform', '∇': 'compress', '꩜': 'brainstorm', '⎋': 'critique',
+    # Vector Memory
+    '⊕': 'commit', '≈': 'recall', '⇥': 'prune',
+    # Swarm Dynamics
+    '⧉': 'replicate', '⛖': 'sync', '☍': 'debate', '∿': 'broadcast',
+    # Hardware Routing
+    '☁': 'uplink', '🖧': 'localize'
+}
+
+class Graph:
+    def __init__(self):
+        self.nx_graph = nx.DiGraph()
+        self.root = None
+        self.node_data = {}
+
+    def add_node(self, node_id, glyph):
+        if not self.root: self.root = node_id
+        type_name = GLYPHS.get(glyph, 'unknown')
+        self.nx_graph.add_node(node_id, glyph=glyph, type=type_name)
+        # Store as a dictionary for easier serialization
+        self.node_data[node_id] = {'id': node_id, 'glyph': glyph, 'type': type_name, 'links': []}
+
+    def add_edge(self, src, tgt):
+        if src in self.nx_graph and tgt in self.nx_graph:
+            self.nx_graph.add_edge(src, tgt)
+
+    def serialize(self):
+        nodes = []
+        for nid in self.nx_graph.nodes:
+            data = self.node_data[nid]
+            data['links'] = list(self.nx_graph.successors(nid))
+            nodes.append(data)
+        return {'nodes': nodes, 'root': self.root}
+
+    def load_serialized(self, data):
+        self.nx_graph.clear()
+        self.node_data.clear()
+        self.root = data.get('root')
+        for n in data.get('nodes', []):
+            self.add_node(n['id'], n['glyph'])
+        for n in data.get('nodes', []):
+            for target in n.get('links', []):
+                self.add_edge(n['id'], target)
+
+    def to_text(self):
+        if not self.root: return ""
+        visited, out = set(), []
+        def traverse(nid):
+            if nid in visited or nid not in self.nx_graph: return
+            visited.add(nid)
+            out.append(self.node_data[nid]['glyph'])
+            successors = list(self.nx_graph.successors(nid))
+            if successors:
+                out.append('(')
+                for child in successors: traverse(child)
+                out.append(')')
+        traverse(self.root)
+        return "".join(out)
+
+def parse_gfs(text):
+    graph = Graph()
+    stack, last_node_id = [], None
+    for char in text:
+        if char in GLYPHS and char not in ['(', ')']:
+            nid = str(uuid.uuid4())[:8]
+            graph.add_node(nid, char)
+            if stack: graph.add_edge(stack[-1], nid)
+            elif last_node_id: graph.add_edge(last_node_id, nid)
+            last_node_id = nid
+        elif char == '(':
+            if last_node_id: stack.append(last_node_id); last_node_id = None
+        elif char == ')':
+            if stack: last_node_id = stack.pop()
+    return graph
+
+
+
+================================================================================
+File: web/js/api.js
+Directory: web/js
+Name: api.js
+File Type: .js
+================================================================================
+
+export const API = {
+    async request(url, options = {}) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return await response.json();
+        } catch (e) {
+            console.error(`API Error at ${url}:`, e);
+            return null;
+        }
+    },
+    getState: () => API.request('/api/state'),
+    getLibrary: () => API.request('/api/library'),
+    saveToLibrary: (name, text) => API.request('/api/library', { 
+        method: 'POST', 
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name, text}) 
+    }),
+    loadProgram: (text) => API.request('/api/load', { 
+        method: 'POST', 
+        headers: {'Content-Type': 'application/json'}, 
+        body: JSON.stringify({text}) 
+    }),
+    play: () => API.request('/api/play', { method: 'POST' }),
+    pause: () => fetch('/api/pause', { method: 'POST' }),
+    step: () => API.request('/api/step', { method: 'POST'}),
+    stepBack: () => API.request('/api/step_back', { method: 'POST'}),
+    getTrace: () => API.request('/api/trace'),
+    restoreSnapshot: (snapshot) => API.request('/api/restore_snapshot', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(snapshot)
+    })
+};
+
+
+
+================================================================================
+File: web/js/canvas.js
+Directory: web/js
+Name: canvas.js
+File Type: .js
+================================================================================
+
+export class Renderer {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.nodePositions = {};
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+    }
+    resize() {
+        const parent = this.canvas.parentElement;
+        if(parent) {
+            this.canvas.width = parent.clientWidth;
+            this.canvas.height = parent.clientHeight;
+        }
+    }
+    updatePhysics(stateData) {
+        if(!stateData || !stateData.graph) return;
+        const nodes = stateData.graph.nodes;
+        const cw = this.canvas.width;
+        const ch = this.canvas.height;
+        
+        nodes.forEach(n => {
+            if(!this.nodePositions[n.id]) {
+                this.nodePositions[n.id] = { x: cw/2 + (Math.random()-0.5)*50, y: ch/2 + (Math.random()-0.5)*50, vx: 0, vy: 0 };
+            }
+        });
+
+        const repel = 500;
+        for(let i=0; i<nodes.length; i++) {
+            for(let j=i+1; j<nodes.length; j++) {
+                let p1 = this.nodePositions[nodes[i].id];
+                let p2 = this.nodePositions[nodes[j].id];
+                let dx = p1.x - p2.x;
+                let dy = p1.y - p2.y;
+                let dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                if(dist < 100) {
+                    let f = repel / (dist * dist);
+                    p1.vx += (dx/dist)*f; p1.vy += (dy/dist)*f;
+                    p2.vx -= (dx/dist)*f; p2.vy -= (dy/dist)*f;
+                }
+            }
+        }
+
+        nodes.forEach(n => {
+            let p1 = this.nodePositions[n.id];
+            (n.links || []).forEach(targetId => {
+                let p2 = this.nodePositions[targetId];
+                if(p2) {
+                    let dx = p2.x - p1.x;
+                    let dy = p2.y - p1.y;
+                    let dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                    let f = (dist - 80) * 0.05;
+                    p1.vx += (dx/dist)*f; p1.vy += (dy/dist)*f;
+                    p2.vx -= (dx/dist)*f; p2.vy -= (dy/dist)*f;
+                }
+            });
+            p1.vx += (cw/2 - p1.x) * 0.005;
+            p1.vy += (ch/2 - p1.y) * 0.005;
+            p1.vx *= 0.85; p1.vy *= 0.85;
+            p1.x += p1.vx; p1.y += p1.vy;
+        });
+    }
+    draw(stateData) {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if(!stateData || !stateData.graph) return;
+        const nodes = stateData.graph.nodes;
+        
+        this.ctx.strokeStyle = '#445566';
+        this.ctx.lineWidth = 2;
+        nodes.forEach(n => {
+            let p1 = this.nodePositions[n.id];
+            if(!p1) return;
+            (n.links || []).forEach(targetId => {
+                let p2 = this.nodePositions[targetId];
+                if(p2) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(p1.x, p1.y);
+                    this.ctx.lineTo(p2.x, p2.y);
+                    this.ctx.stroke();
+                }
+            });
+        });
+
+        nodes.forEach(n => {
+            let p = this.nodePositions[n.id];
+            if(!p) return;
+            this.ctx.fillStyle = '#112233';
+            this.ctx.strokeStyle = '#00ffcc';
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, 15, 0, Math.PI*2);
+            this.ctx.fill();
+            this.ctx.stroke();
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.font = '14px monospace';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(n.glyph, p.x, p.y);
+        });
+    }
+}
+
+
+
+================================================================================
+File: web/js/editor.js
+Directory: web/js
+Name: editor.js
+File Type: .js
+================================================================================
+
+import { API } from './api.js';
+
+export class Builder {
+    constructor(onUpdate) {
+        this.onUpdate = onUpdate;
+        this.program = [];
+        this.loadLibrary();
+    }
+    updateContext() {
+        this.onUpdate(this.program.join(''));
+    }
+    async loadLibrary() {
+        try {
+            const lib = await API.getLibrary();
+            const container = document.getElementById('library-list');
+            if(!container || !lib) return;
+            container.innerHTML = '';
+            for(let [name, code] of Object.entries(lib)) {
+                let btn = document.createElement('button');
+                btn.className = 'full-width-btn';
+                btn.textContent = name;
+                btn.onclick = () => {
+                    const input = document.getElementById('program-input');
+                    if(input) input.value = code;
+                    const drawer = document.getElementById('library-drawer');
+                    if(drawer) drawer.classList.add('collapsed');
+                };
+                container.appendChild(btn);
+            }
+        } catch (e) {
+            console.error("Library failed to load:", e);
+        }
+    }
+}
+
+
+
+================================================================================
+File: web/js/main.js
+Directory: web/js
+Name: main.js
+File Type: .js
+================================================================================
+
+import { API } from './api.js';
+import { Renderer } from './canvas.js';
+import { Builder } from './editor.js';
+
+try {
+    const canvasEl = document.getElementById('canvas');
+    if (!canvasEl) throw new Error("CRITICAL: <canvas id='canvas'> not found!");
+    const renderer = new Renderer(canvasEl);
+
+    let lastGraphState = null;
+    const DEFAULT_PROG = "⟐(⊢◊(≈⟡⊣⌁)(≠✳⌬⇄)⊕)⟳";
+
+    const builder = new Builder((text) => {
+        const input = document.getElementById('program-input');
+        if (input) input.value = text;
+    });
+
+    const bind = (id, fn) => {
+        const el = document.getElementById(id);
+        if (el) el.onclick = fn;
+        else console.warn(`Warning: Button '${id}' missing.`);
+    };
+
+    bind('btn-play', API.play);
+    bind('btn-pause', API.pause);
+    bind('btn-step', API.step);
+    bind('btn-step-back', API.stepBack);
+    bind('btn-reset', () => {
+        API.pause().then(() => {
+            API.loadProgram(DEFAULT_PROG);
+            const input = document.getElementById('program-input');
+            if (input) input.value = DEFAULT_PROG;
+            renderer.nodePositions = {};
+            if(builder) {
+                builder.program = DEFAULT_PROG.split('');
+                builder.updateContext();
+            }
+        });
+    });
+
+    bind('btn-load', () => {
+        const input = document.getElementById('program-input');
+        if(!input) return alert("Missing program-input ID!");
+        API.pause().then(() => {
+            API.loadProgram(input.value);
+            renderer.nodePositions = {}; 
+        });
+    });
+
+    bind('builder-toggle', () => {
+        const drawer = document.getElementById('builder-drawer');
+        const icon = document.getElementById('builder-icon');
+        if (drawer) {
+            drawer.classList.toggle('collapsed');
+            if (icon) icon.textContent = drawer.classList.contains('collapsed') ? '↑' : '↓';
+            setTimeout(() => renderer.resize(), 310);
+        }
+    });
+
+    bind('btn-toggle-lib', () => {
+        const lib = document.getElementById('library-drawer');
+        if (lib) lib.classList.remove('collapsed');
+    });
+
+    bind('btn-close-lib', () => {
+        const lib = document.getElementById('library-drawer');
+        if (lib) lib.classList.add('collapsed');
+    });
+
+    setInterval(async () => {
+        try {
+            lastGraphState = await API.getState();
+            const view = document.getElementById('state-view');
+            if(lastGraphState && lastGraphState.state && view) {
+                view.textContent = `Tick: ${lastGraphState.state.tick} | Nodes: ${lastGraphState.graph.nodes.length}`;
+            }
+        } catch (e) { /* Poll fail safe */ }
+    }, 500);
+
+    function loop() {
+        if (lastGraphState) {
+            renderer.updatePhysics(lastGraphState);
+            renderer.draw(lastGraphState);
+        }
+        requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    console.log("GFS-II Client Initialized Successfully");
+
+} catch (err) {
+    alert("JAVASCRIPT CRASH: " + err.message);
+    console.error(err);
+}
+
+
+
+================================================================================
+File: web/index.html
+Directory: web
+Name: index.html
+File Type: .html
+================================================================================
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GFS-II Command Center</title>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+    <style>
+        :root { --bg: #0f1115; --panel: #1a1d24; --accent: #00ffcc; --text: #e0e0e0; --text-dim: #8899aa; --border: #334; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: monospace; }
+        body { background: var(--bg); color: var(--text); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* Top Navigation */
+        #top-nav { background: var(--panel); padding: 8px 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-bottom: 1px solid var(--border); z-index: 40; }
+        .brand { color: var(--accent); font-weight: bold; font-size: 1.2em; margin-right: 10px; cursor: pointer; }
+        button { background: #2a2d35; color: var(--text); border: 1px solid #445; padding: 6px 12px; cursor: pointer; border-radius: 4px; transition: 0.2s; white-space: nowrap; }
+        button:active { background: var(--accent); color: #000; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .program-bar { display: flex; gap: 5px; flex-grow: 1; min-width: 200px; }
+        input { flex-grow: 1; background: #000; color: var(--accent); border: 1px solid #445; padding: 6px; border-radius: 4px; font-size: 14px; }
+        
+        /* Layout Drawers */
+        .drawer { position: absolute; background: rgba(26, 29, 36, 0.95); backdrop-filter: blur(5px); border: 1px solid var(--border); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 30; display: flex; flex-direction: column; }
+        .drawer-handle { background: #22252c; padding: 4px; text-align: center; cursor: pointer; color: var(--accent); font-weight: bold; flex-shrink: 0; display: flex; align-items: center; justify-content: center; user-select: none; }
+        .drawer-content { padding: 10px; overflow-y: auto; flex-grow: 1; }
+
+        /* Left Popout: Library */
+        #library-drawer { top: 0; left: 0; width: 300px; max-width: 85vw; height: 100%; transform: translateX(-100%); z-index: 50; border-right: 1px solid var(--accent); }
+        #library-drawer.open { transform: translateX(0); }
+        .lib-section { margin-bottom: 20px; }
+        .lib-section h4 { color: var(--text-dim); margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+        .full-width-btn { width: 100%; text-align: left; margin-bottom: 5px; background: #1544a0; border-color: #2555b0; }
+        .full-width-btn.trace { background: #a05515; border-color: #b06525; }
+
+        /* Top Drawer: Complex Builder */
+        #builder-drawer { top: 46px; left: 0; width: 100%; height: 45dvh; transform: translateY(-120%); border-bottom: 1px solid var(--accent); }
+        #builder-drawer.open { transform: translateY(0); }
+        .builder-layout { display: flex; gap: 10px; height: 100%; flex-direction: column; }
+        .builder-row { display: flex; gap: 10px; flex: 1; min-height: 0; }
+        #glyph-palette { flex: 2; display: grid; grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 4px; overflow-y: auto; align-content: start; }
+        #glyph-palette button { font-size: 18px; padding: 8px 0; }
+        #glyph-palette button.faded { opacity: 0.2; pointer-events: none; }
+        #glyph-details { flex: 1; background: #111; padding: 10px; border-radius: 4px; font-size: 12px; overflow-y: auto; border: 1px solid #445; }
+        .builder-controls { display: flex; gap: 5px; }
+        .builder-controls button { flex: 1; background: #1a4a38; border-color: #2a6a48; }
+        #builder-track { background: #000; padding: 8px; border-radius: 4px; color: var(--accent); font-size: 16px; border-left: 4px solid var(--accent); white-space: nowrap; overflow-x: auto; flex-shrink: 0; }
+
+        /* Bottom Drawer: Universal Log */
+        #log-drawer { bottom: 0; left: 0; width: 100%; height: 35dvh; transform: translateY(calc(100% - 24px)); border-top: 1px solid var(--accent); }
+        #log-drawer.open { transform: translateY(0); }
+        #log-output { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-family: monospace; color: #aaa; }
+        .log-entry { border-bottom: 1px solid #223; padding-bottom: 2px; word-break: break-all; }
+        .log-tick { color: #fff; font-weight: bold; }
+        .log-llm { color: #0cf; }
+        .log-sys { color: #f0f; }
+
+        /* Canvas Area */
+        #canvas-container { flex-grow: 1; position: relative; width: 100%; background: #08090a; overflow: hidden; z-index: 10; }
+        canvas { display: block; width: 100%; height: 100%; }
+        .state-overlay { position: absolute; bottom: 35px; right: 10px; color: var(--accent); pointer-events: none; text-shadow: 0 0 4px #000; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div id="top-nav">
+        <div class="brand" id="btn-toggle-lib">≡ LIBRARY</div>
+        <button id="btn-toggle-builder">⚒ BUILDER</button>
+        <button id="btn-step-back">◀ Step Back</button>
+        <button id="btn-step">Step ▶</button>
+        <button id="btn-play">Play</button>
+        <button id="btn-pause">Pause</button>
+        <button id="btn-reload" style="background:#822">Reload</button>
+        <div class="program-bar">
+            <input type="text" id="program-input" value="⟐(⊢◊(≈⟡⊣⌁)(≠✳⌬⇄)⊕)⟳">
+            <button id="btn-load">Inject</button>
+        </div>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+        <div id="state-view" class="state-overlay">Tick: 0 | Nodes: 0</div>
+    </div>
+
+    <div id="builder-drawer" class="drawer">
+        <div class="drawer-content">
+            <div class="builder-layout">
+                <div id="builder-track">Empty</div>
+                <div class="builder-row">
+                    <div id="glyph-palette"></div>
+                    <div id="glyph-details">Select a glyph...</div>
+                </div>
+                <div class="builder-controls">
+                    <button id="btn-add-glyph">Add Node</button>
+                    <button id="btn-rm-glyph">Undo Last</button>
+                    <button id="btn-save-lib">Save Program</button>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-handle" id="btn-close-builder">↑ CLOSE BUILDER ↑</div>
+    </div>
+
+    <div id="log-drawer" class="drawer">
+        <div class="drawer-handle" id="btn-toggle-log">≡ NEURAL EXECUTION LOG ≡</div>
+        <div class="drawer-content" id="log-output"></div>
+    </div>
+
+    <div id="library-drawer" class="drawer">
+        <div class="drawer-handle" id="btn-close-lib" style="justify-content: flex-end; padding-right: 15px; font-size:1.5em;">×</div>
+        <div class="drawer-content">
+            <div class="lib-section">
+                <h4>PROGRAM SCRIPTS</h4>
+                <div id="library-programs"></div>
+            </div>
+            <div class="lib-section">
+                <h4>STATE TRACES</h4>
+                <button id="btn-export-trace" class="full-width-btn trace">↓ Download Current Trace</button>
+                <button class="full-width-btn trace" style="opacity:0.5">↑ Upload Trace (CLI Only)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Comprehensive Dictionary ---
+        const DICTIONARY = {
+            '⟐': { type: 'anchor', desc: 'Anchored starting state.', validNext: ['⊢','⟳','◊','(','☁','🖧'] },
+            '⊢': { type: 'emerge', desc: 'A new task emerges.', validNext: ['⟡','⊣','⌁','✳','⌬','✂','⇄','⤴','⤵','∇','꩜','⎋','⧉','∿'] },
+            '⟡': { type: 'transform', desc: 'Task transformed via LLM.', validNext: ['⟡','⊣','⌁','⊕','(','∇','꩜','⎋','≈','⇥','☍','☁','🖧'] },
+            '⊣': { type: 'resolve', desc: 'Task successfully resolved.', validNext: ['⟳','⊕',')'] },
+            '⟳': { type: 'loop', desc: 'Re-evaluating graph root.', validNext: [] },
+            '◊': { type: 'branch', desc: 'Execution branched.', validNext: ['(','⊢','⟡','⧉'] },
+            '≈': { type: 'recall', desc: 'Recall from ChromaDB vector memory.', validNext: ['(','⊢','⊣','⟡'] },
+            '≠': { type: 'divergence', desc: 'Paths diverged destructively.', validNext: ['(','✳','✂'] },
+            '⊕': { type: 'commit', desc: 'Commit context to Hivemind vectors.', validNext: ['⟳',')','⊣'] },
+            '✳': { type: 'spawn', desc: 'Topological: Spawn random new node.', validNext: ['⌬','⇄','⟡'] },
+            '⌬': { type: 'mutate', desc: 'Topological: Mutate node behavior.', validNext: ['⟡','⊣'] },
+            '(': { type: 'scope_open', desc: 'Begin topological branch.', validNext: ['⊢','⟡','◊','≈','≠','✳'] },
+            ')': { type: 'scope_close', desc: 'End topological branch.', validNext: ['⊕','⟳','(',''] },
+            '⌁': { type: 'trace', desc: 'Log current state.', validNext: ['⟡','⊣',')'] },
+            '✂': { type: 'delete', desc: 'Topological: Delete random graph node.', validNext: ['⟡','⊣',')'] },
+            '⇄': { type: 'rewire', desc: 'Topological: Rewire random edge.', validNext: ['⟡','⊣',')'] },
+            '⤴': { type: 'clone', desc: 'Topological: Clone attached node.', validNext: ['⟡','⊣',')'] },
+            '⤵': { type: 'compress', desc: 'Topological: Compress branch logic.', validNext: ['⟡','⊣',')'] },
+            '∇': { type: 'compress_cog', desc: 'Cognitive: Summarize context core.', validNext: ['⟡','⊣',')'] },
+            '꩜': { type: 'brainstorm', desc: 'Cognitive: Generate wild divergence.', validNext: ['⟡','⊣',')'] },
+            '⎋': { type: 'critique', desc: 'Cognitive: Identify logic flaws.', validNext: ['⟡','⊣',')'] },
+            '⇥': { type: 'prune', desc: 'Memory: Prune oldest context memory.', validNext: ['⟡','⊣',')'] },
+            '⧉': { type: 'replicate', desc: 'Swarm: Clone agent payload.', validNext: ['⊢','⟡'] },
+            '⛖': { type: 'sync', desc: 'Swarm: Wait for peer agents.', validNext: ['⟡','⊣'] },
+            '☍': { type: 'debate', desc: 'Swarm: Synthesize peer contexts.', validNext: ['⟡','⊣'] },
+            '∿': { type: 'broadcast', desc: 'Swarm: Broadcast message to peers.', validNext: ['⟡','⊣'] },
+            '☁': { type: 'uplink', desc: 'Hardware: Route to Cloud API.', validNext: ['⊢','⟡','('] },
+            '🖧': { type: 'localize', desc: 'Hardware: Route to Local LLM.', validNext: ['⊢','⟡','('] }
+        };
+
+        // --- 2. Core API ---
+        const API = {
+            async request(url, options = {}) {
+                try {
+                    const res = await fetch(url, options);
+                    if (!res.ok) throw new Error();
+                    return await res.json();
+                } catch (e) { return null; }
+            },
+            getState: () => API.request('/api/state'),
+            getLibrary: () => API.request('/api/library'),
+            saveToLibrary: (name, text) => API.request('/api/library', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, text}) }),
+            loadProgram: (text) => API.request('/api/load', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text}) }),
+            play: () => API.request('/api/play', { method: 'POST' }),
+            pause: () => fetch('/api/pause', { method: 'POST' }),
+            step: () => API.request('/api/step', { method: 'POST'}),
+            stepBack: () => API.request('/api/step_back', { method: 'POST'}),
+            getTrace: () => API.request('/api/trace')
+        };
+
+        // --- 3. UI Modules ---
+        class Builder {
+            constructor() {
+                this.program = [];
+                this.activeGlyph = null;
+                
+                this.uiPalette = document.getElementById('glyph-palette');
+                this.uiDetails = document.getElementById('glyph-details');
+                this.uiTrack = document.getElementById('builder-track');
+                this.uiInput = document.getElementById('program-input');
+                
+                document.getElementById('btn-add-glyph').onclick = () => this.addCurrent();
+                document.getElementById('btn-rm-glyph').onclick = () => this.removeLast();
+                document.getElementById('btn-save-lib').onclick = () => this.save();
+                
+                this.renderPalette();
+                this.updateContext();
+                this.loadLibrary();
+            }
+            renderPalette() {
+                this.uiPalette.innerHTML = '';
+                const validNext = this.getValidNext();
+                for (const [g, data] of Object.entries(DICTIONARY)) {
+                    const btn = document.createElement('button');
+                    btn.textContent = g;
+                    if (this.program.length === 0 && g !== '⟐') btn.classList.add('faded');
+                    else if (this.program.length > 0 && !validNext.includes(g)) btn.classList.add('faded');
+                    btn.onclick = () => this.selectGlyph(g, data);
+                    this.uiPalette.appendChild(btn);
+                }
+            }
+            getValidNext() {
+                if (this.program.length === 0) return ['⟐'];
+                const last = this.program[this.program.length - 1];
+                return DICTIONARY[last]?.validNext || Object.keys(DICTIONARY);
+            }
+            selectGlyph(g, data) {
+                this.activeGlyph = g;
+                this.uiDetails.innerHTML = `
+                    <h4 style="margin-bottom:5px; color:#fff">${g} - <span style="color:var(--accent)">${data.type.toUpperCase()}</span></h4>
+                    <p style="margin-bottom:8px">${data.desc}</p>
+                    <small style="color:var(--text-dim)">Valid Links: ${data.validNext.join(' ')}</small>
+                `;
+            }
+            addCurrent() {
+                if (!this.activeGlyph) return;
+                this.program.push(this.activeGlyph);
+                this.updateContext();
+            }
+            removeLast() {
+                this.program.pop();
+                this.updateContext();
+            }
+            updateContext() {
+                const progStr = this.program.join('');
+                this.uiTrack.textContent = progStr || 'Empty';
+                this.uiInput.value = progStr;
+                this.renderPalette();
+            }
+            save() {
+                const name = prompt("Enter Name for Library:");
+                if (name) API.saveToLibrary(name, this.program.join('')).then(() => this.loadLibrary());
+            }
+            async loadLibrary() {
+                const lib = await API.getLibrary();
+                const div = document.getElementById('library-programs');
+                if(!div || !lib) return;
+                div.innerHTML = '';
+                for (const [name, text] of Object.entries(lib)) {
+                    const b = document.createElement('button');
+                    b.className = 'full-width-btn';
+                    b.textContent = `${name}`;
+                    b.title = text;
+                    b.onclick = () => {
+                        this.program = text.split('');
+                        this.updateContext();
+                        document.getElementById('library-drawer').classList.remove('open');
+                    };
+                    div.appendChild(b);
+                }
+            }
+        }
+
+        class LogViewer {
+            constructor() {
+                this.container = document.getElementById('log-output');
+                this.lastTick = -1;
+                this.knownPayloads = {};
+            }
+            update(stateData) {
+                if (!stateData || !stateData.state) return;
+                const currentTick = stateData.state.tick;
+                
+                if (currentTick !== this.lastTick && currentTick >= 0) {
+                    this.lastTick = currentTick;
+                    
+                    // 1. Log System Events
+                    if(stateData.events) {
+                        stateData.events.forEach(e => {
+                            if(e.type === 'exec') return; // Too noisy
+                            this.print(`<span class="log-tick">[T:${currentTick}]</span> <span class="log-sys">[SYS]</span> ${e.type.toUpperCase()} at ${e.node.substring(0,6)}`);
+                        });
+                    }
+
+                    // 2. Diff Context Windows to find LLM Packets
+                    if(stateData.payloads) {
+                        for (let [nid, payload] of Object.entries(stateData.payloads)) {
+                            const aid = payload.agent_id || 'unknown';
+                            const context = payload.context_window || [];
+                            const prev = this.knownPayloads[aid] || [];
+                            
+                            if (context.length > prev.length) {
+                                const newItems = context.slice(prev.length);
+                                newItems.forEach(item => {
+                                    this.print(`<span class="log-tick">[T:${currentTick}]</span> <span class="log-llm">[PACKET: ${aid}]</span> ${item}`);
+                                });
+                            }
+                            this.knownPayloads[aid] = [...context];
+                        }
+                    }
+                }
+            }
+            print(htmlStr) {
+                const div = document.createElement('div');
+                div.className = 'log-entry';
+                div.innerHTML = htmlStr;
+                this.container.appendChild(div);
+                this.container.scrollTop = this.container.scrollHeight;
+            }
+            clear() {
+                this.container.innerHTML = '';
+                this.lastTick = -1;
+                this.knownPayloads = {};
+            }
+        }
+
+        class Renderer {
+            constructor(canvas) {
+                this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.nodePositions = {};
+                this.resize(); window.addEventListener('resize', () => this.resize());
+            }
+            resize() {
+                const parent = this.canvas.parentElement;
+                if(parent) { this.canvas.width = parent.clientWidth; this.canvas.height = parent.clientHeight; }
+            }
+            updatePhysics(stateData) {
+                if(!stateData || !stateData.graph) return;
+                const nodes = stateData.graph.nodes;
+                const cw = this.canvas.width; const ch = this.canvas.height;
+                nodes.forEach(n => { if(!this.nodePositions[n.id]) this.nodePositions[n.id] = { x: cw/2 + (Math.random()-0.5)*50, y: ch/2 + (Math.random()-0.5)*50, vx: 0, vy: 0 }; });
+                const repel = 500;
+                for(let i=0; i<nodes.length; i++) {
+                    for(let j=i+1; j<nodes.length; j++) {
+                        let p1 = this.nodePositions[nodes[i].id]; let p2 = this.nodePositions[nodes[j].id];
+                        let dx = p1.x - p2.x; let dy = p1.y - p2.y; let dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                        if(dist < 100) { let f = repel / (dist * dist); p1.vx += (dx/dist)*f; p1.vy += (dy/dist)*f; p2.vx -= (dx/dist)*f; p2.vy -= (dy/dist)*f; }
+                    }
+                }
+                nodes.forEach(n => {
+                    let p1 = this.nodePositions[n.id];
+                    (n.links || []).forEach(targetId => {
+                        let p2 = this.nodePositions[targetId];
+                        if(p2) {
+                            let dx = p2.x - p1.x; let dy = p2.y - p1.y; let dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                            let f = (dist - 80) * 0.05; p1.vx += (dx/dist)*f; p1.vy += (dy/dist)*f; p2.vx -= (dx/dist)*f; p2.vy -= (dy/dist)*f;
+                        }
+                    });
+                    p1.vx += (cw/2 - p1.x) * 0.005; p1.vy += (ch/2 - p1.y) * 0.005;
+                    p1.vx *= 0.85; p1.vy *= 0.85; p1.x += p1.vx; p1.y += p1.vy;
+                });
+            }
+            draw(stateData) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                if(!stateData || !stateData.graph) return;
+                const nodes = stateData.graph.nodes;
+                const activeIds = stateData.active || [];
+                
+                this.ctx.strokeStyle = '#445566'; this.ctx.lineWidth = 2;
+                nodes.forEach(n => {
+                    let p1 = this.nodePositions[n.id];
+                    if(!p1) return;
+                    (n.links || []).forEach(targetId => {
+                        let p2 = this.nodePositions[targetId];
+                        if(p2) { this.ctx.beginPath(); this.ctx.moveTo(p1.x, p1.y); this.ctx.lineTo(p2.x, p2.y); this.ctx.stroke(); }
+                    });
+                });
+
+                nodes.forEach(n => {
+                    let p = this.nodePositions[n.id];
+                    if(!p) return;
+                    this.ctx.fillStyle = activeIds.includes(n.id) ? '#ff0055' : '#112233';
+                    this.ctx.strokeStyle = '#00ffcc';
+                    this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 15, 0, Math.PI*2); this.ctx.fill(); this.ctx.stroke();
+                    this.ctx.fillStyle = '#ffffff'; this.ctx.font = '14px monospace'; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle';
+                    this.ctx.fillText(n.glyph, p.x, p.y);
+                });
+            }
+        }
+
+        // --- 4. Main Initialization ---
+        try {
+            const renderer = new Renderer(document.getElementById('canvas'));
+            const builder = new Builder();
+            const logViewer = new LogViewer();
+            let lastGraphState = null;
+
+            // Bindings
+            const bind = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
+            const toggleDrawer = (id) => document.getElementById(id).classList.toggle('open');
+            
+            bind('btn-toggle-builder', () => toggleDrawer('builder-drawer'));
+            bind('btn-close-builder', () => toggleDrawer('builder-drawer'));
+            bind('btn-toggle-lib', () => toggleDrawer('library-drawer'));
+            bind('btn-close-lib', () => toggleDrawer('library-drawer'));
+            bind('btn-toggle-log', () => toggleDrawer('log-drawer'));
+
+            bind('btn-play', API.play);
+            bind('btn-pause', API.pause);
+            bind('btn-step-back', async () => {
+                await API.pause();
+                await API.stepBack();
+                // Because we stepped back, the log viewer needs a hard reset to avoid duplicate packet detection
+                logViewer.clear(); 
+            });
+            bind('btn-step', async () => {
+                document.getElementById('state-view').textContent = "THINKING (Processing Nodes)...";
+                await API.step();
+            });
+            
+            // Reload injects the current string fresh, resetting physics and logs
+            bind('btn-reload', async () => {
+                await API.pause();
+                const text = document.getElementById('program-input').value;
+                await API.loadProgram(text);
+                renderer.nodePositions = {};
+                logViewer.clear();
+                document.getElementById('state-view').textContent = "Tick: 0 | Nodes: 0";
+            });
+            
+            bind('btn-load', () => document.getElementById('btn-reload').click());
+
+            bind('btn-export-trace', async () => {
+                await API.pause();
+                const trace = await API.getTrace();
+                const blob = new Blob([JSON.stringify(trace, null, 2)], {type: 'application/json'});
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+                a.download = `gfs_trace_${Date.now()}.json`; a.click();
+            });
+
+            // Polling Loop
+            setInterval(async () => {
+                lastGraphState = await API.getState();
+                const view = document.getElementById('state-view');
+                if(lastGraphState && lastGraphState.state && view && !view.textContent.includes("THINKING")) {
+                    view.textContent = `Tick: ${lastGraphState.state.tick} | Nodes: ${lastGraphState.graph.nodes.length}`;
+                    logViewer.update(lastGraphState);
+                }
+            }, 500);
+
+            // Render Loop
+            function loop() {
+                if (lastGraphState) { renderer.updatePhysics(lastGraphState); renderer.draw(lastGraphState); }
+                requestAnimationFrame(loop);
+            }
+            requestAnimationFrame(loop);
+
+        } catch (err) { alert("CRASH: " + err.message); }
+    </script>
+</body>
+</html>
+
+
+
+================================================================================
+File: web/style.css
+Directory: web
+Name: style.css
+File Type: .css
+================================================================================
+
+body, html { margin: 0; padding: 0; height: 100%; font-family: monospace; background: #111; color: #eee; display: flex; flex-direction: column; overflow: hidden; }
+#toolbar { background: #222; padding: 10px; display: flex; gap: 10px; border-bottom: 1px solid #444; align-items: center; flex-wrap: wrap; z-index: 10; height: 40px; box-sizing: border-box; }
+h2, h3 { margin: 0; color: #0fa; text-transform: uppercase; }
+.divider { width: 1px; height: 24px; background: #555; margin: 0 5px; }
+
+/* Workspace acts as the 100% boundary below the toolbar */
+#workspace { display: flex; flex: 1; flex-wrap: nowrap; overflow: hidden; position: relative; height: calc(100vh - 40px); }
+
+/* Center Pane contains the Canvas and the Bottom Drawer */
+#center-pane { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
+#canvas-container { flex: 1; min-height: 0; position: relative; }
+canvas { width: 100%; height: 100%; display: block; background: #151515; cursor: grab; }
+canvas:active { cursor: grabbing; }
+
+/* Bottom Builder Drawer: Exactly 40% height when open */
+#builder-drawer { background: #1a1a1a; border-top: 1px solid #0fa; display: flex; flex-direction: column; transition: height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); height: 40%; overflow: hidden; box-sizing: border-box; }
+#builder-drawer.collapsed { height: 28px; }
+#builder-toggle { height: 28px; min-height: 28px; background: #222; color: #0fa; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; font-weight: bold; user-select: none; border-bottom: 1px solid #444; }
+#builder-toggle:hover { background: #333; }
+#builder-content { padding: 10px; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; box-sizing: border-box; }
+
+.builder-row { display: flex; gap: 10px; align-items: stretch; }
+.layout-split { flex: 1; min-height: 0; }
+#builder-track { flex: 1; }
+
+#glyph-palette { flex: 2; display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; overflow-y: auto; }
+#glyph-details { flex: 1; background: #222; padding: 10px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; }
+#glyph-desc-text { font-size: 13px; line-height: 1.4; }
+
+/* Left Library Overlay: Exactly 50% width, 60% height */
+#library-drawer { position: absolute; left: 0; top: 0; width: 50%; height: 60%; background: rgba(26,26,26,0.95); backdrop-filter: blur(5px); border-right: 1px solid #0fa; border-bottom: 1px solid #0fa; z-index: 100; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; padding: 15px; box-sizing: border-box; }
+#library-drawer.collapsed { transform: translateX(-100%); }
+.drawer-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 10px; }
+#library-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+
+.lib-item { background: #2a2a2a; border: 1px solid #444; padding: 10px; border-radius: 4px; }
+.lib-item-title { font-weight: bold; color: #0cf; margin-bottom: 8px; font-size: 14px; word-break: break-all; }
+.lib-item-actions { display: flex; gap: 5px; }
+.lib-item-actions button { flex: 1; font-size: 12px; padding: 6px; }
+
+/* Sidebar & Generic */
+#sidebar { flex: 0 0 250px; background: #222; border-left: 1px solid #444; padding: 15px; overflow-y: auto; }
+button { background: #333; color: #fff; border: 1px solid #555; padding: 6px 12px; cursor: pointer; border-radius: 3px; font-family: monospace; transition: 0.2s; white-space: nowrap; }
+button:hover { background: #555; }
+input { background: #000; color: #0fa; border: 1px solid #555; padding: 6px; flex: 1; border-radius: 3px; font-family: monospace; min-width: 150px; }
+.track { background: #000; padding: 6px 10px; border-radius: 4px; border-left: 3px solid #0fa; font-size: 18px; white-space: nowrap; overflow-x: auto; overflow-y: hidden; }
+.glyph-btn { font-size: 22px; padding: 2px 0; display: flex; align-items: center; justify-content: center; }
+.glyph-btn.faded { opacity: 0.2; pointer-events: none; }
+pre { color: #0cf; font-size: 13px; margin: 0; }
+
+/* Responsive adjustments for strict vertical stacking on narrow screens */
+@media (max-width: 900px) {
+    #workspace { flex-direction: column; }
+    #sidebar { flex: 0 0 auto; max-height: 25vh; border-left: none; border-top: 1px solid #444; }
+    #library-drawer { width: 100%; height: 50%; border-right: none; }
+    #builder-drawer { height: 50%; }
+}
+
+
+
+================================================================================
+File: ~/.termux/font.ttf
+Directory: ~/.termux
+Name: font.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/LICENSE
+Directory: ~/.termux
+Name: LICENSE
+File Type: (no extension)
+================================================================================
+
+Copyright (c) 2019 - Present, Microsoft Corporation,
+with Reserved Font Name Cascadia Code.
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+http://scripts.sil.org/OFL
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded, 
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+
+
+
+================================================================================
+File: ~/.termux/LICENSE.txt
+Directory: ~/.termux
+Name: LICENSE.txt
+File Type: .txt
+================================================================================
+
+Copyright 2009, 2010, 2013 André Berg
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFont-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFont-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFont-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFont-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFont-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFont-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFont-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFont-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFontMono-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFontMono-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFontMono-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFontMono-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFontMono-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFontMono-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFontMono-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFontMono-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFontPropo-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFontPropo-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFontPropo-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFontPropo-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFontPropo-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFontPropo-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLDZNerdFontPropo-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGLDZNerdFontPropo-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFont-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFont-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFont-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFont-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFont-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFont-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFont-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFont-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFontMono-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFontMono-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFontMono-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFontMono-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFontMono-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFontMono-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFontMono-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFontMono-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFontPropo-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFontPropo-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFontPropo-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFontPropo-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFontPropo-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFontPropo-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGLNerdFontPropo-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGLNerdFontPropo-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFont-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFont-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFont-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFont-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFont-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFont-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFont-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFont-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFontMono-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFontMono-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFontMono-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFontMono-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFontMono-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFontMono-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFontMono-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFontMono-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFontPropo-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFontPropo-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFontPropo-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFontPropo-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFontPropo-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFontPropo-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMDZNerdFontPropo-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGMDZNerdFontPropo-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFont-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFont-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFont-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFont-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFont-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFont-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFont-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFont-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFontMono-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFontMono-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFontMono-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFontMono-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFontMono-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFontMono-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFontMono-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFontMono-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFontPropo-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFontPropo-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFontPropo-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFontPropo-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFontPropo-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFontPropo-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGMNerdFontPropo-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGMNerdFontPropo-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFont-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFont-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFont-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFont-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFont-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFont-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFont-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFont-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFontMono-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFontMono-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFontMono-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFontMono-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFontMono-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFontMono-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFontMono-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFontMono-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFontPropo-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFontPropo-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFontPropo-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFontPropo-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFontPropo-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFontPropo-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSDZNerdFontPropo-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGSDZNerdFontPropo-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFont-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFont-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFont-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFont-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFont-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFont-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFont-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFont-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFontMono-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFontMono-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFontMono-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFontMono-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFontMono-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFontMono-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFontMono-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFontMono-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFontPropo-Bold.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFontPropo-Bold.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFontPropo-BoldItalic.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFontPropo-BoldItalic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFontPropo-Italic.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFontPropo-Italic.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/MesloLGSNerdFontPropo-Regular.ttf
+Directory: ~/.termux
+Name: MesloLGSNerdFontPropo-Regular.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: ~/.termux/README.md
+Directory: ~/.termux
+Name: README.md
+File Type: .md
+================================================================================
+
+# Nerd Fonts
+
+This is an archived font from the Nerd Fonts release v3.3.0.
+
+For more information see:
+* https://github.com/ryanoasis/nerd-fonts/
+* https://github.com/ryanoasis/nerd-fonts/releases/latest/
+
+# Meslo LG
+
+Meslo LG is a customized version of Apple’s Menlo-Regular font
+(which is a customized Bitstream Vera Sans Mono).
+
+We use a patched version by opeik https://github.com/opeik here.
+
+For more information have a look at the upstream website: https://github.com/andreberg/Meslo-Font
+
+Version: 1.21
+
+## Which font?
+
+### TL;DR
+
+* Pick your font family:
+  * If you are limited to monospaced fonts (because of your terminal, etc) then pick a font with `Nerd Font Mono` (or `NFM`).
+  * If you want to have bigger icons (usually around 1.5 normal letters wide) pick a font without `Mono` i.e. `Nerd Font` (or `NF`). Most terminals support this, but ymmv.
+  * If you work in a proportional context (GUI elements or edit a presentation etc) pick a font with `Nerd Font Propo` (or `NFP`).
+
+### Ligatures
+
+Ligatures are generally preserved in the patched fonts.
+Nerd Fonts `v2.0.0` had no ligatures in the `Nerd Font Mono` fonts, this has been dropped with `v2.1.0`.
+If you have a ligature-aware terminal and don't want ligatures you can (usually) disable them in the terminal settings.
+
+### Explanation
+
+Once you narrow down your font choice of family (`Droid Sans`, `Inconsolata`, etc) and style (`bold`, `italic`, etc) you have 2 main choices:
+
+#### `Option 1: Download already patched font`
+
+ * For a stable version download a font package from the [release page](https://github.com/ryanoasis/nerd-fonts/releases)
+ * Or download the development version from the folders here
+
+#### `Option 2: Patch your own font`
+
+ * Patch your own variations with the various options provided by the font patcher (i.e. not include all symbols for smaller font size)
+
+For more information see: [The FAQ](https://github.com/ryanoasis/nerd-fonts/wiki/FAQ-and-Troubleshooting#which-font)
+
+[SIL-RFN]:http://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web_fonts_and_RFNs#14cbfd4a
+
+
+
+
+================================================================================
+File: ~/.termux/unifont.ttf
+Directory: ~/.termux
+Name: unifont.ttf
+File Type: .ttf
+================================================================================
+
+[Binary or non-UTF-8 file - content skipped]
+
+
+================================================================================
+File: main.py
+Directory: .
+Name: main.py
+File Type: .py
+================================================================================
+
+import os
+import json
+import asyncio
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
+import uvicorn
+from src.backend.models import parse_gfs
+from src.backend.engine import Engine
+
+app = FastAPI(title="GFS-II Neural IDE")
+
+LIB_FILE = 'library/programs.json'
+os.makedirs('library', exist_ok=True)
+DEFAULT_PROGRAM = "⟐(⊢◊(≈⟡⊣⌁)(≠✳⌬⇄)⊕)⟳"
+
+def seed_library():
+    if not os.path.exists(LIB_FILE):
+        with open(LIB_FILE, 'w') as f: 
+            json.dump({"Target Loop": DEFAULT_PROGRAM}, f)
+seed_library()
+
+engine_instance = Engine(parse_gfs(DEFAULT_PROGRAM))
+running = False
+
+class LoadRequest(BaseModel):
+    text: str
+    seed: int = 42
+
+@app.get("/")
+async def read_index(): return FileResponse("web/index.html")
+
+@app.get("/api/state")
+async def get_state(): return engine_instance.get_state()
+
+@app.post("/api/step")
+async def step_engine():
+    # Threading bypass: Allows the server to stay alive while the LLM thinks
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, engine_instance.step)
+    return {"status": "ok"}
+
+@app.post("/api/play")
+async def play_engine():
+    global running
+    running = True
+    return {"status": "running"}
+
+@app.post("/api/pause")
+async def pause_engine():
+    global running
+    running = False
+    return {"status": "paused"}
+
+@app.post("/api/load")
+async def load_engine(req: LoadRequest):
+    global running, engine_instance
+    running = False
+    engine_instance = Engine(parse_gfs(req.text), seed=req.seed)
+    return {"status": "ok"}
+
+@app.get("/api/library")
+async def get_library():
+    with open(LIB_FILE, 'r') as f: return json.load(f)
+
+async def engine_daemon():
+    global running, engine_instance
+    loop = asyncio.get_event_loop()
+    while True:
+        if running and engine_instance:
+            try:
+                # Run the heavy ML computation in a separate thread
+                await loop.run_in_executor(None, engine_instance.step)
+            except Exception as e:
+                print(f"Engine Step Error: {e}")
+                running = False
+        await asyncio.sleep(0.5)
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(engine_daemon())
+
+if os.path.exists("web"):
+    app.mount("/web", StaticFiles(directory="web"), name="web")
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
+
+
+
+================================================================================
+File: README.md
+Directory: .
+Name: README.md
+File Type: .md
+================================================================================
+
+# GFS-II: Reflexive Field System
+
+A pocket-sized, enterprise-grade runtime where language = graph = runtime. 
+
+## Overview
+GFS-II is a unified symbolic computation substrate. The system operates entirely on Unicode glyphs representing nodes in an activation-based executable graph. It naturally supports self-modification, live trace viewing, and direct visual mapping.
+
+## Structure
+- `gfs.py`: The Python backend, containing the core Execution Engine, Graph structure, textual/graph parsing logic, and the HTTP Server for the IDE.
+- `web/`: The Canvas-based visual IDE for real-time monitoring and manipulation.
+
+## Core Glyphs
+- **⟐** anchor (start)
+- **⊢** emerge (task init)
+- **⟡** transform (task logic)
+- **⊣** resolve (task end)
+- **⌁** trace (log)
+- **⟳** loop (reactivate)
+
+## Mutation Glyphs
+- **✳** spawn (create node)
+- **✂** delete (remove node)
+- **⇄** rewire (change edges)
+- **⌬** mutate (change glyph)
+- **⤴** clone (duplicate node)
+- **⤵** compress (remove node between)
+
+## Usage
+
+### CLI execution
+```sh
+# Run minimal target program
+./gfs.py run
+
+# Load specific file
+./gfs.py run examples/target.gfs
+
+# Step through explicitly
+./gfs.py step
+```
+
+### Visual IDE
+```sh
+# Start web server on port 8080
+./gfs.py serve
+```
+Open your browser to `http://localhost:8080/web/index.html` to view the live graph.
+
+
+================================================================================
+File: README_NEW.md
+Directory: .
+Name: README_NEW.md
+File Type: .md
+================================================================================
+
+# GFS-II: Reflexive Field System
+A modular, self-modifying, graph-based visual IDE and execution runtime. GFS-II abandons traditional linear execution paradigms, operating entirely on Unicode glyphs representing nodes in an activation-based network. It natively supports self-modification, live matrix-based pan/zoom rendering, physics-based topology layout, and visual execution tracing.
+Built with a philosophy that aligns with practical evolutionary computation, GFS-II blurs the line between static data and living, mutating processes. It is designed for environments where dynamic adaptation is valued over rigid, unchanging principles.
+## Architectural Philosophy
+Traditional code executes top-down. GFS-II executes topologically. Programs are not scripts; they are physical spaces where logic flows like electrical impulses through a neural substrate.
+ * **Reflexivity:** The graph can read, spawn, mutate, and delete its own nodes at runtime.
+ * **Spatial Execution:** Control flow is dictated by graph edges, allowing concurrent divergence and unpredictable convergence.
+ * **Practical Fluidity:** The system prioritizes immediate execution and runtime adaptation over compile-time strictness.
+## Directory & Module Structure
+The system has been completely modularized to separate the physics/execution engine, the REST API, and the visual frontend. This ensures practical expandability and clean separation of concerns.
+.
+├── server.py                 # Core ASGI/HTTP server and API router. Connects UI to Engine.
+├── library/
+│   └── programs.json         # Persistent JSON storage for saved graphs.
+├── src/
+│   └── backend/
+│       ├── engine.py         # Graph traversal, node execution, mutation, and physics logic.
+│       └── models.py         # Graph structures, node definitions, and the string-to-GFS parser.
+└── web/
+├── index.html            # Main UI layout and viewport definitions.
+├── style.css             # UI styling for the editor and canvas.
+└── js/
+├── main.js           # Application entrypoint, event listeners, and render loop.
+├── api.js            # Fetch wrappers for communication with the Python backend.
+├── canvas.js         # Matrix-based Renderer, pan/zoom scaling, and physics drawing.
+└── editor.js         # Syntax rules, state machine, palette rendering, and builder UI.
+## Core Engine Mechanics
+GFS-II evaluates a graph by maintaining a dynamic list of active_nodes. Time in the system is measured in discrete "Ticks."
+### The Execution Lifecycle
+During each tick, the engine performs the following deterministic sequence:
+ 1. **Read Active State:** Snapshots the current array of active node IDs.
+ 2. **Execute Glyphs:** Iterates over the snapshot. For each node, it executes the specific mathematical or topological behavior bound to that node's glyph.
+ 3. **State Mutation:** Applies any graph-altering commands (e.g., node deletion, creation, or rewiring) generated by the executed glyphs.
+ 4. **Edge Propagation:** Moves the "active" status from the currently executing nodes to all valid linked child nodes via connecting edges.
+ 5. **Root Fallback:** If the active node pool empties (a dead end), the engine automatically attempts to re-anchor at the graph's designated root node.
+### Physics and Topology
+The graphical representation is not just cosmetic; it utilizes a repulsive/attractive force-directed graph physics model. Nodes repel each other to maintain visual clarity, while edges act as springs pulling connected logic blocks together.
+## Glyph Syntax & Dictionary
+The system uses specific glyphs to dictate control flow, state mutation, and graph topography. The visual editor enforces valid topological connections based on these rules, preventing fatal structural errors before execution begins.
+### Foundational Control Flow
+ * **⟐ (Anchor):** Anchored starting state. Serves as the immutable root of the program.
+ * **⊢ (Emerge):** A new task emerges into active context. Often used to initialize a distinct processing branch.
+ * **⟡ (Transform):** Standard operational task. Represents a generic state transformation or calculation.
+ * **⊣ (Resolve):** Task successfully resolved. Closes an operational flow safely.
+ * **⟳ (Loop):** Re-evaluating graph root. Terminates the current path and forces the active state back to the ⟐ anchor.
+### Topological Branching
+ * **◊ (Branch):** Execution bifurcates. Active state will duplicate and travel down all connected outgoing edges simultaneously.
+ * **≈ (Similarity):** Conditional gate. Continues execution only if context states match (currently a placeholder for advanced logic).
+ * **≠ (Divergence):** Path destruction. Will randomly select one outgoing edge and permanently sever it from the graph.
+ * **⊕ (Merge):** Funnels multiple concurrent execution paths back into a single active state.
+ * **(** / **)**: Scope modifiers used exclusively during text-to-graph parsing to define nested branching structures.
+### Transhumanist / Evolutionary Operators
+These glyphs alter the physical structure of the program while it is running, allowing for self-optimizing or chaotic growth.
+ * **✳ (Spawn):** Creates a brand new node with a randomized glyph and links the current node to it.
+ * **⌬ (Mutate):** Randomly changes the glyph (and therefore the behavior) of the node currently executing.
+ * **✂ (Delete):** Selects a random node in the entire graph (excluding the root and itself) and permanently deletes it, cleaning up orphaned edges.
+ * **⇄ (Rewire):** Selects a random node and creates a new edge between the current node and the target, bypassing established logic flows.
+ * **⤴ (Clone):** Duplicates an existing connected node and attaches the clone to the current node.
+ * **⤵ (Compress):** Bypasses a connected node, linking directly to its children, and deletes the bypassed intermediary.
+## Example Programs & Tick-by-Tick Rundowns
+To understand GFS-II, you must trace the active state through the spatial graph. Below are practical examples ranging from simple loops to unbounded evolutionary systems.
+### Example 1: The Standard Infinite Loop
+**Program Code:** ⟐(⊢⟡⊣)⟳
+**Description:** A stable, predictable system. It anchors, emerges a task, transforms it, resolves it, and loops back to the start.
+ * **Tick 0:** * *State:* Graph initialized.
+   * *Active Node:* ⟐
+ * **Tick 1:**
+   * *Execution:* ⟐ asserts the root anchor.
+   * *Propagation:* Active state moves across the edge to ⊢.
+   * *Active Node:* ⊢
+ * **Tick 2:**
+   * *Execution:* ⊢ initializes the task context.
+   * *Propagation:* Active state moves to ⟡.
+   * *Active Node:* ⟡
+ * **Tick 3:**
+   * *Execution:* ⟡ performs standard transformation.
+   * *Propagation:* Active state moves to ⊣.
+   * *Active Node:* ⊣
+ * **Tick 4:**
+   * *Execution:* ⊣ resolves the context.
+   * *Propagation:* Active state moves to ⟳.
+   * *Active Node:* ⟳
+ * **Tick 5:**
+   * *Execution:* ⟳ forces a root reset. The active state is wiped.
+   * *Propagation:* Engine detects empty active state, triggers Root Fallback.
+   * *Active Node:* ⟐ (Cycle repeats).
+### Example 2: The Self-Pruning Bifurcation
+**Program Code:** ⟐(⊢◊(≈⟡)(≠✂))⟳
+**Description:** The execution splits into two concurrent realities. One attempts a standard transformation (≈ to ⟡). The other represents a destructive, unpredictable anomaly (≠ to ✂).
+ * **Tick 0:** * *Active Node:* ⟐
+ * **Tick 1:** * *Active Node:* ⊢
+ * **Tick 2:** * *Execution:* ⊢ processes.
+   * *Propagation:* Moves to ◊.
+   * *Active Node:* ◊
+ * **Tick 3:** * *Execution:* ◊ forces execution to branch.
+   * *Propagation:* Active state splits.
+   * *Active Nodes:* ≈ AND ≠
+ * **Tick 4 (Concurrent Execution):**
+   * *Execution Path A:* ≈ passes similarity check.
+   * *Execution Path B:* ≠ triggers divergence. It randomly severs one of its outgoing links. If it severs the link to ✂, the destructive path dies.
+   * *Propagation:* Assuming the link survived, state moves forward.
+   * *Active Nodes:* ⟡ AND ✂
+ * **Tick 5 (Concurrent Execution):**
+   * *Execution Path A:* ⟡ transforms data.
+   * *Execution Path B:* ✂ executes. It randomly selects a node in the graph (perhaps the ⟡ node, perhaps the ≈ node) and permanently deletes it from the topology.
+   * *Propagation:* Both branches attempt to flow to ⟳.
+   * *Active Node:* ⟳
+ * **Tick 6:** * *Execution:* Loop triggers. Graph resets to ⟐, but the physical structure of the graph has now been permanently altered by the ✂ action in Tick 5.
+### Example 3: Unbounded Evolutionary Growth
+**Program Code:** ⟐(✳⌬⇄)⟳
+**Description:** A highly volatile, self-replicating sequence. It continuously spawns new nodes, mutates existing ones, and randomly rewires the topology before looping.
+ * **Tick 0:** * *Active Node:* ⟐
+ * **Tick 1:** * *Active Node:* ✳
+ * **Tick 2:**
+   * *Execution:* ✳ spawns a brand new node (e.g., it rolls a ⊣) and attaches it to itself.
+   * *Propagation:* State moves down the original path to ⌬ AND the new path to the spawned ⊣.
+   * *Active Nodes:* ⌬ AND ⊣
+ * **Tick 3:**
+   * *Execution:* ⌬ mutates itself into a new glyph (e.g., changes from ⌬ to ◊). Meanwhile, the spawned ⊣ resolves its branch.
+   * *Propagation:* State from the mutated ◊ moves to ⇄.
+   * *Active Nodes:* ⇄
+ * **Tick 4:**
+   * *Execution:* ⇄ triggers a rewire. It randomly connects itself to the spawned ⊣ from Tick 2.
+   * *Propagation:* State moves to ⟳ and back to ⊣ (creating an infinite sub-loop).
+ * **Tick N:** * As this program runs, the graph rapidly expands in size, creating a massive, unpredictable neural web of interconnecting logic gates that the physics engine will attempt to continuously balance on the canvas.
+## API Reference
+The Python backend exposes the following endpoints, accessible via web/js/api.js.
+ * GET /api/state: Returns a comprehensive JSON object containing the current graph topology, physics vectors, node edge arrays, and the last 30 event logs.
+ * GET /api/library: Returns the dictionary of saved .gfs scripts stored in library/programs.json.
+ * POST /api/library: Accepts a JSON payload ({ "name": "...", "text": "..." }) to persist a new topological layout to disk.
+ * POST /api/load: Injects a new graph text string into the engine, tearing down the old graph and resetting physics to origin.
+ * POST /api/play: Engages the background daemon thread to step the engine forward automatically.
+ * POST /api/pause: Halts the background daemon thread.
+ * POST /api/step: Advances the execution engine by exactly one tick.
+## Exhaustive Ecosystem & Tooling Integrations
+This architecture is uniquely optimized for dynamic mobile workflows and headless deployment (specifically targeting Android/Termux environments via Remote Desktop or VNC), while maintaining vast expandability for advanced AI and machine learning integrations.
+### Termux & Core System Packages
+To run and develop GFS-II natively on a mobile device, the following packages provide the optimal substrate:
+ * **python**: The core execution runtime for the backend engine.
+ * **x11-repo & tigervnc**: Essential packages for routing the graphical Web UI to a remote viewer (like a Windows Remote Desktop client) or a local Android X11 app.
+ * **termux-api**: Can be directly imported into engine.py via subprocess to trigger physical device responses. For example, executing a ✂ (Delete) node could trigger termux-vibrate to provide tactile feedback of graph destruction.
+ * **proot-distro**: Highly recommended for establishing an isolated Ubuntu or Debian subsystem if complex native dependencies (like C++ graph libraries) are required later.
+ * **nodejs & yarn**: For future build-chain integration, allowing you to bundle the ES6 modules in web/js/ via Vite or Webpack for a production deployment.
+ * **coreutils & jq**: Indispensable for CLI-based manipulation and querying of the library/programs.json file without requiring a Python shell.
+### Python PIP Libraries
+The backend can be supercharged with the following Python packages to increase performance and capabilities:
+ * **fastapi & uvicorn**: For upgrading the backend to a high-throughput ASGI server. If the tick-rate of massive evolutionary graphs overwhelms the standard SimpleHTTPRequestHandler, Uvicorn will handle the concurrency natively.
+ * **networkx**: Replaces the basic Python dictionary graph implementation with highly optimized C-backed algorithms for graph analysis, cycle detection, and rapid pathfinding.
+ * **pydantic**: Enforces strict data validation for incoming JSON payloads on the API layer, preventing malformed graphs from crashing the engine.
+ * **websockets**: Allows migration from the current HTTP polling interval (400ms) to true, real-time bidirectional physics updates pushed directly from the engine to the canvas.
+ * **matplotlib**: Generates static, server-side topological maps of the graph state headlessly, useful for saving execution snapshots over time.
+### Model Context Protocol (MCP) Servers
+For integrating GFS-II with external AI agents or larger data ecosystems:
+ * **sqlite-mcp**: Facilitates the migration of library/programs.json into a structured, queriable database, logging every node execution history and mutation over the lifetime of a program.
+ * **filesystem-mcp**: Enables secure, programmatic access to the host OS, allowing an AI agent to import complex external .gfs scripts or update the editor.js dictionary dynamically.
+ * **github-mcp**: Allows seamless, automated version control. As the graph mutates and evolves, github-mcp can automatically push diffs of the resulting .gfs strings to a remote repository.
+### Gemini CLI Extensions
+For rapid, AI-assisted development within the terminal:
+ * **gemini-shell**: Bridges the Termux environment to an AI context. If a volatile graph configuration causes a Python stack trace, gemini-shell allows for immediate, in-terminal diagnosis.
+ * **gemini-coder**: Automates the repetitive boilerplate generation required when adding new nodes to models.py and syncing the backend dictionary with the frontend editor.js logic.
+ * **gemini-git**: Provides highly contextualized commit messages, analyzing how specific topological changes to the .gfs strings alter the spatial execution flow of the programs.
+
+
+
+================================================================================
+File: server.py
+Directory: .
+Name: server.py
+File Type: .py
+================================================================================
+
+#!/usr/bin/env python3
+import os, json, time, threading
+from http.server import SimpleHTTPRequestHandler, HTTPServer
+from src.backend.models import parse_gfs
+from src.backend.engine import Engine
+
+LIB_FILE = 'library/programs.json'
+if not os.path.exists('library'): os.makedirs('library')
+if not os.path.exists(LIB_FILE):
+    with open(LIB_FILE, 'w') as f: json.dump({"Target Loop": "⟐(⊢◊(≈⟡⊣⌁)(≠✳⌬⇄)⊕)⟳"}, f)
+
+engine_instance = Engine(parse_gfs("⟐⟳"))
+running = False
+
+class WebHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/': self.path = '/web/index.html'
+        if self.path == '/api/state':
+            self._send_json(engine_instance.get_state())
+            return
+        if self.path == '/api/library':
+            with open(LIB_FILE, 'r') as f: self._send_json(json.load(f))
+            return
+        return super().do_GET()
+
+    def do_POST(self):
+        global running, engine_instance
+        content_length = int(self.headers.get('Content-Length', 0))
+        data = json.loads(self.rfile.read(content_length)) if content_length > 0 else {}
+
+        if self.path == '/api/step':
+            engine_instance.step()
+            self._send_json({"status": "ok"})
+        elif self.path == '/api/play':
+            running = True
+            self._send_json({"status": "running"})
+        elif self.path == '/api/pause':
+            running = False
+            self._send_json({"status": "paused"})
+        elif self.path == '/api/load':
+            running = False
+            engine_instance = Engine(parse_gfs(data.get('text', '⟐⟳')), seed=int(data.get('seed', 42)))
+            self._send_json({"status": "ok"})
+        elif self.path == '/api/library':
+            with open(LIB_FILE, 'r') as f: lib = json.load(f)
+            lib[data.get('name', 'Untitled')] = data.get('text')
+            with open(LIB_FILE, 'w') as f: json.dump(lib, f)
+            self._send_json({"status": "saved"})
+
+    def _send_json(self, obj):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(obj).encode())
+
+def engine_loop():
+    global running
+    while True:
+        if running and engine_instance: engine_instance.step()
+        time.sleep(0.5)
+
+if __name__ == "__main__":
+    t = threading.Thread(target=engine_loop, daemon=True)
+    t.start()
+    print("🚀 API & UI Server active at http://localhost:8080/web/index.html")
+    HTTPServer(('0.0.0.0', 8080), WebHandler).serve_forever()
+
+

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Context Engineer V5.0</title>
+    <style>
+        :root {
+            --bg: #090909; --surface: #141414; --surface2: #222222;
+            --primary: #bb86fc; --secondary: #03dac6; --tertiary: #ffb74d; --text: #e0e0e0;
+            --border: #333; --danger: #cf6679; --success: #4CAF50;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: monospace; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Floating Nav Handles */
+        #nav-drawer-btn { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 20px; background: var(--surface2); border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 1000; font-size: 1.2em; color: var(--primary); }
+        #nav-sidebar-btn { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 20px; height: 80px; background: var(--surface2); border: 1px solid var(--border); border-left: none; border-radius: 0 8px 8px 0; cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 90; font-size: 1.2em; color: var(--primary); }
+        #nav-drawer-btn:hover, #nav-sidebar-btn:hover { background: var(--primary); color: #000; }
+
+        /* Always Visible Core Tools */
+        .floating-tools { position: absolute; top: 10px; right: 15px; display: flex; gap: 8px; z-index: 95; }
+        button.icon-btn { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 8px; border-radius: 4px; cursor: pointer; font-size: 1.2em; line-height: 1; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        button.icon-btn:hover { background: rgba(255,255,255,0.1); }
+        
+        /* Standard inputs */
+        input, textarea, select { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 8px; border-radius: 4px; font-family: monospace; width: 100%; }
+        button.std-btn { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button.std-btn:hover { opacity: 0.8; }
+
+        /* Layout Architecture */
+        #main-area { display: flex; flex-grow: 1; width: 100%; overflow: hidden; position: relative; margin-top: 25px; }
+        
+        /* Sidebar (Chats) */
+        #sidebar { width: 260px; background: var(--bg); border-right: 1px solid var(--border); transition: width 0.3s, transform 0.3s; z-index: 80; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
+        #sidebar.retracted { width: 0; border: none; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border); width: 260px; }
+        .sidebar-header h3 { margin: 0; color: var(--primary); }
+        .sidebar-content { width: 260px; padding: 10px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        
+        /* Top Drawer (Libraries) */
+        #library-drawer { position: absolute; top: 0; left: 0; width: 100%; height: 75vh; background: var(--surface); border-bottom: 2px solid var(--primary); transform: translateY(-100%); transition: transform 0.3s ease-in-out; z-index: 900; display: flex; flex-direction: column; padding: 30px 20px 20px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
+        #library-drawer.open { transform: translateY(0); }
+        .drawer-tabs { display: flex; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 10px; align-items: center; }
+        .tab { background: transparent; color: #888; border: none; font-size: 1.2em; cursor: pointer; font-family: monospace; }
+        .tab.active { color: var(--primary); font-weight: bold; border-bottom: 2px solid var(--primary); }
+        #drawer-content-area { flex-grow: 1; overflow-y: auto; padding-right: 10px; }
+
+        /* Chat Area Constraints */
+        #chat-area { flex-grow: 1; display: flex; flex-direction: column; padding: 10px; min-width: 0; overflow: hidden; }
+        
+        /* Token HUD (Moved to top) */
+        .token-hud { flex-shrink: 0; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; padding: 10px; background: var(--surface); border-radius: 4px; border: 1px solid var(--border); }
+        .pie-chart { width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); position: relative; border: 2px solid #444; flex-shrink: 0; }
+        .pie-chart::after { content: ''; position: absolute; top: 15%; left: 15%; width: 70%; height: 70%; background: var(--surface); border-radius: 50%; }
+        .token-stats { font-size: 0.8em; color: #aaa; display: flex; flex-direction: column; gap: 2px; }
+        .token-stat-row { display: flex; align-items: center; gap: 5px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* Chat Log */
+        #chat-log { flex-grow: 1; overflow-y: auto; padding: 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); margin-bottom: 10px; }
+        .msg { margin-bottom: 15px; padding: 10px; border-radius: 4px; white-space: pre-wrap; border-left: 3px solid transparent; background: var(--surface); word-break: break-word; }
+        .msg.user { border-color: var(--primary); }
+        .msg.model { border-color: var(--secondary); background: rgba(3, 218, 198, 0.05); }
+
+        /* Input Row */
+        #input-row { flex-shrink: 0; display: flex; gap: 10px; align-items: stretch; }
+        #user-input { flex-grow: 1; min-height: 80px; resize: none; }
+        .btn-stack { display: flex; flex-direction: column; gap: 5px; width: 120px; flex-shrink: 0; }
+        .btn-stack button { flex-grow: 1; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        #btn-send { background: var(--primary); color: #000; }
+        #btn-compress { background: linear-gradient(45deg, var(--secondary), var(--primary)); color: #000; }
+
+        /* Lists & Items (Strict Bounding) */
+        .folder-group { margin-bottom: 15px; width: 100%; }
+        .folder-title { color: var(--secondary); font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid var(--border); padding-bottom: 2px; display: flex; justify-content: space-between; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 4px; background: var(--surface2); width: 100%; }
+        .item-row:hover { border-color: var(--primary); }
+        .item-row.active { border-color: var(--primary); background: rgba(187, 134, 252, 0.15); }
+        .item-info { flex-grow: 1; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; }
+        .item-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
+        .item-meta { font-size: 0.75em; color: #888; }
+        
+        /* Inline Tools */
+        .edit-tools { display: flex; gap: 4px; flex-shrink: 0; }
+        .edit-tools button { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
+        .edit-tools button:hover { background: var(--surface); border-color: var(--primary); }
+        
+        /* Lock logic */
+        body.locked .req-unlock { display: none !important; }
+        
+        /* Modals */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
+        .modal { background: var(--surface); padding: 20px; border-radius: 8px; border: 1px solid var(--border); min-width: 300px; width: 90vw; max-width: 800px; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .modal.active { display: flex; }
+        .modal h3 { margin: 0; color: var(--primary); }
+        
+        /* Tooltip Input */
+        #tooltip-input { position: absolute; background: var(--surface2); border: 1px solid var(--primary); padding: 8px; border-radius: 4px; display: none; z-index: 3000; box-shadow: 0 4px 12px rgba(0,0,0,0.8); gap: 5px; flex-direction: column; width: 250px; }
+        #tooltip-input.active { display: flex; }
+        
+        .empty-state { color: #666; font-style: italic; padding: 20px; text-align: center; border: 1px dashed var(--border); border-radius: 4px; }
+    </style>
+</head>
+<body class="locked">
+
+    <div id="nav-drawer-btn" onclick="toggleDrawer()">▼</div>
+    <div id="nav-sidebar-btn" onclick="toggleSidebar()">▶</div>
+
+    <div class="floating-tools">
+        <button class="icon-btn" onclick="openModal('analytics-modal')" title="Context Analytics">📊</button>
+        <button class="icon-btn" id="lock-btn" onclick="toggleLock()" title="Toggle Edit Mode">🔒</button>
+        <button class="icon-btn" onclick="openModal('settings-modal')" title="Engine Settings">⚙️</button>
+    </div>
+
+    <div id="library-drawer">
+        <div class="drawer-tabs">
+            <button class="tab active" onclick="switchDrawer('snippets')" id="tab-snippets">Snippet Bank</button>
+            <button class="tab" onclick="switchDrawer('contexts')" id="tab-contexts">Context Vault</button>
+            <div style="flex-grow:1;"></div>
+            <button class="std-btn req-unlock" onclick="reqInput('New Folder Name', 'folder_lib')" style="background:var(--surface2);">+🗂️ New Folder</button>
+            <button class="std-btn req-unlock" onclick="openModal('constructor-modal')" style="background:var(--primary); color:#000;">⚙️ Payload Constructor</button>
+        </div>
+        <div id="drawer-content-area"></div>
+    </div>
+
+    <div id="main-area">
+        
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h3>Sessions</h3>
+                <button class="icon-btn req-unlock" style="font-size: 1em; padding: 4px 8px;" onclick="reqInput('New Chat Title', 'chat', 'General')" title="New Chat">+</button>
+            </div>
+            <div class="sidebar-content" id="chat-list-container"></div>
+        </aside>
+
+        <main id="chat-area">
+            
+            <div class="token-hud">
+                <div class="pie-chart" id="session-pie"></div>
+                <div class="token-stats">
+                    <div class="token-stat-row"><div class="dot" style="background:var(--primary);"></div> User Input</div>
+                    <div class="token-stat-row"><div class="dot" style="background:var(--secondary);"></div> Model Output</div>
+                    <div class="token-stat-row"><div class="dot" style="background:var(--tertiary);"></div> Context Payload</div>
+                </div>
+                <div style="flex-grow:1; text-align:right; font-size:0.85em; color:#888;">
+                    Session: <span id="sess-total" style="color:var(--text); font-weight:bold;">0</span> / <span id="sess-limit">1M</span><br>
+                    Global Tracked: <span id="glob-total">0</span>
+                </div>
+            </div>
+
+            <div id="chat-log"></div>
+            
+            <div id="input-row">
+                <textarea id="user-input" placeholder="Enter prompt..."></textarea>
+                <div class="btn-stack">
+                    <button id="btn-send" onclick="handleSend()">🚀 Send</button>
+                    <button id="btn-compress" onclick="compressSessionAndSave()">🧠 Extract</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="settings-modal" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h3>Engine Settings</h3>
+            <label><input type="checkbox" id="mock-toggle" checked> 🧪 Simulate LLM (Bypass Quotas)</label>
+            <input type="password" id="api-key" placeholder="Gemini API Key">
+            <input type="number" id="context-limit" value="1000000" placeholder="Context Token Limit">
+            <button class="std-btn" style="background:var(--primary); color:#000;" onclick="saveSettings()">Save Configuration</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="analytics-modal" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h3>Context Analytics Dashboard</h3>
+            <div style="height: 200px; display:flex; align-items:center; justify-content:center; border: 1px dashed var(--border); background: var(--bg); color: #666; font-style: italic;">
+                [V5 Global Analytics Graph Mounting Point]
+            </div>
+            <p>Active Session Vector: <b id="stat-active">0 Tokens</b></p>
+            <button class="std-btn" onclick="document.getElementById('analytics-modal').classList.remove('active')">Dismiss</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="constructor-modal" onclick="closeModal(event)">
+        <div class="modal" style="height: 85vh;" onclick="event.stopPropagation()">
+            <h3>Payload Constructor</h3>
+            <div style="display:flex; gap:15px; flex-grow:1; overflow:hidden;">
+                <div style="flex:1; border:1px solid var(--border); padding:10px; overflow-y:auto; background:var(--bg); border-radius:4px;">
+                    <h4 style="margin-top:0; color:var(--secondary);">Snippet Base</h4>
+                    <div id="constructor-snippet-list"></div>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
+                    <input type="text" id="payload-title" placeholder="Payload ID (e.g. Core_Logic_V1)">
+                    <select id="payload-arch">
+                        <option value="markdown">Markdown Constitution</option>
+                        <option value="system_instruct">Raw System Instructions</option>
+                    </select>
+                    <textarea id="payload-custom" placeholder="Recursive instructions or absolute overrides to enforce on this payload..." style="flex-grow:1;"></textarea>
+                </div>
+            </div>
+            <button class="std-btn" style="background:var(--primary); color:#000;" onclick="compilePayload()">Forge & Bank in Vault</button>
+        </div>
+    </div>
+
+    <div id="tooltip-input">
+        <input type="text" id="tt-val" placeholder="...">
+        <div style="display:flex; gap:5px;">
+            <button class="std-btn" id="tt-confirm" style="flex:1; background:var(--success); color:#fff; border:none;">Confirm</button>
+            <button class="std-btn" onclick="closeTooltip()" style="flex:1; background:var(--danger); color:#fff; border:none;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA STATE ---
+        let db = {
+            settings: { key: '', mock: true, limit: 1000000, globTokens: 0 },
+            chats: JSON.parse(localStorage.getItem('gce_v5_chats')) || [],
+            snippets: JSON.parse(localStorage.getItem('gce_v5_snips')) || [],
+            contexts: JSON.parse(localStorage.getItem('gce_v5_contexts')) || [] // Vault
+        };
+        let activeChatId = localStorage.getItem('gce_v5_active_chat') || null;
+        let isLocked = true;
+        let activeDrawerTab = 'snippets';
+
+        // --- INIT ---
+        window.onload = () => {
+            if (db.chats.length === 0) createChat("Deployment Phase", "Termux");
+            if (!activeChatId && db.chats.length > 0) activeChatId = db.chats[0].id;
+            
+            const savedSet = JSON.parse(localStorage.getItem('gce_v5_settings'));
+            if(savedSet) db.settings = {...db.settings, ...savedSet};
+            
+            document.getElementById('api-key').value = db.settings.key;
+            document.getElementById('mock-toggle').checked = db.settings.mock;
+            document.getElementById('context-limit').value = db.settings.limit;
+            document.getElementById('sess-limit').innerText = formatNum(db.settings.limit);
+            
+            refreshUI();
+        };
+
+        function saveData() {
+            localStorage.setItem('gce_v5_chats', JSON.stringify(db.chats));
+            localStorage.setItem('gce_v5_snips', JSON.stringify(db.snippets));
+            localStorage.setItem('gce_v5_contexts', JSON.stringify(db.contexts));
+            localStorage.setItem('gce_v5_settings', JSON.stringify(db.settings));
+            localStorage.setItem('gce_v5_active_chat', activeChatId);
+        }
+
+        function formatNum(num) {
+            return num >= 1000000 ? (num/1000000).toFixed(1)+'M' : num >= 1000 ? (num/1000).toFixed(1)+'K' : num;
+        }
+
+        // --- UI TOGGLES ---
+        function toggleSidebar() { 
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('retracted'); 
+            document.getElementById('nav-sidebar-btn').innerText = sb.classList.contains('retracted') ? '▶' : '◀';
+        }
+        function toggleDrawer() { 
+            const dr = document.getElementById('library-drawer');
+            dr.classList.toggle('open'); 
+            document.getElementById('nav-drawer-btn').innerText = dr.classList.contains('open') ? '▲' : '▼';
+        }
+        function toggleLock() {
+            isLocked = !isLocked;
+            document.body.className = isLocked ? 'locked' : '';
+            document.getElementById('lock-btn').innerText = isLocked ? '🔒' : '🔓';
+            refreshUI(); // Re-render to enforce strict button state
+        }
+        function switchDrawer(tab) {
+            activeDrawerTab = tab;
+            document.getElementById('tab-snippets').classList.toggle('active', tab==='snippets');
+            document.getElementById('tab-contexts').classList.toggle('active', tab==='contexts');
+            renderDrawer();
+        }
+        
+        // --- MODALS & TOOLTIPS ---
+        function openModal(id) { document.getElementById(id).classList.add('active'); if(id==='constructor-modal') populateConstructor(); }
+        function closeModal(e) { e.target.classList.remove('active'); }
+        function saveSettings() {
+            db.settings.key = document.getElementById('api-key').value;
+            db.settings.mock = document.getElementById('mock-toggle').checked;
+            db.settings.limit = parseInt(document.getElementById('context-limit').value) || 1000000;
+            document.getElementById('sess-limit').innerText = formatNum(db.settings.limit);
+            saveData(); document.getElementById('settings-modal').classList.remove('active'); updateHUD();
+        }
+
+        function reqInput(placeholder, actionType, meta = null) {
+            const tt = document.getElementById('tooltip-input');
+            const inp = document.getElementById('tt-val');
+            inp.placeholder = placeholder; inp.value = '';
+            
+            // Center the tooltip
+            tt.style.top = '20%'; tt.style.left = '50%'; tt.style.transform = 'translate(-50%, -50%)';
+            tt.classList.add('active'); inp.focus();
+
+            document.getElementById('tt-confirm').onclick = () => {
+                const val = inp.value.trim(); if(!val) return;
+                
+                if(actionType === 'chat') createChat(val, meta);
+                else if(actionType === 'folder_lib') createFolder(activeDrawerTab, val);
+                else if(actionType === 'move') { moveItem(meta.type, meta.id, val); }
+                else if(actionType === 'rename') { renameItem(meta.type, meta.id, val); }
+                
+                closeTooltip();
+            };
+        }
+        function closeTooltip() { document.getElementById('tooltip-input').classList.remove('active'); }
+
+        // --- CORE LOGIC ---
+        function estimateTokens(str) { return Math.ceil((str||"").length / 4); }
+        function getActiveChat() { return db.chats.find(c => c.id === activeChatId); }
+
+        function createChat(title, folder) {
+            const c = { id: 'c_'+Date.now(), title, folder, messages: [], activeContextId: null, stats: { uTok:0, mTok:0, sTok:0 } };
+            db.chats.push(c); activeChatId = c.id; saveData(); refreshUI();
+        }
+        
+        function createFolder(type, name) {
+            db[type].push({ id: 'dummy_'+Date.now(), folder: name, title: '_ph_', content:'', tokens:0, isDummy: true });
+            saveData(); refreshUI();
+        }
+
+        function renameItem(type, id, newName) { const item = db[type].find(i=>i.id===id); if(item) { item.title = newName; saveData(); refreshUI(); } }
+        function moveItem(type, id, newFolder) { const item = db[type].find(i=>i.id===id); if(item) { item.folder = newFolder; saveData(); refreshUI(); } }
+        function deleteItem(type, id) { db[type] = db[type].filter(i=>i.id!==id); saveData(); refreshUI(); }
+
+        // Trigger Inline Action HTML swap
+        function inlineAction(type, id, action) {
+            const toolsDiv = document.getElementById(`tools-${id}`);
+            if(action === 'delete') {
+                toolsDiv.innerHTML = `
+                    <button style="color:var(--success); border-color:var(--success);" onclick="event.stopPropagation(); deleteItem('${type}','${id}')">✅</button>
+                    <button style="color:var(--danger); border-color:var(--danger);" onclick="event.stopPropagation(); refreshUI()">❌</button>
+                `;
+            } else if(action === 'rename') {
+                reqInput('New Name', 'rename', {type, id});
+            } else if(action === 'move') {
+                reqInput('Target Folder', 'move', {type, id});
+            }
+        }
+
+        function trackTokens(chat, role, text) {
+            const t = estimateTokens(text);
+            db.settings.globTokens += t;
+            if(role === 'user') chat.stats.uTok += t;
+            else if(role === 'model') chat.stats.mTok += t;
+            else chat.stats.sTok += t;
+        }
+
+        async function fetchLLM(prompt) {
+            if (db.settings.mock) {
+                return new Promise(res => setTimeout(() => res(prompt.includes("[COMPRESS]") ? "Simulated structural compression complete. Strict parsing extracted core architecture." : `[SIMULATED] Analyzed ${estimateTokens(prompt)} tokens context. Executing protocol.`), 400));
+            } else {
+                if(!db.settings.key) throw new Error("API Key missing.");
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${db.settings.key}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] })
+                });
+                const data = await res.json();
+                if(data.error) throw new Error(data.error.message);
+                return data.candidates[0].content.parts[0].text;
+            }
+        }
+
+        async function handleSend() {
+            const input = document.getElementById('user-input');
+            const val = input.value; if (!val) return;
+            const chat = getActiveChat(); if(!chat) return;
+
+            chat.messages.push({ role: 'user', text: val });
+            trackTokens(chat, 'user', val);
+            input.value = ''; renderChatLog(); updateHUD();
+
+            let contextPayload = "";
+            if (chat.activeContextId) {
+                const p = db.contexts.find(x=>x.id === chat.activeContextId);
+                if(p) { contextPayload = `[SYSTEM PAYLOAD: ${p.title}]\n${p.content}\n\n`; trackTokens(chat, 'system', p.content); }
+            }
+            const history = chat.messages.map(m => `${m.role.toUpperCase()}: ${m.text}`).join('\n\n');
+            
+            try {
+                const reply = await fetchLLM(contextPayload + history);
+                chat.messages.push({ role: 'model', text: reply });
+                trackTokens(chat, 'model', reply);
+                saveData(); renderChatLog(); updateHUD();
+            } catch(e) { alert(e.message); }
+        }
+
+        async function compressSessionAndSave() {
+            const chat = getActiveChat(); if(!chat || chat.messages.length===0) return;
+            const btn = document.getElementById('btn-compress'); btn.style.opacity = '0.5';
+            const history = chat.messages.map(m => `${m.role.toUpperCase()}: ${m.text}`).join('\n');
+            try {
+                const sum = await fetchLLM(`[COMPRESS] Extract core rules and logic into a dense, strict payload snippet:\n${history}`);
+                trackTokens(chat, 'system', sum); 
+                db.snippets.push({ id: 's_'+Date.now(), folder: "Extractions", title: `Ext: ${chat.title}`, content: sum, tokens: estimateTokens(sum) });
+                saveData(); refreshUI();
+            } catch(e) { alert(e.message); }
+            btn.style.opacity = '1';
+        }
+
+        // --- PAYLOAD CONSTRUCTOR ---
+        function populateConstructor() {
+            const list = document.getElementById('constructor-snippet-list');
+            list.innerHTML = '';
+            const validSnips = db.snippets.filter(s=>!s.isDummy);
+            if(validSnips.length === 0) list.innerHTML = `<div class="empty-state">No snippets available. Use the Extract button in a chat to generate base material.</div>`;
+            validSnips.forEach(s => {
+                list.innerHTML += `<div style="margin-bottom:8px;"><label style="cursor:pointer;"><input type="checkbox" class="con-cb" value="${s.id}"> [${s.folder}] ${s.title} <span style="color:#888;font-size:0.8em;">(~${s.tokens}t)</span></label></div>`;
+            });
+        }
+        function compilePayload() {
+            const title = document.getElementById('payload-title').value || 'Unregistered_Payload';
+            const arch = document.getElementById('payload-arch').value;
+            const custom = document.getElementById('payload-custom').value;
+            
+            const cbs = document.querySelectorAll('.con-cb:checked');
+            let body = "";
+            cbs.forEach(cb => {
+                const s = db.snippets.find(x=>x.id===cb.value);
+                if(s) body += `\n### [${s.title}]\n${s.content}\n`;
+            });
+
+            let finalContent = "";
+            if(arch === 'markdown') finalContent = `# CONSTITUTION: ${title}\n${custom}\n## ARCHITECTURE BASE\n${body}`;
+            else finalContent = `[SYSTEM INSTRUCT]: ${custom}\n[CONTEXT BLOCK]:\n${body}`;
+
+            db.contexts.push({ id: 'p_'+Date.now(), folder: "Constructs", title, content: finalContent, tokens: estimateTokens(finalContent) });
+            saveData(); document.getElementById('constructor-modal').classList.remove('active');
+            switchDrawer('contexts');
+        }
+
+        // --- RENDERING ---
+        function updateHUD() {
+            const chat = getActiveChat(); if(!chat) return;
+            const st = chat.stats;
+            const total = st.uTok + st.mTok + st.sTok;
+            
+            document.getElementById('sess-total').innerText = formatNum(total);
+            document.getElementById('glob-total').innerText = formatNum(db.settings.globTokens);
+            document.getElementById('stat-active').innerText = formatNum(total);
+
+            // Calculate exact conic percentages based on Limit
+            const limit = db.settings.limit;
+            const pctU = Math.min((st.uTok / limit) * 100, 100);
+            const pctM = Math.min((st.mTok / limit) * 100, 100 - pctU);
+            const pctS = Math.min((st.sTok / limit) * 100, 100 - pctU - pctM);
+            
+            const p1 = pctU;
+            const p2 = p1 + pctM;
+            const p3 = p2 + pctS;
+
+            const grad = `conic-gradient(var(--primary) 0% ${p1}%, var(--secondary) ${p1}% ${p2}%, var(--tertiary) ${p2}% ${p3}%, var(--surface2) ${p3}% 100%)`;
+            document.getElementById('session-pie').style.background = grad;
+        }
+
+        function renderGrouped(containerId, items, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            const realItems = items.filter(i => !i.isDummy);
+            if(realItems.length === 0 && type !== 'chats') {
+                container.innerHTML = `<div class="empty-state">No data in ${type === 'snippets' ? 'Snippet Bank' : 'Context Vault'}.</div>`;
+            }
+            
+            const grouped = items.reduce((acc, item) => {
+                acc[item.folder] = acc[item.folder] || [];
+                if(!item.isDummy) acc[item.folder].push(item);
+                return acc;
+            }, {});
+
+            for (const [folder, folderItems] of Object.entries(grouped)) {
+                const grp = document.createElement('div'); grp.className = 'folder-group';
+                grp.innerHTML = `<div class="folder-title"><span>📁 ${folder}</span></div>`;
+                
+                folderItems.forEach(item => {
+                    const isActiveChat = type === 'chats' && item.id === activeChatId;
+                    const isActivePayload = type === 'contexts' && getActiveChat()?.activeContextId === item.id;
+                    
+                    const row = document.createElement('div');
+                    row.className = `item-row ${isActiveChat || isActivePayload ? 'active' : ''}`;
+                    
+                    row.onclick = () => {
+                        if(type==='chats') { activeChatId = item.id; saveData(); refreshUI(); }
+                        if(type==='contexts') { getActiveChat().activeContextId = item.id; saveData(); refreshUI(); alert(`Context Vault Payload [${item.title}] engaged.`); }
+                    };
+
+                    row.innerHTML = `
+                        <div class="item-info">
+                            <span class="item-title">${item.title}</span>
+                            ${type !== 'chats' ? `<span class="item-meta">Weight: ~${item.tokens} Tokens</span>` : ''}
+                        </div>
+                        <div class="edit-tools req-unlock" id="tools-${item.id}">
+                            <button title="Move" onclick="event.stopPropagation(); inlineAction('${type}', '${item.id}', 'move')">✥</button>
+                            <button title="Rename" onclick="event.stopPropagation(); inlineAction('${type}', '${item.id}', 'rename')">📝</button>
+                            <button title="Delete" onclick="event.stopPropagation(); inlineAction('${type}', '${item.id}', 'delete')">❌</button>
+                        </div>
+                    `;
+                    grp.appendChild(row);
+                });
+                container.appendChild(grp);
+            }
+        }
+
+        function renderDrawer() { renderGrouped('drawer-content-area', db[activeDrawerTab], activeDrawerTab); }
+
+        function renderChatLog() {
+            const log = document.getElementById('chat-log');
+            log.innerHTML = '';
+            const chat = getActiveChat(); if(!chat) return;
+            chat.messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `msg ${msg.role}`;
+                div.textContent = msg.text;
+                log.appendChild(div);
+            });
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function refreshUI() {
+            renderGrouped('chat-list-container', db.chats, 'chats');
+            renderDrawer();
+            renderChatLog();
+            updateHUD();
+        }
+    </script>
+</body>
+</html>

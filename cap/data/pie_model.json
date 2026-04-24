@@ -1,0 +1,28 @@
+{
+  "causal_weights": {
+    "echo->touch": 1.1,
+    "touch->nonexistent_command_123": 1.1,
+    "echo->exit": 1.1,
+    "exit->exit": 1.2000000000000002,
+    "echo->echo": 2.000000000000001
+  },
+  "pattern_memory": {
+    "echo": {
+      "success": 19,
+      "failure": 0
+    },
+    "touch": {
+      "success": 0,
+      "failure": 1
+    },
+    "nonexistent_command_123": {
+      "success": 0,
+      "failure": 1
+    },
+    "exit": {
+      "success": 0,
+      "failure": 3
+    }
+  },
+  "temporal_patterns": {}
+}

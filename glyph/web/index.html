@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GFS-III Command Center</title>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="top-nav">
+        <div class="brand" id="btn-toggle-lib">≡ LIBRARY</div>
+        <button id="btn-toggle-builder">⚒ BUILDER</button>
+        <button id="btn-play">Play</button>
+        <button id="btn-pause">Pause</button>
+        <button id="btn-reload" style="background:#822">Reset Engine</button>
+        <div class="program-bar">
+            <input type="text" id="program-input" value="⟐(⊢◊(≈⟡⊣⌁)(≠✳⌬⇄)⊕)⟳">
+            <button id="btn-load">Inject</button>
+        </div>
+    </div>
+
+    <!-- Timeline Scrubber -->
+    <div id="timeline-container">
+        <input type="range" id="timeline-slider" min="0" max="0" value="0" style="width:100%">
+        <div id="timeline-display" style="color:#0f0; text-align:center; font-family:monospace;">Historical Tick: 0</div>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+        <div id="state-view" class="state-overlay">Tick: 0 | Nodes: 0</div>
+        
+        <!-- Multi-Agent POV Overlay -->
+        <div id="agent-pov-container" class="agent-overlay"></div>
+    </div>
+
+    <div id="builder-drawer" class="drawer">
+        <div class="drawer-content">
+            <div class="builder-layout">
+                <div id="builder-track">Empty</div>
+                <div class="builder-row">
+                    <div id="glyph-palette"></div>
+                    <div id="glyph-details">Select a glyph...</div>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-handle" id="btn-close-builder">↑ CLOSE BUILDER ↑</div>
+    </div>
+
+    <div id="log-drawer" class="drawer">
+        <div class="drawer-handle" id="btn-toggle-log">≡ NEURAL EXECUTION LOG ≡</div>
+        <div class="drawer-content" id="log-output"></div>
+    </div>
+
+    <div id="library-drawer" class="drawer">
+        <div class="drawer-handle" id="btn-close-lib" style="justify-content: flex-end; padding-right: 15px; font-size:1.5em;">×</div>
+        <div class="drawer-content">
+            <div class="lib-section">
+                <h4>PROGRAM SCRIPTS</h4>
+                <div id="library-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

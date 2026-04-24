@@ -1,0 +1,265 @@
+<!--
+CAP SANGUINE — MOBILE-FIRST COGNITIVE UI
+PHASE 4: FULL SYSTEM SYNC (DOC ↔ TOC ↔ GRAPH ↔ TRACE ↔ LIVE)
+--><!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CAP SANGUINE</title><script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script><style>
+:root {
+  --bg:#050505;
+  --panel:#0b0b0b;
+  --fg:#cfcfcf;
+  --muted:#777;
+  --accent:#aa2424;
+}
+
+*{box-sizing:border-box}
+body { margin:0; background:var(--bg); color:var(--fg); font-family:system-ui; }
+#app { display:flex; flex-direction:column; height:100vh; }
+
+#topbar { height:56px; display:flex; align-items:center; justify-content:space-between; padding:0 12px; border-bottom:1px solid #111; }
+
+#view { flex:1; display:flex; }
+#main { flex:1; overflow:auto; padding:12px; }
+#toc { width:120px; border-left:1px solid #111; overflow:auto; background:#000; }
+
+.toc-item { padding:6px; font-size:11px; cursor:pointer; color:var(--muted); }
+.toc-item.active { color:#fff; }
+
+#dock { height:60px; display:flex; border-top:1px solid #111; }
+.dock-btn { flex:1; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; }
+
+#overlay { position:fixed; inset:0; background:#000; transform:translateY(100%); transition:.3s; z-index:10; overflow:auto; }
+#overlay.active { transform:translateY(0); }
+
+.section-title { padding:10px; color:#fff; font-weight:bold; }
+.doc-item { padding:10px; border-bottom:1px solid #111; cursor:pointer; }
+.doc-item:hover { background:#0a0a0a; }
+
+.doc-content h1,h2,h3 { color:#fff; }
+
+.timeline-item { padding:10px; margin-bottom:8px; background:#0a0a0a; border-left:3px solid var(--accent); }
+.timeline-item.active { background:#111; }
+
+svg { width:100%; height:100%; }
+.spine { fill:none; stroke:var(--accent); stroke-width:2; }
+.node { fill:#000; stroke:var(--accent); cursor:pointer; }
+.node.active { stroke:#fff; filter:drop-shadow(0 0 6px var(--accent)); }
+
+</style></head>
+<body>
+<div id="app"><div id="topbar">
+  <div onclick="toggleMenu()">☰</div>
+  <div>CAP SYNC</div>
+  <div onclick="refresh()">⟳</div>
+</div><div id="view">
+  <div id="main"></div>
+  <div id="toc"></div>
+</div><div id="dock">
+  <div class="dock-btn" onclick="setView('docs')">Docs</div>
+  <div class="dock-btn" onclick="setView('trace')">Trace</div>
+  <div class="dock-btn" onclick="setView('graph')">Graph</div>
+  <div class="dock-btn" onclick="setView('live')">Live</div>
+</div><div id="overlay"></div></div><script>
+
+const state = {
+  view:'docs',
+  menuOpen:false,
+  structure:null,
+  activeDoc:null,
+  markdown:'',
+  headings:[],
+  activeHeading:null,
+  events:[],
+  activeEventIndex:null
+};
+
+function setState(p){ Object.assign(state,p); render(); }
+function setView(v){ setState({view:v}); }
+function toggleMenu(){ setState({menuOpen:!state.menuOpen}); }
+function refresh(){ location.reload(); }
+
+async function loadStructure(){
+  state.structure = {
+    CORE:['architecture.md','kernel.md'],
+    SYSTEM:['pie.md','clide.md']
+  };
+}
+
+async function loadDoc(name){
+  const res = await fetch(`/docs/compiled/${name}`);
+  const text = await res.text();
+  setState({markdown:text, activeDoc:name});
+}
+
+function render(){
+  renderOverlay();
+
+  if(state.view==='docs') renderDocs();
+  if(state.view==='trace') renderTrace();
+  if(state.view==='graph') renderGraph();
+  if(state.view==='live') renderLive();
+}
+
+/* DOCS */
+function renderDocs(){
+  const main = document.getElementById('main');
+  const toc = document.getElementById('toc');
+
+  if(!state.activeDoc){
+    let html='';
+    for(const sec in state.structure){
+      html+=`<div class="section-title">${sec}</div>`;
+      state.structure[sec].forEach(d=>{
+        html+=`<div class="doc-item" onclick="openDoc('${d}')">${d}</div>`;
+      });
+    }
+    main.innerHTML = html;
+    toc.innerHTML='';
+  } else {
+    const html = marked.parse(state.markdown);
+    main.innerHTML = `<div onclick="closeDoc()">← Back</div><div class="doc-content">${html}</div>`;
+
+    buildTOC();
+    bindScroll();
+  }
+}
+
+function openDoc(d){ loadDoc(d); }
+function closeDoc(){ setState({activeDoc:null}); }
+
+/* TOC + SCROLL SYNC */
+function buildTOC(){
+  const toc = document.getElementById('toc');
+  const headers = document.querySelectorAll('#main h1, #main h2');
+
+  state.headings = [];
+  let html='';
+
+  headers.forEach((h,i)=>{
+    const id='h_'+i;
+    h.id=id;
+    state.headings.push({id,text:h.innerText});
+
+    html+=`<div class="toc-item" onclick="scrollToHeading('${id}')">${h.innerText}</div>`;
+  });
+
+  toc.innerHTML = html;
+}
+
+function scrollToHeading(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+
+function bindScroll(){
+  const tocItems = document.querySelectorAll('.toc-item');
+
+  document.getElementById('main').onscroll = ()=>{
+    let active=null;
+
+    state.headings.forEach((h,i)=>{
+      const el = document.getElementById(h.id);
+      if(el.getBoundingClientRect().top < 100){
+        active = i;
+      }
+    });
+
+    tocItems.forEach(t=>t.classList.remove('active'));
+
+    if(active!==null){
+      tocItems[active]?.classList.add('active');
+      state.activeHeading = active;
+    }
+  }
+}
+
+/* TRACE */
+function renderTrace(){
+  const main = document.getElementById('main');
+
+  main.innerHTML = state.events.map((e,i)=>`
+    <div class="timeline-item ${i===state.activeEventIndex?'active':''}" onclick="focusEvent(${i})">
+      ${e.type} (${e.duration}ms) ${e.anomaly?`⚠ ${e.anomaly}`:''}
+    </div>
+  `).join('');
+}
+
+function focusEvent(i){
+  setState({activeEventIndex:i, view:'graph'});
+}
+
+/* GRAPH SYNC */
+function renderGraph(){
+  const main = document.getElementById('main');
+
+  let path='';
+  let nodes='';
+
+  state.events.slice(-20).forEach((e,i)=>{
+    const x = 60 + Math.sin(i*0.4)*20;
+    const y = i*60+40;
+
+    path += i===0?`M ${x},${y}`:` L ${x},${y}`;
+
+    nodes += `<circle class="node ${i===state.activeEventIndex?'active':''}" cx="${x}" cy="${y}" r="6" onclick="jumpToEvent(${i})"/>`;
+  });
+
+  main.innerHTML = `<svg><path class="spine" d="${path}"/>${nodes}</svg>`;
+}
+
+function jumpToEvent(i){
+  setState({activeEventIndex:i, view:'trace'});
+}
+
+/* LIVE */
+function renderLive(){
+  const main = document.getElementById('main');
+
+  main.innerHTML = state.events.slice(-30).reverse().map((e,i)=>
+    `<div onclick="focusEvent(${i})">${e.type}</div>`
+  ).join('');
+}
+
+/* OVERLAY */
+function renderOverlay(){
+  const el = document.getElementById('overlay');
+  el.classList.toggle('active', state.menuOpen);
+
+  if(!state.structure) return;
+
+  let html='';
+  for(const sec in state.structure){
+    html+=`<div class="section-title">${sec}</div>`;
+    state.structure[sec].forEach(d=>{
+      html+=`<div class="doc-item" onclick="openDocFromMenu('${d}')">${d}</div>`;
+    });
+  }
+
+  el.innerHTML = html;
+}
+
+function openDocFromMenu(d){
+  setState({menuOpen:false});
+  loadDoc(d);
+}
+
+/* INIT */
+async function init(){
+  await loadStructure();
+
+  for(let i=0;i<25;i++){
+    state.events.push({
+      type:['EXEC','INFER','TRACE'][i%3],
+      duration:Math.floor(Math.random()*200),
+      anomaly:i%7===0?'drift':null
+    });
+  }
+
+  render();
+}
+
+init();
+
+</script></body>
+</html>

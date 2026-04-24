@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAP UI Explorer</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #121212;
+            color: #e0e0e0;
+        }
+
+        #nav-bar {
+            height: 50px;
+            background: #1e1e1e;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            z-index: 100;
+            position: relative;
+            justify-content: space-between;
+        }
+
+        .nav-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        select {
+            background: #2c2c2c;
+            color: white;
+            border: 1px solid #444;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button {
+            background: #3a3a3a;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #505050;
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        #viewer-frame {
+            width: 100%;
+            height: calc(100% - 50px);
+            border: none;
+            background: white; /* Ensure visibility of light-themed versions */
+        }
+
+        .title {
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #00e5ff;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="nav-bar">
+    <div class="nav-group">
+        <span class="title">CAP UI EXPLORER</span>
+        <select id="version-select">
+            <!-- Populated by JS -->
+        </select>
+    </div>
+    <div class="nav-group">
+        <button id="prev-btn">← Back</button>
+        <button id="next-btn">Next →</button>
+        <button id="refresh-btn" title="Scan for new versions">↻ Refresh</button>
+    </div>
+</div>
+
+<iframe id="viewer-frame" src=""></iframe>
+
+<script>
+    let versions = [];
+    let currentIndex = -1;
+
+    const select = document.getElementById('version-select');
+    const iframe = document.getElementById('viewer-frame');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const refreshBtn = document.getElementById('refresh-btn');
+
+    /**
+     * Scans for uivX.html files by probing 1-25.
+     * This works on local servers (python -m http.server, etc.) 
+     * and sometimes on file:// depending on browser settings.
+     */
+    async function discoverVersions() {
+        const found = [];
+        const maxProbe = 25;
+        const probes = [];
+
+        // Check for uiv1.html through uiv25.html in parallel
+        for (let i = 1; i <= maxProbe; i++) {
+            const path = `ui/uiv${i}.html`;
+            probes.push(
+                fetch(path, { method: 'HEAD' })
+                    .then(res => {
+                        if (res.ok) return { name: `Version ${i}`, path: path, id: i };
+                        return null;
+                    })
+                    .catch(() => null) // Ignore errors (like CORS or 404)
+            );
+        }
+
+        const results = await Promise.all(probes);
+        const filtered = results.filter(v => v !== null).sort((a, b) => a.id - b.id);
+        
+        return filtered;
+    }
+
+    async function refresh() {
+        refreshBtn.textContent = '...';
+        refreshBtn.disabled = true;
+        
+        const discovered = await discoverVersions();
+        
+        if (discovered.length > 0) {
+            versions = discovered;
+            updateDropdown();
+            
+            // If first load or current version disappeared, go to latest
+            if (currentIndex === -1 || currentIndex >= versions.length) {
+                loadVersion(versions.length - 1);
+            } else {
+                // Stay on current version but update state
+                loadVersion(currentIndex);
+            }
+        } else {
+            console.warn("No versions discovered. Ensure you are running a local server or files are in 'ui/' folder.");
+        }
+
+        refreshBtn.textContent = '↻ Refresh';
+        refreshBtn.disabled = false;
+    }
+
+    function updateDropdown() {
+        select.innerHTML = '';
+        versions.forEach((v, index) => {
+            const opt = document.createElement('option');
+            opt.value = index;
+            opt.textContent = v.name;
+            select.appendChild(opt);
+        });
+    }
+
+    function init() {
+        select.addEventListener('change', (e) => {
+            loadVersion(parseInt(e.target.value));
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) loadVersion(currentIndex - 1);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < versions.length - 1) loadVersion(currentIndex + 1);
+        });
+
+        refreshBtn.addEventListener('click', refresh);
+
+        // Initial scan
+        refresh();
+    }
+
+    function loadVersion(index) {
+        if (index < 0 || index >= versions.length) return;
+        
+        currentIndex = index;
+        select.value = index;
+        iframe.src = versions[index].path;
+        
+        window.location.hash = versions[index].name.replace(/\s+/g, '-').toLowerCase();
+
+        prevBtn.disabled = (currentIndex === 0);
+        nextBtn.disabled = (currentIndex === versions.length - 1);
+    }
+
+    init();
+</script>
+
+</body>
+</html>

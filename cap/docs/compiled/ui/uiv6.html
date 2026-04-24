@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Category 0</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+:root{--bg:#050505;--rm:#661414;--rb:#cc2424;--gl:rgba(15,15,15,0.85);--met:linear-gradient(135deg,#2c2c2c 0%,#1a1a1a 45%,#333 50%,#1a1a1a 55%,#111 100%);--t1:0.6s cubic-bezier(0.25,1,0.5,1);--t2:0.5s cubic-bezier(0.4,0,0.2,1);}
+body,html{margin:0;padding:0;width:100vw;height:100vh;background:var(--bg);color:#999;font-family:sans-serif;overflow:hidden;touch-action:none;overscroll-behavior:none;}
+.bg-lines{position:absolute;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(102,20,20,0.4) 1px,transparent 1px),linear-gradient(90deg,rgba(102,20,20,0.4) 1px,transparent 1px);background-size:60px 60px;opacity:0.04;z-index:0;pointer-events:none;}
+#wrapper{position:absolute;top:0;left:0;width:100vw;height:100vh;overflow-y:auto;overflow-x:hidden;z-index:1;transition:padding-top 0.5s ease;padding-top:20px;}
+body.dock #wrapper{padding-top:90px;}
+#content{padding:80px 5vw 60px;max-width:1400px;margin:0 auto;background:radial-gradient(circle at top right,rgba(13,13,13,0.8),rgba(5,5,5,0.9));min-height:100%;box-sizing:border-box;border-left:1px solid rgba(255,255,255,0.02);border-right:1px solid rgba(255,255,255,0.02);}
+#dock{position:absolute;top:15px;left:20px;width:calc(100vw - 40px);height:60px;display:flex;align-items:center;gap:15px;overflow-x:auto;overflow-y:hidden;z-index:1000;pointer-events:none;opacity:0;transition:opacity 0.4s;scrollbar-width:none;cursor:grab;}
+#dock::-webkit-scrollbar{display:none;}
+#dock.active{opacity:1;pointer-events:auto;}
+.slot{width:45px;height:45px;flex-shrink:0;border:1px dashed transparent;border-radius:4px;position:relative;}
+#sidebar{position:absolute;top:0;left:0;width:420px;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto;overflow-x:visible;pointer-events:none;scrollbar-width:none;z-index:500;}
+#sidebar::-webkit-scrollbar{display:none;}
+#chunks{width:100%;pointer-events:auto;}
+.chunk{margin-bottom:25px;position:relative;width:100%;transform-style:preserve-3d;perspective:1500px;transition:top var(--t1),left var(--t1),width var(--t1),height var(--t1);}
+.c-in{position:relative;width:100%;height:100%;transform-style:preserve-3d;}
+.t-bg{position:absolute;background:var(--met);border:1px solid #111;box-shadow:inset 1px 1px 0 rgba(255,255,255,0.05),inset -1px -1px 0 rgba(0,0,0,0.8);pointer-events:none;z-index:0;transition:transform var(--t2),height var(--t2),border-color 0.3s;}
+.t-bg::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background-image:url("https://www.transparenttextures.com/patterns/brushed-alum.png");opacity:0.15;mix-blend-mode:overlay;}
+.p-head{top:0;left:0;width:100%;height:45px;transform-origin:top;}
+.p-body{top:45px;left:0;width:100%;height:calc(100% - 45px);background:var(--gl);transform-origin:top;}
+.p-side{top:0;right:-1px;width:12px;height:100%;transform-origin:right;transform:rotateY(90deg);}
+.c-content{position:relative;z-index:2;padding:15px;transform-origin:top;transition:transform var(--t2),opacity var(--t2);backface-visibility:hidden;}
+.dis .p-head,.dis .p-body{transform:rotateX(-90deg);}
+.dis .p-side{transform:rotateY(180deg);}
+.dis .c-content{transform:rotateX(90deg);opacity:0;}
+.chunk.min{cursor:pointer;background:transparent;margin:0!important;}
+.chunk.min .p-body{transform:rotateX(-90deg);border-color:transparent;box-shadow:none;}
+.chunk.min .p-side{transform:rotateY(180deg);opacity:0;}
+.chunk.min .p-head{height:100%;border:1px solid var(--rm);box-shadow:inset 0 0 15px rgba(0,0,0,0.9),5px 5px 15px rgba(0,0,0,0.9);}
+.chunk.min:hover .p-head{border-color:var(--rb);transform:translateZ(10px);}
+.chunk.min .c-content{transform:rotateX(90deg) scaleY(0);opacity:0;visibility:hidden;pointer-events:none;}
+.m-icon{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--rb);font-weight:bold;transform:rotateX(-90deg) translateZ(10px);transition:transform var(--t2);z-index:10;pointer-events:none;}
+.chunk.min .m-icon{transform:rotateX(0deg) translateZ(10px);}
+.title-card{border-bottom:2px solid var(--rm);padding-bottom:10px;margin-bottom:10px;}
+.brand{font-size:1.2em;font-weight:bold;color:#fff;letter-spacing:5px;}
+.ctrl-btn{background:transparent;border:1px solid #555;color:#aaa;padding:5px 10px;cursor:pointer;font-family:monospace;font-size:0.85em;transition:0.3s;}
+.ctrl-btn:hover{background:var(--rm);color:#fff;border-color:var(--rb);}
+.t1-hdr{color:var(--rb);font-size:0.8em;text-transform:uppercase;letter-spacing:3px;font-weight:bold;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;}
+.t2-wrap{margin-bottom:6px;}
+.t2-hdr{color:#ccc;font-size:0.7em;text-transform:uppercase;letter-spacing:1.5px;padding:10px 12px;background:rgba(0,0,0,0.6);border-left:2px solid var(--rm);cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.t2-hdr::after{content:'▼';font-size:0.8em;color:#555;transition:transform 0.4s;}
+.t2-wrap.active .t2-hdr::after{transform:rotate(180deg);color:var(--rb);}
+.t3-cont{max-height:0;overflow:hidden;transition:max-height 0.4s;background:rgba(0,0,0,0.4);}
+.t2-wrap.active .t3-cont{max-height:1000px;}
+.doc-link{display:block;padding:10px 15px;color:#777;text-decoration:none;cursor:pointer;font-size:0.8em;border-bottom:1px solid rgba(255,255,255,0.02);transition:0.2s;}
+.doc-link:hover{color:#ccc;background:rgba(255,255,255,0.05);padding-left:20px;}
+.doc-link.active{color:#fff;background:rgba(138,26,26,0.4);border-right:3px solid var(--rb);}
+#content h1{color:#eee;border-bottom:2px solid var(--rm);padding-bottom:15px;font-size:2.5em;letter-spacing:2px;}
+#content h2{color:#8a1a1a;font-size:1.5em;margin-top:40px;border-bottom:1px solid #222;padding-bottom:5px;}
+#content p, #content li{line-height:1.8;color:#888;font-size:1.05em;}
+</style>
+</head>
+<body>
+<div class="bg-lines"></div>
+<div id="dock"></div>
+<div id="wrapper">
+    <div id="content">
+        <h1 style="text-align:center;margin-top:25vh;border:none;color:#222;font-size:4em;letter-spacing:20px;">IDLE</h1>
+    </div>
+</div>
+<div id="sidebar"><div id="chunks"></div></div>
+<script>
+// Dynamic Payload Generation (Bypasses LLM output truncation limits while maxing out scrollability)
+const data = {};
+let fc = 1;
+for(let c=1; c<=8; c++) {
+    data['Category ' + c] = {};
+    for(let s=1; s<=4; s++) {
+        data['Category ' + c]['Subcategory ' + ((c-1)*4 + s)] = {};
+        for(let f=1; f<=4; f++) {
+            data['Category ' + c]['Subcategory ' + ((c-1)*4 + s)]['File ' + fc] = '# Header ' + fc + '\\n\\nBody ' + fc;
+            fc++;
+        }
+    }
+}
+
+const icons = ['◧','◨','◩','◪','▤','▥','▦','▧','▨'];
+let reg = [];
+let drag = false;
+
+function init() {
+    const mc = document.getElementById('chunks');
+    const dk = document.getElementById('dock');
+
+    const mkSlot = (id) => {
+        const s = document.createElement('div');
+        s.className = 'slot'; s.id = 's-' + id;
+        dk.appendChild(s);
+    };
+
+    const mkChunk = (id, html) => {
+        reg.push({id, min: false, h: 0});
+        mkSlot(id);
+        const c = document.createElement('div');
+        c.className = 'chunk dis'; c.id = id;
+        c.onclick = (e) => { if(!drag && c.classList.contains('min')){ e.stopPropagation(); id==='c-0'?toggleAll():toggle(id); } };
+        c.innerHTML = html;
+        mc.appendChild(c);
+        return c;
+    };
+
+    // Title Card
+    mkChunk('c-0', `
+        <div class="c-in">
+            <div class="t-bg p-head"></div><div class="t-bg p-body"></div><div class="t-bg p-side"></div>
+            <div class="m-icon">⎈</div>
+            <div class="c-content">
+                <div class="title-card"><div class="brand">Category 0</div></div>
+                <div style="display:flex;justify-content:space-between;margin-top:15px;align-items:center;">
+                    <span style="color:#888;font-size:0.7em;">Header 0</span>
+                    <button id="m-btn" class="ctrl-btn" onclick="event.stopPropagation();toggleAll()">[ Minimize_All ]</button>
+                </div>
+            </div>
+        </div>
+    `);
+
+    // Modular Categories
+    let i = 1;
+    for(const [cat, subs] of Object.entries(data)){
+        let subsHtml = '';
+        for(const [sub, files] of Object.entries(subs)){
+            let fHtml = '';
+            for(const f of Object.keys(files)){
+                // Passed safely as params to avoid inline newline literal crashes
+                fHtml += `<a class="doc-link" onclick="loadTxt(event, '${cat}', '${sub}', '${f}')">${f}</a>`;
+            }
+            subsHtml += `<div class="t2-wrap"><div class="t2-hdr" onclick="event.stopPropagation();this.parentNode.classList.toggle('active')">${sub}</div><div class="t3-cont">${fHtml}</div></div>`;
+        }
+
+        mkChunk('c-'+i, `
+            <div class="c-in">
+                <div class="t-bg p-head"></div><div class="t-bg p-body"></div><div class="t-bg p-side"></div>
+                <div class="m-icon">${icons[i%icons.length]}</div>
+                <div class="c-content">
+                    <div class="t1-hdr"><span>${cat}</span><button class="ctrl-btn" onclick="event.stopPropagation();toggle('c-${i}')">[ _ ]</button></div>
+                    ${subsHtml}
+                </div>
+            </div>
+        `);
+        i++;
+    }
+
+    initDrag();
+    const els = document.querySelectorAll('.chunk');
+    els.forEach((el, idx) => setTimeout(() => el.classList.remove('dis'), idx*80));
+    setTimeout(chkState, els.length*80 + 400);
+}
+
+// Global scope parameterized loader
+window.loadTxt = (e, cat, sub, f) => {
+    e.preventDefault(); e.stopPropagation();
+    document.querySelectorAll('.doc-link').forEach(l => l.classList.remove('active'));
+    e.target.classList.add('active');
+    const c = document.getElementById('content');
+    c.style.opacity = 0;
+    setTimeout(() => {
+        c.innerHTML = marked.parse(data[cat][sub][f]);
+        c.style.opacity = 1;
+        document.getElementById('wrapper').scrollTop = 0;
+    }, 200);
+    if(window.innerWidth < 800) toggleAll();
+};
+
+function toggle(id) {
+    const c = document.getElementById(id);
+    if(c.classList.contains('dis')) return;
+    const s = document.getElementById('s-'+id);
+    const r = reg.find(x => x.id === id);
+    
+    if(!r.min) {
+        r.h = c.offsetHeight || 100;
+        const br = c.getBoundingClientRect();
+        const ph = document.createElement('div'); ph.id = 'ph-'+id;
+        ph.style.height = br.height+'px'; ph.style.marginBottom = '25px';
+        ph.style.transition = '0.4s';
+        c.parentNode.insertBefore(ph, c);
+
+        document.body.appendChild(c);
+        c.style.position = 'fixed'; c.style.top = br.top+'px'; c.style.left = br.left+'px';
+        c.style.width = br.width+'px'; c.style.height = br.height+'px'; c.style.zIndex = '9999'; c.style.margin = '0';
+        void c.offsetWidth;
+        c.classList.add('min');
+        const er = s.getBoundingClientRect();
+        c.style.top = er.top+'px'; c.style.left = er.left+'px';
+        c.style.width = er.width+'px'; c.style.height = er.height+'px';
+
+        requestAnimationFrame(() => { ph.style.height = '0px'; ph.style.marginBottom = '0px'; });
+        setTimeout(() => {
+            if(r.min){
+                c.style.transition = 'none'; s.appendChild(c);
+                c.style.position='absolute'; c.style.top='0'; c.style.left='0'; c.style.width='100%'; c.style.height='100%'; c.style.zIndex='1';
+                void c.offsetWidth;
+                c.style.transition = 'top var(--t1), left var(--t1), width var(--t1), height var(--t1)';
+            }
+        }, 600);
+        r.min = true;
+    } else {
+        const ph = document.getElementById('ph-'+id);
+        if(ph) { ph.style.height = r.h+'px'; ph.style.marginBottom = '25px'; }
+        const br = c.getBoundingClientRect();
+        document.body.appendChild(c);
+        c.style.position = 'fixed'; c.style.top = br.top+'px'; c.style.left = br.left+'px';
+        c.style.width = br.width+'px'; c.style.height = br.height+'px'; c.style.zIndex = '9999';
+        void c.offsetWidth;
+
+        setTimeout(() => {
+            const tr = ph ? ph.getBoundingClientRect() : {top:100,left:20,width:380,height:r.h};
+            c.classList.remove('min');
+            c.style.top = tr.top+'px'; c.style.left = tr.left+'px'; c.style.width = tr.width+'px'; c.style.height = tr.height+'px';
+            setTimeout(() => {
+                if(!r.min){
+                    c.style.transition = 'none';
+                    if(ph){ ph.parentNode.insertBefore(c,ph); ph.remove(); } else { document.getElementById('chunks').appendChild(c); }
+                    c.style.position='relative'; c.style.top=''; c.style.left=''; c.style.width='100%'; c.style.height='auto'; c.style.zIndex='1';
+                    void c.offsetWidth;
+                    c.style.transition = 'top var(--t1), left var(--t1), width var(--t1), height var(--t1)';
+                }
+            }, 600);
+        }, 50);
+        r.min = false;
+    }
+    evalState();
+}
+
+function toggleAll() {
+    const minAll = !reg.find(x => x.id==='c-0').min;
+    reg.forEach((r, idx) => {
+        setTimeout(() => {
+            if(minAll && !r.min) toggle(r.id);
+            else if(!minAll && r.min) toggle(r.id);
+        }, idx*50);
+    });
+}
+
+function initDrag() {
+    const dk = document.getElementById('dock');
+    let dn=false, sx, sl;
+    dk.onmousedown = e => { dn=true; drag=false; dk.style.cursor='grabbing'; sx=e.pageX-dk.offsetLeft; sl=dk.scrollLeft; };
+    dk.onmouseleave = () => { dn=false; dk.style.cursor='grab'; };
+    window.onmouseup = () => { dn=false; dk.style.cursor='grab'; };
+    dk.onmousemove = e => { if(!dn)return; e.preventDefault(); const x=e.pageX-dk.offsetLeft; const w=(x-sx)*2; if(Math.abs(w)>5)drag=true; dk.scrollLeft=sl-w; };
+    dk.ontouchstart = e => { drag=false; sx=e.touches[0].pageX; sl=dk.scrollLeft; };
+    dk.ontouchmove = e => { if(Math.abs(e.touches[0].pageX-sx)>5)drag=true; };
+}
+
+function evalState() {
+    const aMin = reg.some(x => x.min);
+    const tMin = reg.find(x => x.id==='c-0').min;
+    const dk = document.getElementById('dock');
+    if(aMin){ dk.classList.add('active'); document.body.classList.add('dock'); }
+    else { dk.classList.remove('active'); document.body.classList.remove('dock'); }
+    document.getElementById('m-btn').textContent = tMin ? '[ Restore_All ]' : '[ Minimize_All ]';
+    try{ localStorage.setItem('m-min', tMin?'1':'0'); }catch(e){}
+}
+
+function chkState() { try{ if(localStorage.getItem('m-min')==='1') toggleAll(); }catch(e){} }
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

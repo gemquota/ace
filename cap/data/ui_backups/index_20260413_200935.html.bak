@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CAP.OS // SYNAPTIC_PULSE_IDE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root { --bg: #0d0f0d; --panel: #141714; --border: #222622; --glow: #4af626; --text: #a8dba8; --dim: #2d4d2d; --accent: #00d4ff; --warn: #ffb700; --err: #ff4444; --blade-w: 320px; --hud-h: 70px; --cmd-h: 45px; --grid-size: 20px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Consolas', monospace; background: var(--bg); color: var(--text); margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; font-size: 14px; }
+        #hud-ribbon { height: var(--hud-h); background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--dim); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 2000; backdrop-filter: blur(10px); }
+        .hud-stat { display: flex; flex-direction: column; min-width: 100px; }
+        .stat-label { font-size: 10px; color: var(--dim); letter-spacing: 1.5px; font-weight: bold; margin-bottom: 4px; }
+        .stat-val { font-size: 16px; font-weight: bold; color: var(--glow); }
+        #workspace { flex-grow: 1; position: relative; overflow: hidden; display: flex; }
+        #super-blade { width: var(--blade-w); background: var(--panel); border-right: 1px solid var(--border); position: absolute; left: calc(-1 * var(--blade-w)); top: 0; bottom: 0; z-index: 1000; transition: left 0.4s cubic-bezier(0.19, 1, 0.22, 1); display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        #super-blade.active { left: 0; }
+        .blade-toggle-left { position: absolute; right: -40px; top: 15px; width: 40px; height: 50px; background: var(--panel); border: 1px solid var(--border); border-left: none; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 0 8px 8px 0; color: var(--glow); }
+        #canvas-wrap { flex-grow: 1; background: radial-gradient(circle, #111411 0%, #0a0c0a 100%); position: relative; overflow: hidden; }
+        #synaptic-canvas { width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+        .window { position: absolute; background: var(--panel); border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.8); z-index: 100; display: flex; flex-direction: column; overflow: hidden; border-radius: 6px; min-width: 200px; min-height: 150px; }
+        .window.active { border-color: var(--dim); z-index: 500; }
+        .window.maximized { top: 0 !important; left: 0 !important; width: 100% !important; height: calc(100% - var(--cmd-h)) !important; border-radius: 0; }
+        .win-header { background: rgba(0,0,0,0.4); padding: 8px 15px; font-size: 11px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: move; }
+        .win-toolbar { background: rgba(0,0,0,0.2); padding: 5px 10px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
+        .win-body { flex-grow: 1; position: relative; overflow: auto; background: #080a08; }
+        .win-editor { width: 100%; height: 100%; background: transparent; border: none; color: var(--glow); font-family: inherit; font-size: 13px; padding: 15px; outline: none; resize: none; display: none; }
+        .win-view { width: 100%; height: 100%; padding: 20px; overflow: auto; display: none; }
+        .win-resizer { position: absolute; right: 0; bottom: 0; width: 15px; height: 15px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 50%, var(--dim) 50%); }
+        .btn-mini { padding: 4px 8px; font-size: 10px; border: 1px solid var(--dim); color: var(--text); background: rgba(255,255,255,0.05); cursor: pointer; border-radius: 3px; }
+        .btn-mini:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-mini.primary { border-color: var(--glow); color: var(--glow); }
+        #grid-matrix { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0.05; background-image: radial-gradient(var(--glow) 1px, transparent 1px); background-size: var(--grid-size) var(--grid-size); }
+        #command-center { position: absolute; bottom: 0; left: 0; right: 0; background: var(--panel); border-top: 1px solid var(--dim); z-index: 1500; transition: height 0.3s cubic-bezier(0.19, 1, 0.22, 1); height: var(--cmd-h); display: flex; flex-direction: column; }
+        #command-center.expanded { height: 320px; }
+        .cmd-header { height: var(--cmd-h); display: flex; align-items: center; padding: 0 20px; cursor: pointer; }
+        .cmd-body { flex-grow: 1; display: none; padding: 20px; gap: 20px; }
+        #command-center.expanded .cmd-body { display: flex; }
+        #telemetry-blade { width: 350px; background: var(--panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+        #chat-drawer { position: absolute; right: calc(-1 * var(--blade-w) - 50px); top: 0; bottom: 0; width: calc(var(--blade-w) + 50px); background: var(--panel); border-left: 1px solid var(--border); z-index: 1200; transition: right 0.4s cubic-bezier(0.19, 1, 0.22, 1); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+        #chat-drawer.active { right: 0; }
+        .chat-toggle { position: absolute; left: -40px; top: 80px; width: 40px; height: 50px; background: var(--panel); border: 1px solid var(--border); border-right: none; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px 0 0 8px; color: var(--accent); }
+        #legend { position: absolute; bottom: 60px; left: 20px; background: rgba(0,0,0,0.7); border: 1px solid var(--dim); padding: 10px; border-radius: 6px; font-size: 10px; z-index: 800; pointer-events: none; backdrop-filter: blur(5px); }
+        .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .chat-header { padding: 15px; border-bottom: 1px solid var(--border); font-weight: bold; color: var(--accent); display: flex; justify-content: space-between; }
+        #chat-messages { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 8px 12px; border-radius: 8px; max-width: 85%; font-size: 12px; line-height: 1.4; }
+        .msg.system { align-self: center; background: rgba(255,255,255,0.05); color: var(--dim); font-style: italic; font-size: 10px; }
+        .msg.user { align-self: flex-end; background: var(--dim); color: var(--glow); border-bottom-right-radius: 2px; }
+        .msg.agent { align-self: flex-start; background: #1a1d1a; border: 1px solid var(--border); border-bottom-left-radius: 2px; }
+        .chat-input-wrap { padding: 15px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+        .group-tag { padding: 2px 6px; border-radius: 4px; background: var(--border); font-size: 10px; cursor: pointer; }
+        .group-tag.active { background: var(--accent); color: #000; }
+        #event-log { padding: 15px; gap: 12px; display: flex; flex-direction: column; overflow-y: auto; }
+        .event { border-left: 2px solid var(--dim); padding-left: 12px; margin-bottom: 15px; }
+        .event-type { font-size: 10px; font-weight: bold; color: var(--glow); }
+        .fs-item { padding: 8px 15px; font-size: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .fs-item:hover { background: rgba(255,255,255,0.03); color: var(--glow); }
+        .hud-group { display: flex; gap: 40px; }
+        @media (max-width: 768px) {
+            :root { --blade-w: 280px; --hud-h: auto; }
+            #hud-ribbon { padding: 10px; flex-direction: column; gap: 10px; }
+            .hud-group { gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; }
+            #telemetry-blade { display: none !important; }
+            .cmd-body { flex-direction: column; padding: 10px; }
+            #cmd-targets { width: 100% !important; height: 100px; border-right: none !important; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="hud-ribbon">
+        <div class="hud-group">
+            <div class="hud-stat"><div class="stat-label">CLIDE_STABILITY</div><div class="stat-val" id="val-clide">--%</div></div>
+            <div class="hud-stat"><div class="stat-label">APC_INTEGRITY</div><div class="stat-val" id="val-apc">--%</div></div>
+            <div class="hud-stat"><div class="stat-label">PIE_CONFIDENCE</div><div class="stat-val" id="val-pie">--%</div></div>
+        </div>
+        <div class="hud-group">
+            <div class="hud-stat"><div class="stat-label">SWARM_POPULATION</div><div class="stat-val" id="val-swarm">0</div></div>
+            <div class="hud-stat"><div class="stat-label">CREDIT_RESERVE</div><div class="stat-val" id="total-credits" style="color:var(--warn)">0.00</div></div>
+            <button class="btn-mini primary" onclick="graph.fullSync()">SYNC_MESH</button>
+        </div>
+    </div>
+
+    <div id="workspace">
+        <div id="super-blade">
+            <div class="blade-toggle-left" onclick="toggleBlade('super-blade')">📁</div>
+            <div style="padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                <span>SUPER_EXPLORER</span>
+                <div style="display:flex; gap:5px;">
+                    <span title="New File" style="cursor:pointer; color:var(--glow)" onclick="fs.createFile()">+📄</span>
+                    <span title="New Folder" style="cursor:pointer; color:var(--accent)" onclick="fs.createFolder()">+📁</span>
+                </div>
+            </div>
+            <div style="display:flex; gap:5px; padding:10px; border-bottom:1px solid var(--border)">
+                <div class="btn-mini" onclick="fs.goUp()">UP</div>
+                <div class="btn-mini" onclick="fs.refresh()">SYNC</div>
+            </div>
+            <div id="file-list" style="flex-grow:1; overflow-y:auto;"></div>
+        </div>
+
+        <div id="canvas-wrap">
+            <div id="grid-matrix"></div>
+            <canvas id="synaptic-canvas"></canvas>
+            <div id="legend">
+                <div class="legend-item"><span style="color:#4af626">🛡️</span> CLIDE (ORCHESTRATOR)</div>
+                <div class="legend-item"><span style="color:#00d4ff">⚙️</span> APC (EXECUTOR)</div>
+                <div class="legend-item"><span style="color:#ff00ff">🧠</span> PIE (REASONER)</div>
+                <div class="legend-item"><span style="color:#ffb700">🤖</span> AGENT (SWARM)</div>
+                <div class="legend-item"><span style="color:#ff4444">🧵</span> TRACE (GOAL)</div>
+                <div class="legend-item"><span style="color:#555">⚡</span> EVENT (SYSTEM)</div>
+            </div>
+            <div id="chat-drawer">
+                <div class="chat-toggle" onclick="toggleBlade('chat-drawer')">💬</div>
+                <div class="chat-header">
+                    <span>SWARM_COMMS</span>
+                    <span id="active-group-label" style="font-size:10px; color:var(--dim)">GROUP: DIRECT_CLIDE</span>
+                </div>
+                <div style="padding:10px; border-bottom:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap;" id="chat-groups">
+                    <span class="group-tag active" onclick="setChatGroup('DIRECT', 'CLIDE')">CLIDE</span>
+                    <span class="group-tag" onclick="setChatGroup('OVERSEER', 'ALL')">OVERSEER</span>
+                    <span class="group-tag" onclick="setChatGroup('COLLECTIVE', 'SWARM')">COLLECTIVE</span>
+                </div>
+                <div id="chat-messages">
+                    <div class="msg system">Establishing secure uplink to CAP.OS Swarm...</div>
+                </div>
+                <div class="chat-input-wrap">
+                    <textarea id="chat-input" style="height:80px; background:#000; border:1px solid var(--dim); color:var(--glow); padding:10px; outline:none; resize:none;" placeholder="Enter intent or message..."></textarea>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:9px; color:var(--dim)">Ctrl+Enter to send</span>
+                        <button class="btn-mini primary" onclick="sendChatMessage()">TRANSMIT</button>
+                    </div>
+                </div>
+            </div>
+            <div id="command-center">
+                <div class="cmd-header" onclick="toggleCmdCenter()">
+                    <span style="flex-grow:1; letter-spacing: 2px; font-size: 11px; color: var(--accent)">TACTICAL_COMMAND</span>
+                    <span id="cmd-arrow">▲</span>
+                </div>
+                <div class="cmd-body">
+                    <div id="cmd-targets" style="width:250px; border-right:1px solid var(--border); padding-right:20px; overflow-y:auto;">
+                        <div class="btn-mini primary" style="width:100%; margin-bottom:10px;" onclick="setCmdTarget('DIRECT', 'CLIDE')">🛡️ DIRECT_CLIDE</div>
+                        <div id="agent-targets"></div>
+                    </div>
+                    <div style="flex-grow:1; display:flex; flex-direction:column; gap:10px;">
+                        <textarea id="cmd-input" style="flex-grow:1; background:#000; border:1px solid var(--dim); color:var(--glow); padding:10px; outline:none;" placeholder="Inject goal..."></textarea>
+                        <button class="btn-mini primary" style="align-self:flex-end" onclick="sendTacticalCommand()">EXECUTE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="telemetry-blade">
+            <div style="padding:15px; border-bottom:1px solid var(--border)">COGNITIVE_FEED</div>
+            <div id="event-log"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script>
+        const canvas = document.getElementById('synaptic-canvas'), ctx = canvas.getContext('2d');
+        const GRID_SIZE = 20, NODE_COLORS = { 'CLIDE': '#4af626', 'APC': '#00d4ff', 'PIE': '#ff00ff', 'AGENT': '#ffb700', 'TRACE': '#ff4444', 'EVENT': '#888' };
+        const NODE_ICONS = { 'CLIDE': '🛡️', 'APC': '⚙️', 'PIE': '🧠', 'AGENT': '🤖', 'TRACE': '🧵', 'EVENT': '⚡' };
+        let nodes = [], links = [], offset = { x: 0, y: 0 }, zoom = 1.0, isPanning = false, lastMousePos = { x: 0, y: 0 }, touchStartDist = 0;
+
+        const snap = (v) => Math.round(v / GRID_SIZE) * GRID_SIZE;
+
+        const wm = {
+            windows: [], zIdx: 100,
+            create(title, id, type, content, path) {
+                let win = this.windows.find(w => w.id === id);
+                if (win) return this.focus(win);
+                const el = document.createElement('div');
+                el.className = 'window active'; el.id = `win-${id}`;
+                el.style.width = '600px'; el.style.height = '400px';
+                el.style.left = snap(100 + this.windows.length * 30) + 'px';
+                el.style.top = snap(100 + this.windows.length * 30) + 'px';
+                el.innerHTML = `<div class="win-header"><span>${title}</span><div style="display:flex; gap:10px;"><span onclick="wm.minimize('${id}')" style="cursor:pointer">_</span><span onclick="wm.maximize('${id}')" style="cursor:pointer">□</span><span onclick="wm.close('${id}')" style="cursor:pointer; color:var(--err)">×</span></div></div><div class="win-toolbar"><button class="btn-mini" onclick="wm.toggleMode('${id}')">VIEW/EDIT</button><button class="btn-mini primary" onclick="wm.save('${id}')">SAVE</button></div><div class="win-body"><textarea class="win-editor"></textarea><div class="win-view"></div></div><div class="win-resizer"></div>`;
+                document.getElementById('canvas-wrap').appendChild(el);
+                win = { id, el, content, path, mode: 'EDIT', zoom: 1.0, maximized: false };
+                this.windows.push(win); this.setupInteractions(win); this.focus(win); this.render(win);
+            },
+            setupInteractions(win) {
+                const h = win.el.querySelector('.win-header'), r = win.el.querySelector('.win-resizer');
+                h.onmousedown = (e) => {
+                    if (win.maximized) return; this.focus(win);
+                    let sx = e.clientX - win.el.offsetLeft, sy = e.clientY - win.el.offsetTop;
+                    const mv = (em) => { win.el.style.left = snap(em.clientX - sx) + 'px'; win.el.style.top = snap(em.clientY - sy) + 'px'; };
+                    const up = () => { window.removeEventListener('mousemove', mv); window.removeEventListener('mouseup', up); };
+                    window.addEventListener('mousemove', mv); window.addEventListener('mouseup', up);
+                };
+                r.onmousedown = (e) => {
+                    e.stopPropagation(); this.focus(win);
+                    let sw = win.el.offsetWidth, sh = win.el.offsetHeight, sx = e.clientX, sy = e.clientY;
+                    const mv = (em) => { win.el.style.width = snap(sw + (em.clientX - sx)) + 'px'; win.el.style.height = snap(sh + (em.clientY - sy)) + 'px'; };
+                    const up = () => { window.removeEventListener('mousemove', mv); window.removeEventListener('mouseup', up); };
+                    window.addEventListener('mousemove', mv); window.addEventListener('mouseup', up);
+                };
+                win.el.onmousedown = () => this.focus(win);
+            },
+            focus(w) { this.windows.forEach(i => i.el.classList.remove('active')); w.el.classList.add('active'); w.el.style.zIndex = ++this.zIdx; },
+            toggleMode(id) { const w = this.windows.find(i => i.id === id); w.mode = w.mode === 'EDIT' ? 'VIEW' : 'EDIT'; this.render(w); },
+            maximize(id) { const w = this.windows.find(i => i.id === id); w.maximized = !w.maximized; w.el.classList.toggle('maximized', w.maximized); },
+            render(w) { const ed = w.el.querySelector('.win-editor'), vi = w.el.querySelector('.win-view'); ed.style.display = w.mode === 'EDIT' ? 'block' : 'none'; vi.style.display = w.mode === 'VIEW' ? 'block' : 'none'; ed.value = w.content; if (w.mode === 'VIEW') vi.innerHTML = marked.parse(w.content); },
+            async save(id) { const w = this.windows.find(i => i.id === id); w.content = w.el.querySelector('.win-editor').value; await fetch('/api/fs/write', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ path: w.path, content: w.content }) }); },
+            close(id) { const idx = this.windows.findIndex(i => i.id === id); if (idx !== -1) { this.windows[idx].el.remove(); this.windows.splice(idx, 1); } }
+        };
+
+        const graph = {
+            addNode(id, type, label, data = {}) {
+                let n = nodes.find(i => i.id === id);
+                if (!n) { 
+                    n = { id, type, label, x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: 0, vy: 0, baseRadius: 10, pulse: 0, jitter: 0, color: NODE_COLORS[type] || '#FFF', icon: NODE_ICONS[type] || '?' }; 
+                    nodes.push(n); 
+                }
+                if (data.load) n.jitter = data.load * 15; 
+                if (data.velocity) n.pulseSpeed = data.velocity * 0.1; 
+                if (data.balance) n.baseRadius = 5 + (data.balance / 100);
+            },
+            addLink(s, t) { if (!links.find(l => l.source === s && l.target === t)) links.push({ source: s, target: t }); },
+            async fullSync() { const r = await fetch('/api/observability/full_mesh').then(i => i.json()); r.nodes.forEach(n => this.addNode(n.id, n.type, n.label, n.data)); r.links.forEach(l => this.addLink(l.source, l.target)); },
+            update() {
+                const t = Date.now() * 0.005;
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                
+                nodes.forEach(n => {
+                    // Grouping Forces (Attractors)
+                    let targetX = centerX, targetY = centerY;
+                    if (['CLIDE', 'APC', 'PIE'].includes(n.type)) { targetX = centerX; targetY = centerY; }
+                    else if (n.type === 'AGENT') { targetX = centerX + 300; targetY = centerY; }
+                    else if (n.type === 'TRACE') { targetX = centerX - 300; targetY = centerY; }
+                    else if (n.type === 'EVENT') {
+                        const link = links.find(l => l.target === n.id);
+                        if (link) {
+                            const src = nodes.find(i => i.id === link.source);
+                            if (src) { targetX = src.x - 50; targetY = src.y + 50; }
+                        }
+                    }
+
+                    n.vx += (targetX - n.x) * 0.0005;
+                    n.vy += (targetY - n.y) * 0.0005;
+
+                    links.forEach(l => {
+                        let ns = nodes.find(i => i.id === l.source), nt = nodes.find(i => i.id === l.target);
+                        if (ns && nt) { const dx = ns.x - nt.x, dy = ns.y - nt.y, d = Math.hypot(dx, dy) || 1, f = (d - 120) * 0.001; ns.vx -= dx * f; ns.vy -= dy * f; nt.vx += dx * f; nt.vy += dy * f; }
+                    });
+                    nodes.forEach(n2 => { if (n !== n2) { const dx = n.x - n2.x, dy = n.y - n2.y, d = Math.hypot(dx, dy) || 1; const minD = (n.type === 'EVENT' ? 30 : 100); if (d < minD) { n.vx += (dx / d) * 1.5; n.vy += (dy / d) * 1.5; } } });
+                    
+                    n.x += n.vx; n.y += n.vy; n.vx *= 0.85; n.vy *= 0.85;
+                    n.currentPulse = Math.sin(t * (n.pulseSpeed || 1)) * 5; 
+                    n.currentJitterX = Math.cos(t * 10) * (n.jitter || 0); 
+                    n.currentJitterY = Math.sin(t * 10) * (n.jitter || 0);
+                });
+            },
+            draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.save(); ctx.translate(offset.x, offset.y); ctx.scale(zoom, zoom);
+                
+                // Draw Connections
+                ctx.lineWidth = 1;
+                links.forEach(l => { 
+                    let ns = nodes.find(i => i.id === l.source), nt = nodes.find(i => i.id === l.target); 
+                    if (ns && nt) { 
+                        ctx.beginPath(); 
+                        ctx.strokeStyle = (l.type === 'CAUSAL') ? 'rgba(255, 68, 68, 0.2)' : 'rgba(74, 246, 38, 0.1)';
+                        ctx.moveTo(ns.x, ns.y); 
+                        ctx.lineTo(nt.x, nt.y); 
+                        ctx.stroke(); 
+                    } 
+                });
+
+                // Draw Nodes
+                nodes.forEach(n => { 
+                    const r = n.baseRadius + n.currentPulse; 
+                    const x = n.x + n.currentJitterX;
+                    const y = n.y + n.currentJitterY;
+
+                    // Glow Effect
+                    ctx.shadowBlur = 15; ctx.shadowColor = n.color;
+                    
+                    // Core Circle
+                    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); 
+                    ctx.fillStyle = n.color; ctx.fill(); 
+                    ctx.shadowBlur = 0;
+
+                    // Icon
+                    ctx.fillStyle = '#FFF'; ctx.font = `${r + 4}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(n.icon, x, y);
+
+                    // Label
+                    ctx.fillStyle = '#FFF'; ctx.font = '10px Consolas'; ctx.textAlign = 'center'; 
+                    ctx.fillText(n.label, x, y + r + 15); 
+                });
+                ctx.restore();
+            }
+        };
+
+        const fs = {
+            currentPath: '.',
+            async ls(path) {
+                this.currentPath = path; const r = await fetch(`/api/fs/ls?path=${path}`).then(i => i.json()); const l = document.getElementById('file-list'); l.innerHTML = '';
+                r.items.forEach(i => {
+                    const d = document.createElement('div'); d.className = 'fs-item'; d.style.justifyContent = 'space-between';
+                    d.innerHTML = `<div style="display:flex;align-items:center;gap:10px;" onclick="fs.handleClick('${i.path}',${i.is_dir})"><span>${i.is_dir?'📁':'📄'}</span><span>${i.name}</span></div><div style="display:flex;gap:8px;opacity:0.3" class="fs-ctrl"><span onclick="fs.rename('${i.path}','${i.name}')">✎</span><span onclick="fs.delete('${i.path}')" style="color:var(--err)">×</span></div>`;
+                    d.onmouseenter = () => d.querySelector('.fs-ctrl').style.opacity = '1'; d.onmouseleave = () => d.querySelector('.fs-ctrl').style.opacity = '0.3'; l.appendChild(d);
+                });
+            },
+            handleClick(p, d) { if (d) this.ls(p); else this.open(p, p.split('/').pop()); },
+            goUp() { const p = this.currentPath.split('/'); if (p.length > 1) { p.pop(); this.ls(p.join('/') || '.'); } else this.ls('.'); },
+            async open(p, n) { const r = await fetch(`/api/fs/read?path=${p}`).then(i => i.json()); wm.create(n, p, 'FILE', r.content || '', p); },
+            async createFile() { const n = prompt("File name:"); if (!n) return; await fetch('/api/fs/write', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ path: this.currentPath==='.'?n:`${this.currentPath}/${n}`, content: '' }) }); this.refresh(); },
+            async createFolder() { const n = prompt("Folder name:"); if (!n) return; await fetch('/api/fs/mkdir', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ path: this.currentPath==='.'?n:`${this.currentPath}/${n}` }) }); this.refresh(); },
+            async rename(o, n_old) { const n = prompt("New name:", n_old); if (!n || n === n_old) return; const b = o.split('/').slice(0,-1).join('/'), p = b?`${b}/${n}`:n; await fetch('/api/fs/rename', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ old_path: o, new_path: p }) }); this.refresh(); },
+            async delete(p) { if (!confirm(`Delete ${p}?`)) return; await fetch(`/api/fs/delete?path=${p}`, { method: 'DELETE' }); this.refresh(); },
+            refresh() { this.ls(this.currentPath); }
+        };
+
+        function initCanvas() {
+            canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
+            canvas.onmousedown = (e) => { if (e.altKey || e.button === 1) { isPanning = true; lastMousePos = { x: e.clientX, y: e.clientY }; } };
+            window.onmousemove = (e) => { if (isPanning) { offset.x += e.clientX - lastMousePos.x; offset.y += e.clientY - lastMousePos.y; lastMousePos = { x: e.clientX, y: e.clientY }; } };
+            window.onmouseup = () => isPanning = false; window.onwheel = (e) => { zoom *= (e.deltaY > 0 ? 0.9 : 1.1); };
+        }
+
+        async function updateStats() {
+            try {
+                const [agents, status] = await Promise.all([ fetch('/api/swarm/agents').then(r => r.json()), fetch('/api/status').then(r => r.json()) ]);
+                if (status.subsystems) {
+                    const c = status.subsystems.CLIDE?.metrics?.success_rate ?? 0.998, a = status.subsystems.APC?.metrics?.success_rate ?? 1.0, p = status.meta_metrics?.planning_accuracy ?? status.subsystems.PIE?.metrics?.success_rate ?? 0.85;
+                    document.getElementById('val-clide').innerText = `${(c*100).toFixed(1)}%`; document.getElementById('val-apc').innerText = `${(a*100).toFixed(1)}%`; document.getElementById('val-pie').innerText = `${(p*100).toFixed(1)}%`;
+                }
+                document.getElementById('val-swarm').innerText = agents.length;
+                document.getElementById('total-credits').innerText = agents.reduce((s, a) => s + (a.balance || 0), 0).toFixed(2);
+                
+                // Update Command & Chat Targets
+                let targetHTML = `<div class="btn-mini primary" style="width:100%; margin-bottom:10px;" onclick="setCmdTarget('DIRECT', 'CLIDE')">🛡️ DIRECT_CLIDE</div>`;
+                let chatGroupHTML = `<span class="group-tag ${currentChatTarget.id==='CLIDE'?'active':''}" onclick="setChatGroup('DIRECT', 'CLIDE')">CLIDE</span>
+                                     <span class="group-tag ${currentChatTarget.id==='ALL'?'active':''}" onclick="setChatGroup('OVERSEER', 'ALL')">OVERSEER</span>
+                                     <span class="group-tag ${currentChatTarget.id==='SWARM'?'active':''}" onclick="setChatGroup('COLLECTIVE', 'SWARM')">COLLECTIVE</span>`;
+                
+                agents.forEach(a => {
+                    const shortId = a.agent_id.slice(0,8);
+                    targetHTML += `<div class="btn-mini" style="width:100%; margin-bottom:5px; text-align:left;" onclick="setCmdTarget('AGENT', '${a.agent_id}')">🤖 ${shortId}</div>`;
+                    chatGroupHTML += `<span class="group-tag ${currentChatTarget.id===a.agent_id?'active':''}" onclick="setChatGroup('AGENT', '${a.agent_id}')">🤖 ${shortId}</span>`;
+                    graph.addNode(a.agent_id, 'AGENT', shortId, { balance: a.balance, load: status.cognitive_load || 0.2, velocity: status.event_velocity || 1.0 });
+                });
+                
+                document.getElementById('agent-targets').innerHTML = targetHTML;
+                document.getElementById('chat-groups').innerHTML = chatGroupHTML;
+
+            } catch(e) { console.error("Stats Error:", e); }
+        }
+
+        let currentCmdTarget = { type: 'DIRECT', id: 'CLIDE' };
+        function setCmdTarget(type, id) { currentCmdTarget = { type, id }; document.getElementById('cmd-input').placeholder = `Inject into ${type}_${id.slice(0,8)}...`; }
+        async function sendTacticalCommand() {
+            const g = document.getElementById('cmd-input').value; if (!g) return; const b = document.querySelector('.cmd-body button'); b.innerText = 'INJECTING...'; b.disabled = true;
+            try {
+                const r = await fetch(currentCmdTarget.type==='DIRECT'?'/api/control/goal':'/api/execute', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(currentCmdTarget.type==='DIRECT'?{goal:g}:{goal:g,target_id:currentCmdTarget.id,routing:'DIRECT'}) }).then(i => i.json());
+                if (r.status === 'success') { document.getElementById('cmd-input').value = ''; b.innerText = 'SUCCESS'; } else b.innerText = 'FAIL';
+            } catch (e) { b.innerText = 'ERROR'; } finally { setTimeout(() => { b.innerText = 'EXECUTE'; b.disabled = false; }, 2000); }
+        }
+
+        // Chat Logic
+        let currentChatTarget = { type: 'DIRECT', id: 'CLIDE' };
+        function setChatGroup(type, id) {
+            currentChatTarget = { type, id };
+            document.getElementById('active-group-label').innerText = `GROUP: ${type}_${id.slice(0,8)}`;
+            updateStats(); // Refresh tags
+        }
+        function addChatMessage(role, text) {
+            const l = document.getElementById('chat-messages'), d = document.createElement('div');
+            d.className = `msg ${role}`; d.innerText = text; l.appendChild(d); l.scrollTop = l.scrollHeight;
+        }
+        async function sendChatMessage() {
+            const i = document.getElementById('chat-input'), text = i.value; if (!text) return;
+            addChatMessage('user', text); i.value = '';
+            try {
+                const r = await fetch('/api/execute', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ goal: text, target_id: currentChatTarget.id, routing: currentChatTarget.type }) }).then(r => r.json());
+                if (r.status === 'success') addChatMessage('system', `Intent dispatched. Trace: ${r.trace_id}`);
+                else addChatMessage('system', 'Dispatch failed.');
+            } catch(e) { addChatMessage('system', 'Communication Error.'); }
+        }
+        document.getElementById('chat-input').onkeydown = (e) => { if (e.ctrlKey && e.key === 'Enter') sendChatMessage(); };
+
+        const ws = new WebSocket(`ws://${location.host}/ws/live`);
+        ws.onmessage = (e) => {
+            const m = JSON.parse(e.data); if (m.type === 'EVENT') {
+                const ev = m.data, l = document.getElementById('event-log'), d = document.createElement('div'); d.className = 'event'; d.innerHTML = `<div class="event-type">${ev.event_type}</div><div>${ev.payload.message || ''}</div>`; l.prepend(d);
+                if (ev.trace_id) graph.addNode(ev.trace_id, 'TRACE', ev.trace_id.slice(0,8), { load: 0.5, velocity: 2.0 });
+                graph.addNode(ev.event_id, 'EVENT', ev.event_type.slice(0,8), { load: 0.1 });
+                graph.addLink(ev.trace_id, ev.event_id);
+                
+                // If event has message, show in chat if relevant
+                if (ev.payload.message && (ev.layer === 'CLIDE' || ev.event_type.includes('DECISION'))) {
+                    addChatMessage('agent', `[${ev.layer}] ${ev.payload.message}`);
+                }
+            }
+        };
+
+        function toggleBlade(id) { document.getElementById(id).classList.toggle('active'); }
+        function toggleCmdCenter() { document.getElementById('command-center').classList.toggle('expanded'); }
+        function loop() { graph.update(); graph.draw(); requestAnimationFrame(loop); }
+
+        initCanvas(); fs.ls('.'); updateStats(); graph.fullSync(); setInterval(updateStats, 5000); loop();
+    </script>
+</body>
+</html>

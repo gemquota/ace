@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MACHINERY // 0.3.1</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --red-muted: #661414;
+            --red-mid: #8a1a1a;
+            --red-bright: #cc2424;
+            --cyan-dim: #1a5c66;
+            --border-muted: rgba(102, 20, 20, 0.4);
+            --metal-shine: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 45%, #333 50%, #1a1a1a 55%, #111 100%);
+            --glass-bg: rgba(15, 15, 15, 0.85);
+            --trans-timing: 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+            --fold-timing: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100vw; height: 100vh;
+            background-color: var(--bg-deep); color: #999;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            overflow: hidden; touch-action: none; overscroll-behavior: none;
+        }
+
+        .bg-lines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--border-muted) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--border-muted) 1px, transparent 1px);
+            background-size: 60px 60px; opacity: 0.04; z-index: 0; pointer-events: none;
+        }
+
+        #app-container {
+            position: relative; width: 100vw; height: 100vh; z-index: 10;
+        }
+
+        /* FULL WIDTH CONTENT */
+        #content-wrapper {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            overflow-y: auto; overflow-x: hidden; background: transparent; z-index: 1;
+            transition: padding-top 0.5s ease; padding-top: 20px;
+        }
+
+        #content {
+            padding: 80px 5vw 60px 5vw; max-width: 1400px; margin: 0 auto;
+            background: radial-gradient(circle at top right, rgba(13,13,13,0.8), rgba(5,5,5,0.9));
+            min-height: 100%; box-sizing: border-box;
+        }
+
+        /* FLOATING TOP DOCK */
+        #top-dock {
+            position: absolute; top: 15px; left: 20px; width: calc(100% - 40px);
+            display: flex; align-items: flex-start; justify-content: flex-start; gap: 12px; flex-wrap: wrap;
+            z-index: 500; pointer-events: none; opacity: 0; transition: opacity 0.4s ease;
+        }
+        #top-dock.active { pointer-events: auto; opacity: 1; }
+        
+        .dock-slot { width: 45px; height: 45px; border: 1px dashed transparent; border-radius: 4px; }
+
+        /* SIDEBAR AREA - Flush to Top */
+        #sidebar-scroll-area {
+            position: absolute; top: 0; left: 0; width: 420px; height: 100vh;
+            padding: 20px; box-sizing: border-box;
+            overflow-y: auto; overflow-x: visible; pointer-events: auto;
+            scrollbar-width: none; z-index: 100;
+        }
+        #sidebar-scroll-area::-webkit-scrollbar { display: none; }
+
+        /* MODULES & 3D FOLDING ARCHITECTURE */
+        .menu-chunk {
+            margin-bottom: 25px; position: relative; width: 100%;
+            transform-style: preserve-3d; perspective: 1500px;
+            transition: top var(--trans-timing), left var(--trans-timing), width var(--trans-timing), height var(--trans-timing);
+        }
+
+        .chunk-inner-wrapper {
+            position: relative; width: 100%; height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        /* Physical 3D Plates */
+        .t-bg {
+            position: absolute; background: var(--metal-shine); border: 1px solid #111;
+            box-shadow: inset 1px 1px 0 rgba(255,255,255,0.05), inset -1px -1px 0 rgba(0,0,0,0.8);
+            pointer-events: none; z-index: 0;
+            transition: transform var(--fold-timing), height var(--fold-timing), border-color 0.3s;
+        }
+        .t-bg::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/brushed-alum.png");
+            opacity: 0.15; mix-blend-mode: overlay;
+        }
+        
+        /* The Tangram Geometry */
+        .t-header-plate { top: 0; left: 0; width: 100%; height: 45px; transform-origin: top; } 
+        .t-body-plate { top: 45px; left: 0; width: 100%; height: calc(100% - 45px); background: var(--glass-bg); transform-origin: top; }
+        .t-side-plate { top: 0; right: -1px; width: 12px; height: 100%; transform-origin: right; transform: rotateY(90deg); }
+
+        /* Content Block */
+        .chunk-content {
+            position: relative; z-index: 2; padding: 15px;
+            transform-origin: top; transition: transform var(--fold-timing);
+            backface-visibility: hidden;
+        }
+
+        /* INITIAL ASSEMBLY STATE (Robust Folding) */
+        .disassembled .t-header-plate { transform: rotateX(-90deg); }
+        .disassembled .t-body-plate { transform: rotateX(-90deg); }
+        .disassembled .t-side-plate { transform: rotateY(180deg); }
+        .disassembled .chunk-content { transform: rotateX(90deg); }
+
+        /* MINIMIZED GRID STATE (Physical Retraction) */
+        .menu-chunk.minimized {
+            cursor: pointer; background: transparent;
+        }
+        
+        /* Fold the body under */
+        .menu-chunk.minimized .t-body-plate {
+            transform: rotateX(-90deg); border-color: transparent; box-shadow: none;
+        }
+        .menu-chunk.minimized .t-side-plate {
+            transform: rotateY(180deg); opacity: 0;
+        }
+        /* The header stretches to become the square icon */
+        .menu-chunk.minimized .t-header-plate {
+            height: 100%; border: 1px solid var(--red-muted);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9), 5px 5px 15px rgba(0,0,0,0.9);
+        }
+        .menu-chunk.minimized:hover .t-header-plate {
+            border-color: var(--red-bright); transform: translateZ(10px);
+        }
+        /* Collapse text completely */
+        .menu-chunk.minimized .chunk-content {
+            transform: rotateX(90deg) scaleY(0); pointer-events: none;
+        }
+        
+        /* Centered Dock Icons */
+        .minimized-icon {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: var(--red-bright); font-weight: bold;
+            transform: rotateX(-90deg) translateZ(10px); transition: transform var(--fold-timing);
+            z-index: 10; pointer-events: none; text-shadow: 0 0 8px rgba(204, 36, 36, 0.6);
+        }
+        .menu-chunk.minimized .minimized-icon { transform: rotateX(0deg) translateZ(10px); }
+
+        /* Internal UI Typography */
+        .title-card {
+            border-bottom: 2px solid var(--red-muted); padding-bottom: 10px; margin-bottom: 10px;
+        }
+        .brand { font-size: 1.2em; font-weight: bold; color: #fff; letter-spacing: 5px; text-shadow: 0 0 10px var(--red-muted); }
+
+        .ctrl-btn {
+            background: transparent; border: 1px solid #555; color: #aaa;
+            padding: 5px 10px; cursor: pointer; font-family: monospace; font-size: 0.85em;
+            transition: 0.3s;
+        }
+        .ctrl-btn:hover { background: var(--red-muted); color: #fff; border-color: var(--red-bright); }
+
+        .tier-1-header {
+            color: var(--red-bright); font-size: 0.8em; text-transform: uppercase;
+            letter-spacing: 3px; font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .tier-2-wrapper { margin-bottom: 6px; }
+        .tier-2-header {
+            color: #ccc; font-size: 0.7em; text-transform: uppercase; letter-spacing: 1.5px;
+            padding: 10px 12px; background: rgba(0, 0, 0, 0.6); border-left: 2px solid var(--red-muted);
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 2px;
+        }
+        .tier-2-header::after { content: '▼'; font-size: 0.8em; color: #555; transition: transform 0.4s; }
+        .tier-2-wrapper.active .tier-2-header::after { transform: rotate(180deg); color: var(--red-bright); }
+
+        .tier-3-container { max-height: 0; overflow: hidden; transition: max-height 0.4s; background: rgba(0,0,0,0.4); }
+        .tier-2-wrapper.active .tier-3-container { max-height: 1000px; }
+
+        .doc-link {
+            display: block; padding: 10px 15px; color: #777; text-decoration: none; cursor: pointer;
+            font-size: 0.8em; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s;
+        }
+        .doc-link:hover { color: #ccc; background: rgba(255, 255, 255, 0.05); padding-left: 20px; }
+        .doc-link.active { color: #fff; background: rgba(138, 26, 26, 0.4); border-right: 3px solid var(--red-bright); }
+
+        #content h1 { color: #eee; border-bottom: 2px solid var(--red-muted); padding-bottom: 15px; font-size: 2.5em; letter-spacing: 2px; }
+        #content h2 { color: #8a1a1a; font-size: 1.5em; margin-top: 40px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        #content p, #content li { line-height: 1.8; color: #888; font-size: 1.05em; }
+        #content code { background: #111; padding: 2px 5px; border-radius: 3px; color: var(--red-bright); font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="bg-lines"></div>
+
+    <div id="top-dock"></div>
+
+    <div id="app-container">
+        <div id="content-wrapper">
+            <div id="content">
+                <h1 style="text-align:center; margin-top: 25vh; border:none; color: #222; font-size: 4em; letter-spacing: 20px;">IDLE</h1>
+            </div>
+        </div>
+
+        <div id="sidebar-scroll-area">
+            <div id="menu-chunks"></div>
+        </div>
+    </div>
+
+    <script>
+        const docsData = {
+            "SYSTEM ARCHITECTURE": {
+                "Kernel Primitives": { "Clock Vector.md": "# Clock Vector\nSystem time logic.", "Event Hashing.md": "# Event Hashing\nSHA256 logs." },
+                "Swarm Logistics": { "Agent Spawning.md": "# Spawning\nFabrication mechanics.", "Darwinian Ledger.md": "# Ledger\nEconomy rules." }
+            },
+            "EXECUTION SUBSTRATE (APC)": {
+                "Termux Integration": { "Proot Setup.md": "# Proot\nIsolating environments.", "X11 Bridging.md": "# X11\nDisplay output." },
+                "Sandboxing": { "Filesystem Jails.md": "# Jails\nChroot mechanics.", "Timeout Enforcers.md": "# Timeouts\nProcess killing." },
+                "Python Tooling": { "Venv Injection.md": "# Injection\nPIP dependency loading." }
+            },
+            "INFERENCE ENGINE (PIE)": {
+                "Causal Graphs": { "Node Generation.md": "# Nodes\nCausal plotting.", "Edge Weighting.md": "# Edges\nProbabilities." },
+                "Anomaly Flavors": { "Silent Failures.md": "# Silent\nExit 0 errors.", "Drift Metrics.md": "# Drift\nDeviation from intent." }
+            },
+            "INTENT COMPILER (CLIDE)": {
+                "Ontology Maps": { "Semantic Primitives.md": "# Primitives\nVerbs.", "Entity Parsing.md": "# Parsing\nNouns." },
+                "DAG Generators": { "Linear Chains.md": "# Linear\nStraight paths.", "Branching Logic.md": "# Branches\nParallel steps." }
+            },
+            "META-COGNITION": {
+                "Evolution": { "Arch Mutation.md": "# Mutation\nSelf editing.", "Experiment Runner.md": "# Experiments\nA/B testing." }
+            },
+            "MCP SERVERS": {
+                "Local Bridges": { "SQLite Server.md": "# SQLite\nDB interface.", "FS Server.md": "# FileSystem\nRead/Write." },
+                "Web Tooling": { "Browser Server.md": "# Browser\nPuppeteer wrapper." }
+            },
+            "TELEMETRY UI": {
+                "Canvas Rendering": { "Force Physics.md": "# Physics\nD3 integration.", "WebGL Fallback.md": "# WebGL\nFast render." },
+                "Sockets": { "Live Feed.md": "# Live\nWebsocket stream." }
+            },
+            "DEPRECATED PROTOCOLS": {
+                "Phase 1": { "Old Sandbox.md": "# Old\nRemoved.", "Legacy Logs.md": "# Legacy\nArchived." }
+            }
+        };
+
+        const icons = ['◧', '◨', '◩', '◪', '▤', '▥', '▦', '▧', '▨'];
+        let chunkRegistry = [];
+
+        function initArchitecture() {
+            const menuContainer = document.getElementById('menu-chunks');
+            const topDock = document.getElementById('top-dock');
+
+            // 1. GENERATE TITLE CARD (Master Toggle)
+            const titleId = 'chunk-title';
+            chunkRegistry.push({ id: titleId, isMinimized: false, height: 0 });
+            
+            const titleSlot = document.createElement('div');
+            titleSlot.className = 'dock-slot'; titleSlot.id = 'slot-' + titleId;
+            topDock.appendChild(titleSlot);
+
+            const titleChunk = document.createElement('div');
+            titleChunk.className = 'menu-chunk disassembled'; titleChunk.id = titleId;
+            
+            // If minimized, clicking the title card restores EVERYTHING
+            titleChunk.onclick = (e) => { 
+                if (titleChunk.classList.contains('minimized')) { 
+                    e.stopPropagation(); 
+                    toggleAll(); 
+                } 
+            };
+
+            titleChunk.innerHTML = `
+                <div class="chunk-inner-wrapper">
+                    <div class="t-bg t-header-plate"></div>
+                    <div class="t-bg t-body-plate"></div>
+                    <div class="t-bg t-side-plate"></div>
+                    <div class="minimized-icon">⎈</div>
+                    <div class="chunk-content">
+                        <div class="title-card">
+                            <div class="brand">MACHINERY // OS</div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top:15px; align-items:center;">
+                            <span style="color:#888; font-size:0.7em; letter-spacing:2px;">GLOBAL SYS_NAV</span>
+                            <button class="ctrl-btn" onclick="event.stopPropagation(); toggleAll()">[ MINIMIZE_ALL ]</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            menuContainer.appendChild(titleChunk);
+
+            // 2. GENERATE CATEGORY MODULES
+            let chunkIndex = 1;
+            for (const [catName, subcats] of Object.entries(docsData)) {
+                const id = 'chunk-' + chunkIndex;
+                chunkRegistry.push({ id, isMinimized: false, height: 0 });
+                
+                const slot = document.createElement('div');
+                slot.className = 'dock-slot'; slot.id = 'slot-' + id;
+                topDock.appendChild(slot);
+
+                const chunk = document.createElement('div');
+                chunk.className = 'menu-chunk disassembled'; chunk.id = id;
+                
+                chunk.onclick = (e) => { if (chunk.classList.contains('minimized')) { e.stopPropagation(); toggleMinimize(id); } };
+
+                const wrapper = document.createElement('div'); wrapper.className = 'chunk-inner-wrapper';
+                ['t-header-plate', 't-body-plate', 't-side-plate'].forEach(cls => {
+                    const plate = document.createElement('div'); plate.className = `t-bg ${cls}`; wrapper.appendChild(plate);
+                });
+
+                const minIcon = document.createElement('div'); minIcon.className = 'minimized-icon';
+                minIcon.textContent = icons[chunkIndex % icons.length];
+                wrapper.appendChild(minIcon);
+
+                const contentArea = document.createElement('div'); contentArea.className = 'chunk-content';
+
+                const catHeader = document.createElement('div'); catHeader.className = 'tier-1-header'; 
+                catHeader.innerHTML = `<span>${catName}</span><button class="ctrl-btn" onclick="event.stopPropagation(); toggleMinimize('${id}')">[ _ ]</button>`;
+                contentArea.appendChild(catHeader);
+
+                for (const [subcatName, files] of Object.entries(subcats)) {
+                    const subcatWrapper = document.createElement('div'); subcatWrapper.className = 'tier-2-wrapper';
+                    const subcatHeader = document.createElement('div'); subcatHeader.className = 'tier-2-header'; subcatHeader.textContent = subcatName;
+                    subcatHeader.onclick = (e) => { e.stopPropagation(); subcatWrapper.classList.toggle('active'); };
+                    subcatWrapper.appendChild(subcatHeader);
+                    
+                    const linksContainer = document.createElement('div'); linksContainer.className = 'tier-3-container';
+                    for (const [title, content] of Object.entries(files)) {
+                        const link = document.createElement('a'); link.className = 'doc-link'; link.textContent = title;
+                        link.onclick = (e) => {
+                            e.preventDefault(); e.stopPropagation();
+                            document.querySelectorAll('.doc-link').forEach(el => el.classList.remove('active'));
+                            link.classList.add('active');
+                            renderContent(content);
+                            if(window.innerWidth < 800) toggleAll(); 
+                        };
+                        linksContainer.appendChild(link);
+                    }
+                    subcatWrapper.appendChild(linksContainer); 
+                    contentArea.appendChild(subcatWrapper);
+                }
+
+                wrapper.appendChild(contentArea);
+                chunk.appendChild(wrapper);
+                menuContainer.appendChild(chunk);
+                chunkIndex++;
+            }
+
+            // Staggered Unfolding Physics
+            setTimeout(() => {
+                document.querySelectorAll('.menu-chunk').forEach((el, idx) => {
+                    setTimeout(() => { el.classList.remove('disassembled'); }, idx * 100);
+                });
+            }, 100);
+
+            checkRestoreState();
+        }
+
+        function toggleMinimize(id) {
+            const chunk = document.getElementById(id);
+            const slot = document.getElementById('slot-' + id);
+            const registryEntry = chunkRegistry.find(c => c.id === id);
+            
+            if (!registryEntry.isMinimized) {
+                // MINIMIZE
+                registryEntry.height = chunk.offsetHeight;
+                const startRect = chunk.getBoundingClientRect();
+                
+                const placeholder = document.createElement('div'); placeholder.id = 'ph-' + id;
+                placeholder.style.height = startRect.height + 'px'; placeholder.style.marginBottom = '25px';
+                placeholder.style.transition = 'height 0.4s ease, margin 0.4s ease';
+                chunk.parentNode.insertBefore(placeholder, chunk);
+
+                chunk.style.position = 'fixed';
+                chunk.style.top = startRect.top + 'px'; chunk.style.left = startRect.left + 'px';
+                chunk.style.width = startRect.width + 'px'; chunk.style.height = startRect.height + 'px';
+                chunk.style.zIndex = '999'; chunk.style.margin = '0';
+                
+                void chunk.offsetWidth; 
+
+                chunk.classList.add('minimized');
+                const endRect = slot.getBoundingClientRect();
+                
+                chunk.style.top = endRect.top + 'px'; chunk.style.left = endRect.left + 'px';
+                chunk.style.width = endRect.width + 'px'; chunk.style.height = endRect.height + 'px';
+
+                requestAnimationFrame(() => { placeholder.style.height = '0px'; placeholder.style.marginBottom = '0px'; });
+                setTimeout(() => { if(registryEntry.isMinimized) chunk.style.zIndex = '250'; }, 700);
+
+                registryEntry.isMinimized = true;
+            } else {
+                // RESTORE
+                const placeholder = document.getElementById('ph-' + id);
+                if(placeholder) {
+                    placeholder.style.height = registryEntry.height + 'px'; 
+                    placeholder.style.marginBottom = '25px';
+                }
+
+                chunk.style.zIndex = '999';
+
+                setTimeout(() => {
+                    const targetRect = placeholder ? placeholder.getBoundingClientRect() : {top:0, left:0, width:400, height: registryEntry.height};
+                    chunk.classList.remove('minimized');
+                    chunk.style.top = targetRect.top + 'px'; chunk.style.left = targetRect.left + 'px';
+                    chunk.style.width = targetRect.width + 'px'; chunk.style.height = targetRect.height + 'px';
+
+                    setTimeout(() => {
+                        if(!registryEntry.isMinimized) { 
+                            chunk.style.position = 'relative'; chunk.style.top = ''; chunk.style.left = '';
+                            chunk.style.width = '100%'; chunk.style.height = 'auto'; chunk.style.zIndex = '';
+                            if(placeholder) placeholder.remove();
+                        }
+                    }, 700); 
+                }, 50);
+
+                registryEntry.isMinimized = false;
+            }
+            evaluateGlobalState();
+        }
+
+        function toggleAll() {
+            const titleEntry = chunkRegistry.find(c => c.id === 'chunk-title');
+            const intentToMinimize = !titleEntry.isMinimized;
+
+            chunkRegistry.forEach((c, index) => {
+                setTimeout(() => {
+                    if (intentToMinimize && !c.isMinimized) toggleMinimize(c.id);
+                    else if (!intentToMinimize && c.isMinimized) toggleMinimize(c.id);
+                }, index * 50); 
+            });
+        }
+
+        function evaluateGlobalState() {
+            const anyMin = chunkRegistry.some(c => c.isMinimized);
+            const titleEntry = chunkRegistry.find(c => c.id === 'chunk-title');
+            const topDock = document.getElementById('top-dock');
+            const wrapper = document.getElementById('content-wrapper');
+
+            if (anyMin) {
+                topDock.classList.add('active');
+                wrapper.style.paddingTop = (topDock.offsetHeight + 40) + 'px';
+            } else {
+                topDock.classList.remove('active');
+                wrapper.style.paddingTop = '20px';
+            }
+
+            try { localStorage.setItem('cap-menu-minimized', titleEntry.isMinimized ? 'true' : 'false'); } catch (e) {}
+        }
+
+        function checkRestoreState() {
+            try {
+                if(localStorage.getItem('cap-menu-minimized') === 'true') { setTimeout(() => { toggleAll(); }, 500); }
+            } catch (e) {}
+        }
+
+        window.addEventListener('resize', () => {
+            chunkRegistry.forEach(c => {
+                if(c.isMinimized) {
+                    const chunk = document.getElementById(c.id);
+                    const slot = document.getElementById('slot-' + c.id);
+                    chunk.style.transition = 'none'; 
+                    const endRect = slot.getBoundingClientRect();
+                    chunk.style.top = endRect.top + 'px'; chunk.style.left = endRect.left + 'px';
+                    chunk.style.width = endRect.width + 'px'; chunk.style.height = endRect.height + 'px';
+                    setTimeout(() => { chunk.style.transition = ''; }, 50);
+                }
+            });
+            evaluateGlobalState(); 
+        });
+
+        function renderContent(markdownString) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.style.opacity = 0;
+            setTimeout(() => {
+                contentDiv.innerHTML = marked.parse(markdownString);
+                contentDiv.style.opacity = 1;
+                document.getElementById('content-wrapper').scrollTop = 0;
+            }, 200);
+        }
+
+        document.addEventListener('DOMContentLoaded', initArchitecture);
+    </script>
+</body>
+</html>

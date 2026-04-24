@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RRE // SYSTEM_DESIGN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --accent-muted: #661414;
+            --accent-mid: #8a1a1a;
+            --accent-bright: #cc2424;
+            --border-muted: rgba(102, 20, 20, 0.4);
+            --metal-shine: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 45%, #333 50%, #1a1a1a 55%, #111 100%);
+            --trans-timing: 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        [data-theme="cobalt"] { --accent-muted: #1a2c66; --accent-mid: #1a3c8a; --accent-bright: #245bcc; --border-muted: rgba(26, 44, 102, 0.4); }
+        [data-theme="emerald"] { --accent-muted: #146614; --accent-mid: #1a8a1a; --accent-bright: #24cc24; --border-muted: rgba(20, 102, 20, 0.4); }
+        [data-theme="neon"] { --accent-muted: #661466; --accent-mid: #8a1a8a; --accent-bright: #cc24cc; --border-muted: rgba(102, 20, 102, 0.4); }
+        [data-theme="mono"] { --accent-muted: #333333; --accent-mid: #666666; --accent-bright: #ffffff; --border-muted: rgba(100, 100, 100, 0.4); }
+        [data-theme="nuclear"] { --accent-muted: #1a5c66; --accent-mid: #1a7a8a; --accent-bright: #24b0cc; --border-muted: rgba(26, 92, 102, 0.4); }
+        [data-theme="crimson"] { --accent-muted: #4a0000; --accent-mid: #800000; --accent-bright: #ff0000; --border-muted: rgba(74, 0, 0, 0.4); }
+        [data-theme="toxic"] { --accent-muted: #4d6614; --accent-mid: #6b8a1a; --accent-bright: #99cc24; --border-muted: rgba(77, 102, 20, 0.4); }
+        [data-theme="retro"] { --accent-muted: #664d14; --accent-mid: #8a6b1a; --accent-bright: #cc9924; --border-muted: rgba(102, 77, 20, 0.4); }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            background-color: var(--bg-deep); color: #999;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            overflow: hidden; touch-action: none;
+        }
+
+        .bg-lines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--border-muted) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--border-muted) 1px, transparent 1px);
+            background-size: 60px 60px; opacity: 0.04; z-index: 0;
+        }
+
+        .menu-chunk {
+            background: var(--metal-shine); border: 1px solid #111;
+            box-shadow: inset 1px 1px 0 rgba(255,255,255,0.05), inset -1px -1px 0 rgba(0,0,0,0.8), 10px 10px 30px rgba(0,0,0,0.9);
+            position: relative;
+        }
+
+        .menu-chunk::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/brushed-alum.png");
+            opacity: 0.1; pointer-events: none; mix-blend-mode: overlay; z-index: 1;
+        }
+
+        .chunk-inner {
+            margin: 4px; background: rgba(10, 10, 10, 0.6); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.03); box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            padding: 10px; position: relative; z-index: 2;
+        }
+
+        .bolt {
+            position: absolute; width: 4px; height: 4px; background: #222; border-radius: 50%;
+            box-shadow: inset 1px 1px 1px rgba(255,255,255,0.1), 1px 1px 2px rgba(0,0,0,0.9); z-index: 5;
+        }
+        .t-l { top: 4px; left: 4px; } .t-r { top: 4px; right: 4px; }
+        .b-l { bottom: 4px; left: 4px; } .b-r { bottom: 4px; right: 4px; }
+
+        .square-btn { 
+            background: rgba(0,0,0,0.4); border: 1px solid var(--border-muted); 
+            cursor: pointer; transition: all 0.3s; color: #555; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .square-btn:hover { border-color: var(--accent-mid); color: #999; }
+        .square-btn.active { background: rgba(255, 255, 255, 0.02); border-color: var(--accent-bright); color: #fff; box-shadow: 0 0 10px var(--accent-mid); }
+        
+        /* High-Density U-Table Styles */
+        /* Toggle Switch Styling */
+        .switch {
+            position: relative; display: inline-block; width: 34px; height: 18px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #111; border: 1px solid var(--border-muted); transition: .4s; border-radius: 18px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px;
+            background-color: var(--accent-mid); transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: rgba(255,255,255,0.05); border-color: var(--accent-bright); }
+        input:checked + .slider:before { transform: translateX(16px); background-color: var(--accent-bright); box-shadow: 0 0 5px var(--accent-bright); }
+
+        .u-row { 
+            display: grid; grid-template-columns: 30px 30px 1fr 40px 40px 40px 40px; 
+            align-items: center; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.03);
+            cursor: pointer; transition: all 0.2s; gap: 8px;
+        }
+        .u-row .u-check { opacity: 0.3; transition: opacity 0.2s; }
+        .u-row:hover .u-check, .u-row.selected .u-check { opacity: 1; }
+        .u-row.selected { background: rgba(255,255,255,0.03); }
+        .u-row.active { background: rgba(255,255,255,0.05); border-color: var(--u-color); box-shadow: inset 2px 0 0 var(--u-color); }
+        .u-row.active .u-id { color: var(--u-color); font-weight: 900; }
+        .u-row.active .u-icon { color: var(--u-color); filter: drop-shadow(0 0 5px var(--u-color)); }
+
+        .u-row[data-val="1"] { --u-color: #ef4444; }
+        .u-row[data-val="2"] { --u-color: #f97316; }
+        .u-row[data-val="3"] { --u-color: #eab308; }
+        .u-row[data-val="4"] { --u-color: #22c55e; }
+        .u-row[data-val="5"] { --u-color: #3b82f6; }
+        .u-row[data-val="6"] { --u-color: #4f46e5; }
+        .u-row[data-val="7"] { --u-color: #a855f7; }
+
+        .stat-col { font-family: monospace; font-size: 8px; text-transform: uppercase; text-align: right; pr-1; }
+        .stat-col.c1 { color: #2d4a44; } /* Muted Teal */
+        .stat-col.c2 { color: #4a3d2d; } /* Muted Amber */
+        .stat-col.c3 { color: #4a2d2d; } /* Muted Red */
+        .stat-col.c4 { color: #3d2d4a; } /* Muted Purple */
+        .u-row.active .stat-col.c1 { color: #4fd1c5; }
+        .u-row.active .stat-col.c2 { color: #f6ad55; }
+        .u-row.active .stat-col.c3 { color: #fc8181; }
+        .u-row.active .stat-col.c4 { color: #b794f4; }
+        .stat-label { font-size: 6px; color: #555; margin-bottom: 2px; }
+
+        input[type="range"] { 
+            -webkit-appearance: none; width: 100%; height: 4px; 
+            background: linear-gradient(90deg, var(--accent-muted) 1px, transparent 1px);
+            background-size: 10% 100%; background-color: #111; border-radius: 2px; outline: none; 
+        }
+        input[type="range"]::-webkit-slider-thumb { 
+            -webkit-appearance: none; appearance: none; width: 12px; height: 18px; 
+            background: var(--accent-bright); cursor: pointer; border-radius: 1px; box-shadow: 0 0 5px var(--accent-bright);
+        }
+
+        .brand { font-size: 1.5em; font-weight: bold; color: #fff; letter-spacing: 5px; text-transform: uppercase; text-shadow: 0 0 10px var(--accent-muted); line-height: 1; }
+        .version { font-size: 0.6em; color: var(--accent-mid); letter-spacing: 2px; font-weight: bold; margin-top: 2px; }
+
+        .drawer {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%);
+            width: 100%; max-width: 28rem; transition: transform var(--trans-timing); z-index: 60;
+        }
+        .drawer.active { transform: translateX(-50%) translateY(0); }
+
+        .val-badge { border: 1px solid var(--accent-muted); background: rgba(0,0,0,0.4); padding: 0 6px; border-radius: 2px; color: var(--accent-bright); font-family: monospace; font-weight: bold; cursor: pointer; }
+
+        .help-tooltip { display: none; position: absolute; background: #0a0a0a; border: 1px solid var(--accent-muted); padding: 8px 12px; font-size: 8px; color: #aaa; z-index: 100; text-transform: uppercase; letter-spacing: 1px; width: 200px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); pointer-events: none; }
+        .label-trigger:active + .help-tooltip { display: block; }
+
+        .chat-msg { border-left: 2px solid var(--accent-muted); padding: 8px; margin-bottom: 6px; background: rgba(255,255,255,0.01); }
+        
+        .icon-btn { color: var(--accent-mid); transition: all 0.3s; cursor: pointer; }
+        .icon-btn:hover { color: var(--accent-bright); transform: scale(1.1); }
+
+        .theme-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 8px 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .theme-item:hover { background: rgba(255,255,255,0.02); border-color: var(--accent-mid); }
+        .theme-item.active { border-color: var(--accent-bright); background: rgba(255,255,255,0.05); }
+        .swatch { width: 12px; height: 12px; border-radius: 2px; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+
+        .nav-tab {
+            padding: 0 15px; height: 100%; display: flex; align-items: center; gap: 8px;
+            color: #555; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
+            font-size: 9px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.3s;
+        }
+        .nav-tab:hover { color: #999; background: rgba(255,255,255,0.02); }
+        .nav-tab.active { color: var(--accent-bright); border-bottom-color: var(--accent-bright); }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+    <div class="bg-lines"></div>
+
+    <!-- LANDING VIEW -->
+    <div id="landing-view" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="max-w-6xl w-full flex flex-col gap-3 relative z-10 h-full py-4">
+            
+            <div class="menu-chunk shrink-0">
+                <div class="bolt t-l"></div><div class="bolt t-r"></div>
+                <div class="bolt b-l"></div><div class="bolt b-r"></div>
+                <div class="chunk-inner flex items-center justify-between py-1 px-4">
+                    <div>
+                        <div class="brand">RRE</div>
+                        <div class="version">v1.2.4</div>
+                    </div>
+                    <div class="flex items-center gap-4 flex-1 max-w-xs ml-12">
+                        <input type="text" id="new-session-name" class="bg-transparent flex-1 outline-none text-white font-black text-xs border-b border-white/5 focus:border-white/20 transition-colors" placeholder="PROJECT_ID...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- USE CASE TABLE (CENTER) -->
+            <div class="flex-1 menu-chunk overflow-hidden flex flex-col min-h-0">
+                <div class="bolt t-l"></div><div class="bolt t-r"></div>
+                <div class="bolt b-l"></div><div class="bolt b-r"></div>
+                
+                <!-- Legend / Status Bar -->
+                <div class="bg-black/40 border-b border-white/5 px-4 py-2 flex items-center justify-between">
+                    <div class="flex gap-4">
+                        <div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-accent-bright animate-pulse"></div><span class="text-[7px] font-black uppercase tracking-widest text-zinc-500">Live_Session</span></div>
+                        <div class="flex items-center gap-2 text-[7px] font-medium text-zinc-600">
+                            <span class="flex items-center gap-1"><svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-width="2"/></svg> VAL: Check</span>
+                            <span class="flex items-center gap-1 ml-2"><svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2"/></svg> GEN: Draft</span>
+                        </div>
+                    </div>
+                    <div class="text-[7px] font-mono text-zinc-500 uppercase">Search_Space: ACTIVE</div>
+                </div>
+
+                <div class="chunk-inner h-full overflow-hidden flex flex-col p-0" id="u-selector">
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-[30px_30px_1fr_40px_40px_40px_40px] items-center px-3 py-2 bg-white/5 border-b border-white/10 text-[7px] font-black uppercase tracking-[0.2em] text-zinc-500 gap-2 relative">
+                        <span class="text-center">SEL</span>
+                        <span class="text-center">ID</span>
+                        <span class="pl-2">Method_&_Primary_Goal</span>
+                        <div class="flex justify-end cursor-pointer hover:text-white transition-colors" onclick="showTooltip(event, 'strict')">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke-width="2"/></svg>
+                        </div>
+                        <div class="flex justify-end cursor-pointer hover:text-white transition-colors" onclick="showTooltip(event, 'flex')">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M2 12c.5-2 2.5-2.5 4-2.5 2 0 4 2.5 6 2.5s4-2.5 6-2.5c1.5 0 3.5.5 4 2.5" stroke-width="2"/></svg>
+                        </div>
+                        <div class="flex justify-end cursor-pointer hover:text-white transition-colors" onclick="showTooltip(event, 'load')">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93" stroke-width="2"/></svg>
+                        </div>
+                        <div class="flex justify-end cursor-pointer hover:text-white transition-colors" onclick="showTooltip(event, 'dir')">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 6l9 1 9-1M6 18l12 0M12 7v11" stroke-width="2"/></svg>
+                        </div>
+                        <div id="icon-tooltip" class="help-tooltip"></div>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto">
+                        <!-- U1 -->
+                        <div class="u-row active" data-val="1" onclick="toggleSelection(event, 1)">
+                            <div class="u-check flex justify-center"><input type="checkbox" class="accent-accent-bright" id="check-1" checked></div>
+                            <span class="u-id font-mono text-[10px] text-center">U1</span>
+                            <div class="flex flex-col pl-2">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <div class="u-icon"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+                                    <span class="font-black text-[9px] uppercase text-white tracking-widest">Alignment</span>
+                                    <span class="text-[7px] text-zinc-600 uppercase">Base_Refinement</span>
+                                </div>
+                                <span class="text-[8px] text-zinc-400 leading-tight pr-4">Shared understanding and basic goal definition. Baseline session stability.</span>
+                            </div>
+                            <span class="stat-col c1">9.8</span>
+                            <span class="stat-col c2">0.2</span>
+                            <span class="stat-col c3">LOW</span>
+                            <span class="stat-col c4">BAL</span>
+                        </div>
+
+                        <!-- U2 -->
+                        <div class="u-row" data-val="2" onclick="toggleSelection(event, 2)">
+                            <div class="u-check flex justify-center"><input type="checkbox" class="accent-accent-bright" id="check-2"></div>
+                            <span class="u-id font-mono text-[10px] text-center">U2</span>
+                            <div class="flex flex-col pl-2">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <div class="u-icon"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 21h6m-3-18a7 7 0 00-7 7c0 2.5 1.5 4.5 3 5.5l1 2.5h6l1-2.5c1.5-1 3-3 3-5.5a7 7 0 00-7-7z"/></svg></div>
+                                    <span class="font-black text-[9px] uppercase text-white tracking-widest">Drafting</span>
+                                    <span class="text-[7px] text-zinc-600 uppercase">Expansion_Mode</span>
+                                </div>
+                                <span class="text-[8px] text-zinc-400 leading-tight pr-4">Exploring the solution space. Prioritizing variety over immediate decisions.</span>
+                            </div>
+                            <span class="stat-col c1">4.2</span>
+                            <span class="stat-col c2">8.9</span>
+                            <span class="stat-col c3">HIGH</span>
+                            <span class="stat-col c4">GEN</span>
+                        </div>
+
+                        <!-- U3 -->
+                        <div class="u-row" data-val="3" onclick="toggleSelection(event, 3)">
+                            <div class="u-check flex justify-center"><input type="checkbox" class="accent-accent-bright" id="check-3"></div>
+                            <span class="u-id font-mono text-[10px] text-center">U3</span>
+                            <div class="flex flex-col pl-2">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <div class="u-icon"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg></div>
+                                    <span class="font-black text-[9px] uppercase text-white tracking-widest">Decision</span>
+                                    <span class="text-[7px] text-zinc-600 uppercase">Commitment_Phase</span>
+                                </div>
+                                <span class="text-[8px] text-zinc-400 leading-tight pr-4">Narrowing focus to concrete technical choices and binary commitments.</span>
+                            </div>
+                            <span class="stat-col c1">9.9</span>
+                            <span class="stat-col c2">0.1</span>
+                            <span class="stat-col c3">MED</span>
+                            <span class="stat-col c4">VAL</span>
+                        </div>
+
+                        <!-- U4 -->
+                        <div class="u-row" data-val="4" onclick="toggleSelection(event, 4)">
+                            <div class="u-check flex justify-center"><input type="checkbox" class="accent-accent-bright" id="check-4"></div>
+                            <span class="u-id font-mono text-[10px] text-center">U4</span>
+                            <div class="flex flex-col pl-2">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <div class="u-icon"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                                    <span class="font-black text-[9px] uppercase text-white tracking-widest">Audit</span>
+                                    <span class="text-[7px] text-zinc-600 uppercase">Vulnerability_Check</span>
+                                </div>
+                                <span class="text-[8px] text-zinc-400 leading-tight pr-4">Adversarial check. Finding weak points and potential system failures.</span>
+                            </div>
+                            <span class="stat-col c1">8.5</span>
+                            <span class="stat-col c2">4.4</span>
+                            <span class="stat-col c3">MAX</span>
+                            <span class="stat-col c4">VAL</span>
+                        </div>
+
+                        <!-- U5 -->
+                        <div class="u-row" data-val="5" onclick="toggleSelection(event, 5)">
+                            <div class="u-check flex justify-center"><input type="checkbox" class="accent-accent-bright" id="check-5"></div>
+                            <span class="u-id font-mono text-[10px] text-center">U5</span>
+                            <div class="flex flex-col pl-2">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <div class="u-icon"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+                                    <span class="font-black text-[9px] uppercase text-white tracking-widest">Structure</span>
+                                    <span class="text-[7px] text-zinc-600 uppercase">Schema_Mapping</span>
+                                </div>
+                                <span class="text-[8px] text-zinc-400 leading-tight pr-4">Defining entities, relationships, and the overall information layout.</span>
+                            </div>
+                            <span class="stat-col c1">9.5</span>
+                            <span class="stat-col c2">0.5</span>
+                            <span class="stat-col c3">MED</span>
+                            <span class="stat-col c4">BAL</span>
+                        </div>
+
+                        <!-- U6 -->
+                        <div class="u-row" data-val="6" onclick="toggleSelection(event, 6)">
+                            <div class="u-check flex justify-center"><input type="checkbox" class="accent-accent-bright" id="check-6"></div>
+                            <span class="u-id font-mono text-[10px] text-center">U6</span>
+                            <div class="flex flex-col pl-2">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <div class="u-icon"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+                                    <span class="font-black text-[9px] uppercase text-white tracking-widest">Logic</span>
+                                    <span class="text-[7px] text-zinc-600 uppercase">Validation_Pass</span>
+                                </div>
+                                <span class="text-[8px] text-zinc-400 leading-tight pr-4">Hardening state transitions and strict logic gates.</span>
+                            </div>
+                            <span class="stat-col c1">10.0</span>
+                            <span class="stat-col c2">0.0</span>
+                            <span class="stat-col c3">DEEP</span>
+                            <span class="stat-col c4">VAL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SESSIONS LIST -->
+            <div id="session-list" class="flex flex-col gap-1 overflow-y-auto max-h-32 mb-2"></div>
+
+            <div class="flex gap-2 h-10 shrink-0">
+                <button onclick="toggleDrawer('config')" class="menu-chunk flex-1 group">
+                    <div class="chunk-inner flex items-center justify-center h-full gap-2">
+                        <svg class="w-3 h-3 text-accent-mid" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-accent-bright">Parameters</span>
+                    </div>
+                </button>
+                <button onclick="toggleDrawer('settings')" class="menu-chunk flex-1 group">
+                    <div class="chunk-inner flex items-center justify-center h-full gap-2">
+                        <svg class="w-3 h-3 text-accent-mid" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-accent-bright">Preferences</span>
+                    </div>
+                </button>
+            </div>
+
+            <button onclick="createNewSession()" class="menu-chunk active:scale-95 transition-all shrink-0">
+                <div class="bolt t-l"></div><div class="bolt t-r"></div>
+                <div class="bolt b-l"></div><div class="bolt b-r"></div>
+                <div class="chunk-inner py-4 text-center flex items-center justify-center gap-4">
+                    <svg class="w-5 h-5 text-accent-bright" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span class="font-black text-accent-bright text-xs tracking-[0.5em] uppercase">Deploy_Machinery</span>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- CONFIG DRAWER -->
+    <div id="drawer-config" class="drawer">
+        <div class="menu-chunk m-2">
+            <div class="bolt t-l"></div><div class="bolt t-r"></div>
+            <div class="chunk-inner space-y-4 pb-6">
+                <span class="text-[10px] font-black text-accent-bright uppercase tracking-widest block border-b border-white/5 pb-2">Session_Settings</span>
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-end"><span class="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">1. Question_Breadth</span><span class="val-badge" id="x-val-badge">2</span></div>
+                        <input type="range" id="config-x" min="1" max="10" value="2" oninput="updateSlider('x')">
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-end"><span class="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">2. Option_Density</span><span class="val-badge" id="y-val-badge">3</span></div>
+                        <input type="range" id="config-y" min="0" max="10" value="3" oninput="updateSlider('y')">
+                    </div>
+                    <div class="stat-grid">
+                        <span class="text-[8px] font-black text-zinc-500 uppercase">3. Internal_Loops</span>
+                        <span class="val-badge" id="loop-val-badge">1</span>
+                    </div>
+                    <input type="range" id="config-discussion" min="1" max="5" value="1" oninput="updateSlider('loop')">
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-4">
+                    <div class="flex gap-1" id="m-selector">
+                        <div class="square-btn active flex-1 h-8 text-[7px]" data-val="1" onclick="setSquare('m', 1)">M1</div>
+                        <div class="square-btn flex-1 h-8 text-[7px]" data-val="2" onclick="setSquare('m', 2)">M2</div>
+                        <div class="square-btn flex-1 h-8 text-[7px]" data-val="3" onclick="setSquare('m', 3)">M3</div>
+                    </div>
+                    <div class="flex gap-1" id="depth-selector">
+                        <div class="square-btn active flex-1 h-8 text-[7px]" data-val="STANDARD" onclick="setSquare('depth', 'STANDARD')">STD</div>
+                        <div class="square-btn flex-1 h-8 text-[7px]" data-val="DEEP" onclick="setSquare('depth', 'DEEP')">DEEP</div>
+                    </div>
+                </div>
+                <button onclick="toggleDrawer(null)" class="w-full text-[8px] text-zinc-700 uppercase tracking-[0.4em] pt-4">Close_Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORLD DRAWER -->
+    <div id="drawer-world" class="drawer">
+        <div class="menu-chunk m-2">
+            <div class="bolt t-l"></div><div class="bolt t-r"></div>
+            <div class="chunk-inner space-y-4 pb-6">
+                <span class="text-[10px] font-black text-accent-bright uppercase tracking-widest block border-b border-white/5 pb-2">Global_Controls</span>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center bg-black/40 p-2 border border-white/5">
+                        <div class="flex flex-col"><span class="text-[9px] font-black text-white uppercase">Dual_Reasoning</span><span class="text-[7px] text-zinc-600 uppercase">Analysis vs Synthesis</span></div>
+                        <label class="switch"><input type="checkbox" id="toggle-duality" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="flex justify-between items-center bg-black/40 p-2 border border-white/5">
+                        <div class="flex flex-col"><span class="text-[9px] font-black text-white uppercase">Detail_Level</span><span class="text-[7px] text-zinc-600 uppercase">Standard vs High</span></div>
+                        <label class="switch"><input type="checkbox" id="toggle-depth"><span class="slider"></span></label>
+                    </div>
+                    <div class="flex justify-between items-center bg-black/40 p-2 border border-white/5">
+                        <div class="flex flex-col"><span class="text-[9px] font-black text-white uppercase">Session_Pacing</span><span class="text-[7px] text-zinc-600 uppercase">Continuous vs Pulsed</span></div>
+                        <label class="switch"><input type="checkbox" id="toggle-flow" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="flex justify-between items-center bg-black/40 p-2 border border-white/5">
+                        <div class="flex flex-col"><span class="text-[9px] font-black text-white uppercase">Risk_Handling</span><span class="text-[7px] text-zinc-600 uppercase">Stable vs Stress</span></div>
+                        <label class="switch"><input type="checkbox" id="toggle-failure"><span class="slider"></span></label>
+                    </div>
+                </div>
+                <button onclick="toggleDrawer(null)" class="w-full text-[8px] text-zinc-700 uppercase tracking-[0.4em] pt-4">Close_Controls</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS DRAWER -->
+    <div id="drawer-settings" class="drawer">
+        <div class="menu-chunk m-2">
+            <div class="bolt t-l"></div><div class="bolt t-r"></div>
+            <div class="chunk-inner space-y-4 pb-6">
+                <span class="text-[10px] font-black text-accent-bright uppercase tracking-widest block border-b border-white/5 pb-2">Interface_Theme</span>
+                <div id="theme-list" class="space-y-1">
+                    <div class="theme-item active" onclick="setTheme('sanguine')" data-theme="sanguine"><span class="text-[9px] font-black uppercase">Sanguine</span><div class="swatch" style="background-color: #cc2424;"></div></div>
+                    <div class="theme-item" onclick="setTheme('cobalt')" data-theme="cobalt"><span class="text-[9px] font-black uppercase">Cobalt</span><div class="swatch" style="background-color: #245bcc;"></div></div>
+                    <div class="theme-item" onclick="setTheme('emerald')" data-theme="emerald"><span class="text-[9px] font-black uppercase">Emerald</span><div class="swatch" style="background-color: #24cc24;"></div></div>
+                    <div class="theme-item" onclick="setTheme('neon')" data-theme="neon"><span class="text-[9px] font-black uppercase">Neon</span><div class="swatch" style="background-color: #cc24cc;"></div></div>
+                    <div class="theme-item" onclick="setTheme('mono')" data-theme="mono"><span class="text-[9px] font-black uppercase">Mono</span><div class="swatch" style="background-color: #ffffff;"></div></div>
+                    <div class="theme-item" onclick="setTheme('nuclear')" data-theme="nuclear"><span class="text-[9px] font-black uppercase">Nuclear</span><div class="swatch" style="background-color: #24b0cc;"></div></div>
+                    <div class="theme-item" onclick="setTheme('crimson')" data-theme="crimson"><span class="text-[9px] font-black uppercase">Crimson</span><div class="swatch" style="background-color: #ff0000;"></div></div>
+                    <div class="theme-item" onclick="setTheme('toxic')" data-theme="toxic"><span class="text-[9px] font-black uppercase">Toxic</span><div class="swatch" style="background-color: #99cc24;"></div></div>
+                    <div class="theme-item" onclick="setTheme('retro')" data-theme="retro"><span class="text-[9px] font-black uppercase">Retro</span><div class="swatch" style="background-color: #cc9924;"></div></div>
+                </div>
+                <button onclick="toggleDrawer(null)" class="w-full text-[8px] text-zinc-700 uppercase tracking-[0.4em] pt-4">Close_Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORKSPACE VIEW -->
+    <div id="workspace-view" class="hidden flex-1 flex flex-col overflow-hidden relative z-10">
+        <header class="bg-black/80 border-b border-white/5 h-12 flex items-center px-4 justify-between shrink-0">
+            <div class="flex items-center gap-2 h-full">
+                <div class="nav-tab active" onclick="setTab('init')"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-width="2"/></svg></div>
+                <div class="nav-tab" onclick="setTab('ctrl')"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17h18M3 12h18M3 7h18M7 5v4M12 10v4M17 15v4" stroke-width="2"/></svg></div>
+                <div class="nav-tab" onclick="setTab('exec')"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 17l6-6-6-6M12 19h8" stroke-width="2"/></svg></div>
+                <div class="nav-tab" onclick="setTab('res')"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5a5 5 0 110-10 5 5 0 010 10z" stroke-width="2"/></svg></div>
+                <div class="w-[1px] h-4 bg-white/10 mx-2"></div>
+                <div id="active-session-title" class="font-black text-white uppercase text-[8px] tracking-widest">SESSION</div>
+                <div id="state-anchor" class="text-accent-mid font-mono text-[7px]">[U1|M1|RND1]</div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-1 bg-black/40 p-1 rounded border border-white/5">
+                    <button class="icon-btn p-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm1 5h-2v7h5v-2h-3V7z" stroke-width="2"/></svg></button>
+                    <button onclick="toggleDrawer('world')" class="icon-btn p-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke-width="2"/></svg></button>
+                </div>
+                <button onclick="showLanding()" class="icon-btn"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+            </div>
+        </header>
+        <main id="chat-feed" class="flex-1 overflow-y-auto space-y-2 p-3 mx-2 my-2"></main>
+        <footer class="h-16 menu-chunk mx-2 mb-2 shrink-0">
+            <div class="chunk-inner h-full flex gap-2 p-1">
+                <textarea id="user-input" class="flex-1 bg-black/40 outline-none p-2 text-white text-[11px] resize-none" placeholder="Type here..."></textarea>
+                <button onclick="sendMessage()" id="send-btn" class="w-16 bg-accent-muted/20 border border-accent-muted text-accent-bright flex items-center justify-center transition-all active:scale-95"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let config = { u: 1, m: 1, depth: "STANDARD", x: 2, y: 3, discussion_depth: 1, selected_u: [1] };
+        let activeDrawer = null;
+        let currentSessionId = null;
+        let sessionData = null;
+        let currentTab = 'init';
+
+        function setTheme(t) { 
+            document.body.setAttribute('data-theme', t); localStorage.setItem('mrre_theme', t);
+            document.querySelectorAll('.theme-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
+        }
+        setTheme(localStorage.getItem('mrre_theme') || 'sanguine');
+
+        function toggleDrawer(id) {
+            if (activeDrawer) document.getElementById(`drawer-${activeDrawer}`).classList.remove('active');
+            if (id && activeDrawer !== id) { document.getElementById(`drawer-${id}`).classList.add('active'); activeDrawer = id; } 
+            else { activeDrawer = null; }
+        }
+
+        function showTooltip(event, type) {
+            const tooltip = document.getElementById('icon-tooltip');
+            const data = {
+                'strict': { label: 'Strictness', desc: 'How tightly the system enforces logic gates and definitions.' },
+                'flex': { label: 'Flexibility', desc: 'The level of creative freedom or "noise" allowed in the session.' },
+                'load': { label: 'Complexity', desc: 'The cognitive weight or detail required for the current round.' },
+                'dir': { label: 'Direction', desc: 'Whether the engine is pushing to narrow down (VAL) or expand (GEN).' }
+            };
+            const item = data[type];
+            tooltip.innerHTML = `<div class="font-black text-accent-bright mb-1">${item.label}</div><div class="leading-tight text-zinc-500 lowercase">${item.desc}</div>`;
+            
+            const rect = event.currentTarget.getBoundingClientRect();
+            const parentRect = event.currentTarget.offsetParent.getBoundingClientRect();
+            
+            tooltip.style.display = 'block';
+            tooltip.style.right = (parentRect.right - rect.right) + 'px';
+            tooltip.style.top = (rect.bottom - parentRect.top + 5) + 'px';
+            
+            // Hide on next click elsewhere
+            setTimeout(() => {
+                const hide = () => { tooltip.style.display = 'none'; document.removeEventListener('click', hide); };
+                document.addEventListener('click', hide);
+            }, 10);
+        }
+
+        function setTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.nav-tab').forEach((el, i) => {
+                const tabs = ['init', 'ctrl', 'exec', 'res'];
+                el.classList.toggle('active', tabs[i] === tab);
+            });
+            console.log(`Tab switched to: ${tab}`);
+            // Logic for tab content switching can be added here
+        }
+
+        function toggleSelection(event, val) {
+            if (!config.selected_u) config.selected_u = [];
+            if (config.selected_u.includes(val)) {
+                config.selected_u = config.selected_u.filter(v => v !== val);
+            } else {
+                config.selected_u.push(val);
+            }
+            if (config.selected_u.length === 0) config.selected_u = [1];
+            
+            document.querySelectorAll('.u-row').forEach(row => {
+                const v = parseInt(row.dataset.val);
+                const isSelected = config.selected_u.includes(v);
+                row.classList.toggle('active', isSelected);
+                const check = row.querySelector('input[type="checkbox"]');
+                if (check) check.checked = isSelected;
+            });
+            config.u = config.selected_u[0]; 
+        }
+
+        function setSquare(group, val) {
+            if (group === 'discussion') config.discussion_depth = val; else config[group] = val;
+            document.querySelectorAll(`#${group}-selector .square-btn`).forEach(btn => btn.classList.toggle('active', btn.dataset.val == val));
+        }
+
+        function updateSlider(id) {
+            const slider = document.getElementById(`config-${id === 'loop' ? 'discussion' : id}`);
+            config[id === 'loop' ? 'discussion_depth' : id] = parseInt(slider.value);
+            document.getElementById(`${id}-val-badge`).innerText = slider.value;
+        }
+
+        async function loadSessions() {
+            try {
+                const res = await fetch('/api/sessions');
+                const sessions = await res.json();
+                const list = document.getElementById('session-list');
+                if (!list) return;
+                list.innerHTML = '';
+                sessions.forEach(s => {
+                    const div = document.createElement('div');
+                    div.className = "menu-chunk cursor-pointer mb-2 hover:border-accent-bright transition-colors";
+                    div.innerHTML = `<div class="chunk-inner py-2 px-4 flex justify-between items-center">
+                        <span class="text-[9px] font-black text-white uppercase">${s.name}</span>
+                        <span class="text-[7px] text-zinc-500 uppercase">U${s.config.u} | ID: ${s.id.slice(0,6)}</span>
+                    </div>`;
+                    div.onclick = () => loadSession(s.id);
+                    list.appendChild(div);
+                });
+            } catch (e) { console.error("Failed to load sessions", e); }
+        }
+
+        async function createNewSession() {
+            const name = document.getElementById('new-session-name').value || "ANON_UNIT";
+            const res = await fetch('/api/sessions', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, config}) });
+            const data = await res.json(); loadSession(data.id);
+        }
+
+        async function loadSession(id) {
+            currentSessionId = id; 
+            document.getElementById('landing-view').classList.add('hidden');
+            document.getElementById('workspace-view').classList.remove('hidden'); 
+            await refreshSessionData();
+            if (sessionData && sessionData.history.length <= 1) await sendMessage("INITIALIZE_SESSION", true);
+        }
+
+        function showLanding() { 
+            document.getElementById('landing-view').classList.remove('hidden'); 
+            document.getElementById('workspace-view').classList.add('hidden'); 
+            loadSessions();
+        }
+
+        async function refreshSessionData() {
+            if(!currentSessionId) return;
+            try {
+                const res = await fetch(`/api/sessions/${currentSessionId}`); 
+                sessionData = await res.json();
+                document.getElementById('active-session-title').innerText = sessionData.name;
+                const c = sessionData.config; 
+                document.getElementById('state-anchor').innerText = `[U${c.u}|M${c.m}|RND${sessionData.round}]`;
+                renderChatFeed();
+            } catch (e) { console.error("Failed to refresh session", e); }
+        }
+
+        function renderChatFeed() {
+            const feed = document.getElementById('chat-feed'); 
+            if (!feed) return;
+            feed.innerHTML = '';
+            if (!sessionData || !sessionData.history) return;
+            
+            sessionData.history.forEach(msg => {
+                const div = document.createElement('div'); div.className = "chat-msg";
+                const content = typeof marked !== 'undefined' ? marked.parse(msg.content) : msg.content;
+                if(msg.role === 'ai') div.innerHTML = `<div class="font-black text-accent-bright uppercase text-[7px] mb-1 tracking-widest">${msg.agent_name || 'AGENT'}</div><div class="text-zinc-400 text-[10px] prose-invert prose-xs max-w-none">${content}</div>`;
+                else if(msg.role === 'user') div.innerHTML = `<div class="font-black text-zinc-600 uppercase text-[7px] mb-1 tracking-widest">USER</div><div class="text-zinc-200 text-[10px] whitespace-pre-wrap">${msg.content}</div>`;
+                else if(msg.role === 'system') div.innerHTML = `<div class="font-black text-zinc-500 uppercase text-[7px] mb-1 tracking-widest">SYSTEM</div><div class="text-zinc-500 text-[10px] italic">${msg.content}</div>`;
+                feed.appendChild(div);
+            });
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        async function sendMessage(textOverride = null, isHidden = false) {
+            const input = document.getElementById('user-input');
+            const msg = textOverride || input.value.trim(); 
+            if(!msg) return;
+            if(!isHidden) input.value = '';
+            const btn = document.getElementById('send-btn'); 
+            if (btn) btn.disabled = true;
+            try {
+                await fetch(`/api/sessions/${currentSessionId}/chat`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({message: msg}) });
+                await refreshSessionData();
+            } catch (e) { console.error("Failed to send message", e); }
+            finally { if (btn) btn.disabled = false; }
+        }
+
+        // Initialize
+        loadSessions();
+    </script>
+</body>
+</html>

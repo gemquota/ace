@@ -1,0 +1,55 @@
+{
+  "manifest_version": "1.1.0",
+  "system_version": "3.1.0",
+  "project_root": "dev/cap",
+  "WORKSPACE_ROOT": "/data/data/com.termux/files/home/dev/cap",
+  "namespaces": [
+    "clide",
+    "apc",
+    "pie"
+  ],
+  "entry_points": {
+    "orchestrator": "core/clide/kernel/orchestrator.py",
+    "executor": "core/apc/executor.py",
+    "inference": "core/pie/inference.py",
+    "dashboard": "core/clide/dashboard/server.py",
+    "mesh_boot": "scripts/build_mesh_state.py",
+    "worker": "core.clide.worker"
+  },
+  "persistence": {
+    "events": "data/cap_events.db",
+    "swarm_broker": "redis://localhost:6379/0",
+    "self_model": "data/cap_arch_model.json"
+  },
+  "ACTIVE_NODES": [
+    {
+      "node_id": "executive-termux",
+      "role": "DISPATCHER",
+      "ip": "127.0.0.1",
+      "capabilities": [
+        "\u8f7b\u91cf\u7ea7",
+        "ALWAYS_ON",
+        "MOBILE"
+      ],
+      "load_limit": 0.5
+    },
+    {
+      "node_id": "execution-windows",
+      "role": "HEAVY_COMPUTE",
+      "ip": "100.x.y.z",
+      "capabilities": [
+        "\u9ad8\u6027\u80fd",
+        "WINDOWS_NATIVE",
+        "GPU_ENABLED"
+      ],
+      "load_limit": 0.9
+    }
+  ],
+  "capability_flags": {
+    "mesh_enabled": true,
+    "redis_backed": true,
+    "celery_dag": true
+  },
+  "operational_modality": "DISTRIBUTED_HORIZON",
+  "last_sync": "Thu Apr 9 2026"
+}

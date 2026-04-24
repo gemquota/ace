@@ -1,0 +1,76 @@
+{
+  "version": "1.0.0",
+  "subsystems": {
+    "CLIDE": {
+      "name": "CLIDE",
+      "role": "Intent Compilation",
+      "metrics": {
+        "efficiency": 1.0,
+        "success_rate": 1.0,
+        "latency": 0.0,
+        "error_count": 0
+      }
+    },
+    "APC": {
+      "name": "APC",
+      "role": "Action Execution",
+      "metrics": {
+        "efficiency": 1.0,
+        "success_rate": 1.0,
+        "latency": 0.0,
+        "error_count": 0
+      }
+    },
+    "PIE": {
+      "name": "PIE",
+      "role": "Inference & Analysis",
+      "metrics": {
+        "efficiency": 1.0,
+        "success_rate": 1.0,
+        "latency": 0.0,
+        "error_count": 0
+      }
+    },
+    "MEMORY": {
+      "name": "MEMORY",
+      "role": "Historical Learning",
+      "metrics": {
+        "efficiency": 1.0,
+        "success_rate": 1.0,
+        "latency": 0.0,
+        "error_count": 0
+      }
+    },
+    "ORCHESTRATOR": {
+      "name": "ORCHESTRATOR",
+      "role": "Planning & Scheduling",
+      "metrics": {
+        "efficiency": 1.0,
+        "success_rate": 1.0,
+        "latency": 0.0,
+        "error_count": 0
+      }
+    },
+    "SOVEREIGN": {
+      "name": "SOVEREIGN",
+      "role": "Autonomous Goal Generation",
+      "metrics": {
+        "efficiency": 1.0,
+        "success_rate": 1.0,
+        "latency": 0.0,
+        "error_count": 0
+      }
+    }
+  },
+  "meta_metrics": {
+    "learning_efficiency": 0.0,
+    "planning_accuracy": 0.0,
+    "execution_variance": 0.0,
+    "explore_vs_exploit_ratio": 0.5
+  },
+  "config_overrides": {
+    "MEMORY.increase_pattern_decay_rate": {
+      "decay_rate": 0.2
+    }
+  }
+}

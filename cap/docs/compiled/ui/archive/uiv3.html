@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CATEGORY 1 // SUBCATEGORY_1</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --red-muted: #661414;
+            --red-mid: #8a1a1a;
+            --red-bright: #cc2424;
+            --cyan-dim: #1a5c66;
+            --border-muted: rgba(102, 20, 20, 0.4);
+            --metal-shine: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 45%, #333 50%, #1a1a1a 55%, #111 100%);
+            --glass-bg: rgba(15, 15, 15, 0.7);
+            --trans-timing: 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        /* STRICT VIEWPORT LOCKING */
+        body, html {
+            margin: 0; padding: 0; width: 100vw; height: 100vh;
+            background-color: var(--bg-deep); color: #999;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            overflow: hidden; touch-action: none; overscroll-behavior: none;
+        }
+
+        .bg-lines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--border-muted) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--border-muted) 1px, transparent 1px);
+            background-size: 60px 60px; opacity: 0.04; z-index: 0; pointer-events: none;
+        }
+
+        #app-container {
+            position: relative; width: 100vw; height: 100vh; z-index: 10;
+            display: flex; flex-direction: column;
+        }
+
+        /* TOP DOCK FOR MINIMIZED MODULES */
+        /* Anchored physically to maintain bounding box accuracy, hidden visually */
+        #top-dock {
+            position: absolute; top: 0; left: 0; width: 100%; height: 80px;
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+            background: linear-gradient(to bottom, rgba(5,5,5,0.95), transparent);
+            border-bottom: 1px solid rgba(102, 20, 20, 0.3); backdrop-filter: blur(5px);
+            z-index: 200; pointer-events: none; opacity: 0; transition: opacity 0.5s ease;
+            padding-left: 60px; box-sizing: border-box;
+        }
+        #top-dock.active { opacity: 1; pointer-events: auto; }
+
+        .dock-slot { width: 45px; height: 45px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 4px; }
+
+        /* FULL WIDTH CONTENT */
+        #content-wrapper {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            overflow-y: auto; overflow-x: hidden; background: transparent; z-index: 1;
+            padding-top: 20px; transition: padding-top 0.5s ease;
+        }
+        body.dock-active #content-wrapper { padding-top: 90px; }
+
+        #content {
+            padding: 60px 5vw; max-width: 1400px; margin: 0 auto;
+            background: radial-gradient(circle at top right, rgba(13,13,13,0.8), rgba(5,5,5,0.9));
+            min-height: 100%; box-sizing: border-box;
+        }
+
+        /* STYLIZED GLOBAL TOGGLE ICON */
+        #global-toggle {
+            position: fixed; top: 20px; left: 20px; z-index: 1000;
+            width: 40px; height: 40px; background: var(--glass-bg);
+            border: 1px solid var(--red-muted); border-radius: 4px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 15px rgba(204, 36, 36, 0.2);
+            cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px;
+            transition: all 0.4s; overflow: hidden;
+        }
+        #global-toggle:hover { border-color: var(--red-bright); background: rgba(30, 30, 30, 0.9); box-shadow: 0 0 20px rgba(204, 36, 36, 0.4); }
+        .tg-part { width: 20px; height: 2px; background: var(--red-bright); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .tg-part:nth-child(2) { width: 14px; }
+        
+        #global-toggle.all-minimized .tg-part:nth-child(1) { transform: translateY(6px) rotate(45deg); width: 24px; }
+        #global-toggle.all-minimized .tg-part:nth-child(2) { opacity: 0; transform: translateX(10px); }
+        #global-toggle.all-minimized .tg-part:nth-child(3) { transform: translateY(-6px) rotate(-45deg); width: 24px; }
+
+        /* SIDEBAR AREA */
+        #sidebar-scroll-area {
+            position: absolute; top: 0; left: 0; width: 380px; height: 100vh;
+            padding: 90px 20px 20px 20px; box-sizing: border-box;
+            overflow-y: auto; overflow-x: visible; pointer-events: auto;
+            scrollbar-width: none; z-index: 100;
+        }
+        #sidebar-scroll-area::-webkit-scrollbar { display: none; }
+
+        /* MODULES & TRANSFORMER ANIMATION */
+        .menu-chunk {
+            margin-bottom: 20px; position: relative; width: 100%;
+            transform-style: preserve-3d; perspective: 1000px; border-radius: 4px;
+            transition: top var(--trans-timing), left var(--trans-timing), width var(--trans-timing), height var(--trans-timing), box-shadow 0.3s;
+        }
+
+        /* Tangram Assembly Backgrounds */
+        .t-bg {
+            position: absolute; background: var(--metal-shine); border: 1px solid #111;
+            box-shadow: inset 1px 1px 0 rgba(255,255,255,0.05), inset -1px -1px 0 rgba(0,0,0,0.8);
+            transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.8s;
+            pointer-events: none; z-index: 0; border-radius: 2px;
+        }
+        .t-bg::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/brushed-alum.png");
+            opacity: 0.15; mix-blend-mode: overlay;
+        }
+        
+        .t-1 { top: 0; left: 0; width: 100%; height: 15px; } 
+        .t-2 { top: 18px; left: 0; width: 35px; height: calc(100% - 18px); } 
+        .t-3 { top: 18px; left: 38px; width: calc(100% - 38px); height: calc(100% - 38px); } 
+        .t-4 { bottom: 0; left: 38px; width: calc(100% - 38px); height: 17px; background: rgba(204, 36, 36, 0.15); } 
+
+        /* Disassembled Intro State */
+        .disassembled .t-1 { transform: translateY(-80px) rotateX(90deg); opacity: 0; }
+        .disassembled .t-2 { transform: translateX(-80px) rotateY(-90deg); opacity: 0; }
+        .disassembled .t-3 { transform: translateZ(-300px) rotateZ(10deg) scale(0.8); opacity: 0; }
+        .disassembled .t-4 { transform: translateY(80px) rotateX(-90deg); opacity: 0; }
+
+        /* Inner Content */
+        .chunk-inner {
+            margin: 6px; background: rgba(10, 10, 10, 0.6); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.03); box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            padding: 15px; position: relative; z-index: 2;
+            transition: opacity 0.3s ease, visibility 0.3s;
+        }
+        .disassembled .chunk-inner { opacity: 0; pointer-events: none; }
+
+        /* Bolts */
+        .bolt {
+            position: absolute; width: 6px; height: 6px; background: #222; border-radius: 50%;
+            box-shadow: inset 1px 1px 1px rgba(255,255,255,0.1), 1px 1px 2px rgba(0,0,0,0.9); z-index: 5;
+            transition: opacity 0.4s;
+        }
+        .t-l { top: 6px; left: 6px; } .t-r { top: 6px; right: 6px; }
+        .b-l { bottom: 6px; left: 6px; } .b-r { bottom: 6px; right: 6px; }
+        .disassembled .bolt { opacity: 0; }
+
+        /* MINIMIZED GRID STATE */
+        .menu-chunk.minimized {
+            cursor: pointer; overflow: hidden; background: var(--metal-shine); border: 1px solid #222;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.9), inset 0 0 15px rgba(204, 36, 36, 0.1);
+        }
+        .menu-chunk.minimized:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.9), 0 0 20px rgba(204, 36, 36, 0.4); transform: translateY(-3px); border-color: var(--red-muted); }
+        
+        .menu-chunk.minimized .t-bg,
+        .menu-chunk.minimized .chunk-inner,
+        .menu-chunk.minimized .bolt { opacity: 0; visibility: hidden; pointer-events: none; }
+        
+        .minimized-icon {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: var(--red-bright);
+            opacity: 0; z-index: 10; transition: opacity 0.5s ease 0.2s; pointer-events: none;
+            text-shadow: 0 0 8px rgba(204, 36, 36, 0.6);
+        }
+        .menu-chunk.minimized .minimized-icon { opacity: 1; }
+
+        /* Internal UI Elements */
+        .brand {
+            font-size: 0.85em; font-weight: bold; color: #fff; text-align: center;
+            letter-spacing: 5px; padding-bottom: 10px; margin-bottom: 5px;
+            border-bottom: 1px solid var(--red-muted); text-transform: uppercase;
+            text-shadow: 0 0 10px var(--red-muted);
+        }
+
+        .tier-1-header {
+            color: var(--red-bright); font-size: 0.7em; text-transform: uppercase;
+            letter-spacing: 3px; padding: 0 0 10px 0; font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 8px; display: flex; justify-content: space-between;
+        }
+
+        .tier-2-wrapper { margin-bottom: 6px; }
+        .tier-2-header {
+            color: #ccc; font-size: 0.65em; text-transform: uppercase; letter-spacing: 1.5px;
+            padding: 10px 12px; background: rgba(0, 0, 0, 0.4); border-left: 2px solid var(--red-muted);
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+        }
+        .tier-2-header::after { content: '⚙'; font-size: 1em; color: #555; transition: transform 0.4s; }
+        .tier-2-wrapper.active .tier-2-header::after { transform: rotate(180deg); color: var(--red-bright); }
+
+        .tier-3-container { max-height: 0; overflow: hidden; transition: max-height 0.4s; background: rgba(0,0,0,0.6); opacity: 0; }
+        .tier-2-wrapper.active .tier-3-container { max-height: 1000px; opacity: 1; }
+
+        .doc-link {
+            display: block; padding: 8px 15px; color: #666; text-decoration: none; cursor: pointer;
+            font-size: 0.75em; border-bottom: 1px solid rgba(255,255,255,0.01);
+        }
+        .doc-link:hover { color: #aaa; background: rgba(255, 255, 255, 0.03); padding-left: 20px; }
+        .doc-link.active { color: #fff; background: rgba(138, 26, 26, 0.3); border-right: 3px solid var(--red-bright); }
+
+        #content h1 { color: #eee; border-bottom: 2px solid var(--red-muted); padding-bottom: 15px; }
+        #content h2 { color: #8a1a1a; font-size: 1.5em; margin-top: 50px; }
+        #content p, #content li { line-height: 1.8; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="bg-lines"></div>
+
+    <div id="global-toggle" onclick="toggleAll()" title="Minimize / Restore Subsystems">
+        <div class="tg-part"></div><div class="tg-part"></div><div class="tg-part"></div>
+    </div>
+
+    <div id="top-dock"></div>
+
+    <div id="app-container">
+        <div id="content-wrapper">
+            <div id="content">
+                <h1 style="text-align:center; margin-top: 25vh; border:none; color: #222; font-size: 4em; letter-spacing: 20px;">00</h1>
+            </div>
+        </div>
+
+        <div id="sidebar-scroll-area">
+            <div id="menu-chunks"></div>
+        </div>
+    </div>
+
+    <script>
+        const docsData = {
+            "CATEGORY 1": {
+                "SUBCATEGORY 1": {
+                    "FILE 1": "# HEADER 1\n\n## HEADER 2\nBODY 1\n\n* LIST 1\n* LIST 2",
+                    "FILE 2": "# HEADER 3\n\n## HEADER 4\nBODY 2"
+                },
+                "SUBCATEGORY 2": {
+                    "FILE 3": "# HEADER 5\n\nBODY 3"
+                }
+            },
+            "CATEGORY 2": {
+                "SUBCATEGORY 3": {
+                    "FILE 4": "# HEADER 6\n\nBODY 4"
+                }
+            }
+        };
+
+        const icons = ['◰', '◳', '◱', '◲'];
+        let chunkRegistry = [];
+
+        function initArchitecture() {
+            const menuContainer = document.getElementById('menu-chunks');
+            const topDock = document.getElementById('top-dock');
+            let chunkIndex = 0;
+
+            for (const [catName, subcats] of Object.entries(docsData)) {
+                const id = 'chunk-' + chunkIndex;
+                chunkRegistry.push({ id, isMinimized: false, height: 0 });
+                
+                // Dock Slot Setup
+                const slot = document.createElement('div');
+                slot.className = 'dock-slot';
+                slot.id = 'slot-' + id;
+                topDock.appendChild(slot);
+
+                // Menu Module Setup
+                const chunk = document.createElement('div');
+                chunk.className = 'menu-chunk disassembled';
+                chunk.id = id;
+                
+                chunk.onclick = (e) => {
+                    if (chunk.classList.contains('minimized')) {
+                        e.stopPropagation();
+                        toggleMinimize(id);
+                    }
+                };
+
+                // Tangram Backgrounds
+                ['t-1','t-2','t-3','t-4'].forEach(cls => {
+                    const tbg = document.createElement('div');
+                    tbg.className = `t-bg ${cls}`;
+                    chunk.appendChild(tbg);
+                });
+
+                // Minimized Icon
+                const minIcon = document.createElement('div');
+                minIcon.className = 'minimized-icon';
+                minIcon.textContent = icons[chunkIndex % icons.length];
+                chunk.appendChild(minIcon);
+
+                // Industrial Bolts
+                ['t-l', 't-r', 'b-l', 'b-r'].forEach(pos => {
+                    const bolt = document.createElement('div'); 
+                    bolt.className = `bolt ${pos}`; 
+                    chunk.appendChild(bolt);
+                });
+
+                const inner = document.createElement('div'); 
+                inner.className = 'chunk-inner';
+
+                const brand = document.createElement('div'); 
+                brand.className = 'brand'; 
+                brand.textContent = 'BRAND 1 // BRAND 2';
+                inner.appendChild(brand);
+
+                const catHeader = document.createElement('div'); 
+                catHeader.className = 'tier-1-header'; 
+                catHeader.innerHTML = `<span>${catName}</span>`;
+                inner.appendChild(catHeader);
+
+                for (const [subcatName, files] of Object.entries(subcats)) {
+                    const subcatWrapper = document.createElement('div'); 
+                    subcatWrapper.className = 'tier-2-wrapper active';
+                    
+                    const subcatHeader = document.createElement('div'); 
+                    subcatHeader.className = 'tier-2-header'; 
+                    subcatHeader.textContent = subcatName;
+                    subcatHeader.onclick = (e) => { e.stopPropagation(); subcatWrapper.classList.toggle('active'); };
+                    subcatWrapper.appendChild(subcatHeader);
+                    
+                    const linksContainer = document.createElement('div'); 
+                    linksContainer.className = 'tier-3-container';
+                    for (const [title, content] of Object.entries(files)) {
+                        const link = document.createElement('a'); 
+                        link.className = 'doc-link'; 
+                        link.textContent = title;
+                        link.onclick = (e) => {
+                            e.preventDefault(); e.stopPropagation();
+                            document.querySelectorAll('.doc-link').forEach(el => el.classList.remove('active'));
+                            link.classList.add('active');
+                            renderContent(content);
+                        };
+                        linksContainer.appendChild(link);
+                    }
+                    subcatWrapper.appendChild(linksContainer); 
+                    inner.appendChild(subcatWrapper);
+                }
+
+                chunk.appendChild(inner); 
+                menuContainer.appendChild(chunk);
+                chunkIndex++;
+            }
+
+            // Trigger Unfolding Animation
+            setTimeout(() => {
+                document.querySelectorAll('.menu-chunk').forEach((el, idx) => {
+                    setTimeout(() => { el.classList.remove('disassembled'); }, idx * 200);
+                });
+            }, 150);
+
+            checkRestoreState();
+        }
+
+        // FLIP Engine 
+        function toggleMinimize(id) {
+            const chunk = document.getElementById(id);
+            const slot = document.getElementById('slot-' + id);
+            const registryEntry = chunkRegistry.find(c => c.id === id);
+            
+            if (!registryEntry.isMinimized) {
+                // FLIGHT UP TO DOCK
+                registryEntry.height = chunk.offsetHeight;
+                const startRect = chunk.getBoundingClientRect();
+                
+                const placeholder = document.createElement('div');
+                placeholder.id = 'ph-' + id;
+                placeholder.style.height = startRect.height + 'px';
+                placeholder.style.marginBottom = '20px';
+                placeholder.style.transition = 'height 0.5s ease, margin 0.5s ease';
+                chunk.parentNode.insertBefore(placeholder, chunk);
+
+                // Tear out
+                chunk.style.position = 'fixed';
+                chunk.style.top = startRect.top + 'px';
+                chunk.style.left = startRect.left + 'px';
+                chunk.style.width = startRect.width + 'px';
+                chunk.style.height = startRect.height + 'px';
+                chunk.style.zIndex = '250';
+                chunk.style.margin = '0';
+                
+                void chunk.offsetWidth; // Force Reflow
+
+                chunk.classList.add('minimized');
+                const endRect = slot.getBoundingClientRect();
+                
+                chunk.style.top = endRect.top + 'px';
+                chunk.style.left = endRect.left + 'px';
+                chunk.style.width = endRect.width + 'px';
+                chunk.style.height = endRect.height + 'px';
+
+                requestAnimationFrame(() => {
+                    placeholder.style.height = '0px';
+                    placeholder.style.marginBottom = '0px';
+                });
+
+                registryEntry.isMinimized = true;
+            } else {
+                // FLIGHT DOWN TO LIST
+                const placeholder = document.getElementById('ph-' + id);
+                
+                placeholder.style.height = registryEntry.height + 'px';
+                placeholder.style.marginBottom = '20px';
+
+                setTimeout(() => {
+                    const targetRect = placeholder.getBoundingClientRect();
+                    chunk.classList.remove('minimized');
+                    chunk.style.top = targetRect.top + 'px';
+                    chunk.style.left = targetRect.left + 'px';
+                    chunk.style.width = targetRect.width + 'px';
+                    chunk.style.height = targetRect.height + 'px';
+
+                    setTimeout(() => {
+                        if(!registryEntry.isMinimized) { 
+                            chunk.style.position = 'relative';
+                            chunk.style.top = ''; chunk.style.left = '';
+                            chunk.style.width = '100%'; chunk.style.height = 'auto';
+                            chunk.style.zIndex = '';
+                            if(placeholder) placeholder.remove();
+                        }
+                    }, 700); 
+                }, 50);
+
+                registryEntry.isMinimized = false;
+            }
+            evaluateGlobalState();
+        }
+
+        function toggleAll() {
+            const allMin = chunkRegistry.every(c => c.isMinimized);
+            chunkRegistry.forEach((c, index) => {
+                setTimeout(() => {
+                    if (allMin && c.isMinimized) toggleMinimize(c.id);
+                    else if (!allMin && !c.isMinimized) toggleMinimize(c.id);
+                }, index * 80); // Stagger the flights slightly
+            });
+        }
+
+        function evaluateGlobalState() {
+            const allMin = chunkRegistry.every(c => c.isMinimized);
+            const anyMin = chunkRegistry.some(c => c.isMinimized);
+            const toggleBtn = document.getElementById('global-toggle');
+            const topDock = document.getElementById('top-dock');
+
+            if (allMin) toggleBtn.classList.add('all-minimized');
+            else toggleBtn.classList.remove('all-minimized');
+
+            if (anyMin) {
+                topDock.classList.add('active');
+                document.body.classList.add('dock-active');
+            } else {
+                topDock.classList.remove('active');
+                document.body.classList.remove('dock-active');
+            }
+
+            try {
+                localStorage.setItem('cap-menu-minimized', allMin ? 'true' : 'false');
+            } catch (e) {} // Handle blocked cookies gracefully
+        }
+
+        function checkRestoreState() {
+            try {
+                if(localStorage.getItem('cap-menu-minimized') === 'true') {
+                    setTimeout(() => { toggleAll(); }, 600);
+                }
+            } catch (e) {}
+        }
+
+        // Maintain physical coordinates on window resize
+        window.addEventListener('resize', () => {
+            chunkRegistry.forEach(c => {
+                if(c.isMinimized) {
+                    const chunk = document.getElementById(c.id);
+                    const slot = document.getElementById('slot-' + c.id);
+                    chunk.style.transition = 'none'; 
+                    const endRect = slot.getBoundingClientRect();
+                    chunk.style.top = endRect.top + 'px';
+                    chunk.style.left = endRect.left + 'px';
+                    chunk.style.width = endRect.width + 'px';
+                    chunk.style.height = endRect.height + 'px';
+                    setTimeout(() => { 
+                        chunk.style.transition = 'top var(--trans-timing), left var(--trans-timing), width var(--trans-timing), height var(--trans-timing), box-shadow 0.3s'; 
+                    }, 50);
+                }
+            });
+        });
+
+        function renderContent(markdownString) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.style.opacity = 0;
+            setTimeout(() => {
+                contentDiv.innerHTML = marked.parse(markdownString);
+                contentDiv.style.opacity = 1;
+                document.getElementById('content-wrapper').scrollTop = 0;
+            }, 200);
+        }
+
+        document.addEventListener('DOMContentLoaded', initArchitecture);
+    </script>
+</body>
+</html>
